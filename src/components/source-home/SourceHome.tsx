@@ -456,24 +456,35 @@ function ValuesSection() {
 }
 
 function TestimonialsSection() {
+  const rollingReviews = [...homeCopy.testimonials.items, ...homeCopy.testimonials.items];
+
   return (
-    <section className="sec" id="reviews-sec">
+    <section className="sec review-section" id="reviews-sec">
       <div className="deco"><div className="deco-dots" /></div>
       <div className="wrap">
         <div className="sec-head sec-center">
           <span className="eyebrow-pill">{homeCopy.testimonials.eyebrow}</span>
           <h2 className="t-h1">{homeCopy.testimonials.title}</h2>
         </div>
-        <div className="review-grid">
-          {homeCopy.testimonials.items.map(({ quote, name, role }) => (
-            <div className="review-card" key={name}>
-              <div className="review-stars">{[0, 1, 2, 3, 4].map((item) => <Icon key={item} name="star" size={16} />)}</div>
-              <p className="review-q">“{quote}”</p>
-              <div className="review-by">
-                <div className="avatar">{name.slice(0, 1)}</div>
-                <div><div className="review-name">{name}</div><div className="review-role">{role}</div></div>
+      </div>
+      <div className="review-rail" aria-label="고객 리뷰">
+        <div className="review-track">
+          {rollingReviews.map(({ quote, name, role, brand }, index) => (
+            <article
+              className="review-card"
+              key={`${brand}-${index}`}
+              aria-hidden={index >= homeCopy.testimonials.items.length}
+            >
+              <div className="review-stars" aria-label="5점 만점">
+                {[0, 1, 2, 3, 4].map((item) => <Icon key={item} name="star" size={14} />)}
               </div>
-            </div>
+              <p className="review-q">“{quote}”</p>
+              <div className="review-person">
+                <span>{name}</span>
+                <strong>{role}</strong>
+                <em>{brand}</em>
+              </div>
+            </article>
           ))}
         </div>
       </div>
