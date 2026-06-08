@@ -3,8 +3,8 @@ export const homeCopy = {
     eyebrow: "CS 운영 구독 서비스",
     title: ["상담원 채용 없이", "고객센터 운영을 시작하세요"],
     description: [
-      "CS 운영 구조 설계, 응대 기준, 운영 리포트는 물론",
-      "실제 상담 응대까지 Replo가 함께 설계하고 운영합니다.",
+      "CS 운영 구조 설계, 자동화, 운영 리포트는 물론 실제 상담 응대까지",
+      "고객센터 운영에 필요한 모든 영역을 Replo가 함께 설계하고 운영합니다.",
     ],
     primaryCta: "운영 진단 받기",
     secondaryCta: "서비스 살펴보기",
@@ -23,7 +23,7 @@ export const homeCopy = {
     conclusion: "Replo는 사람에만 의존하지 않는 CS 운영 구조를 만듭니다.",
   },
   checklist: {
-    title: "혹시 이런 상황인가요?",
+    title: "혹시 이런 상황 아니신가요??",
     items: [
       "반복 문의가 줄지 않습니다",
       "대표나 내부 직원이 직접 응대하고 있습니다",
