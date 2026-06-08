@@ -53,7 +53,6 @@ export default function DiagnosisPage() {
   const [form, setForm] = useState<DiagnosisForm>(initialForm);
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isSuccess, setIsSuccess] = useState(false);
 
   function updateField(name: keyof DiagnosisForm, value: string) {
     setForm((current) => ({ ...current, [name]: value }));
@@ -89,29 +88,12 @@ export default function DiagnosisPage() {
         return;
       }
 
-      setIsSuccess(true);
+      window.location.assign("/contatct/success");
     } catch {
       setError("네트워크 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.");
     } finally {
       setIsSubmitting(false);
     }
-  }
-
-  if (isSuccess) {
-    return (
-      <main className="diagnosis-page">
-        <div className="diagnosis-shell diagnosis-success-shell">
-          <section className="diagnosis-card diagnosis-success" aria-live="polite">
-            <span className="diagnosis-kicker">접수 완료</span>
-            <h1>운영 진단 신청이 완료되었습니다.</h1>
-            <p>입력해 주신 내용을 바탕으로 리플로 팀이 확인 후 연락드리겠습니다.</p>
-            <a href="/" className="diagnosis-submit diagnosis-link-button">
-              홈으로 돌아가기
-            </a>
-          </section>
-        </div>
-      </main>
-    );
   }
 
   return (
