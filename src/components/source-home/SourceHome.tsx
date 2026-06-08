@@ -149,7 +149,7 @@ function ChecklistSection() {
       <div className="wrap">
         <div className="sec-head sec-center">
           <span className="eyebrow-pill">{homeCopy.checklist.eyebrow}</span>
-          <h2 className="t-h1">{homeCopy.checklist.title[0]}<br />{homeCopy.checklist.title[1]}</h2>
+          <h2 className="t-h1">{homeCopy.checklist.title[0]}</h2>
           <p className="t-lead" style={{ marginTop: 16 }}>{homeCopy.checklist.description}</p>
         </div>
         <div className="check-list">
@@ -239,7 +239,7 @@ function SolutionSection() {
       <div className="wrap">
         <div className="sec-head sec-center">
           <span className="eyebrow-pill">{homeCopy.service.eyebrow}</span>
-          <h2 className="t-h1">{homeCopy.service.title}</h2>
+          <h2 className="t-h1">{homeCopy.service.title[0]}<br />{homeCopy.service.title[1]}</h2>
           <p className="t-lead" style={{ marginTop: 16 }}>{homeCopy.service.description[0]}<br />{homeCopy.service.description[1]}</p>
         </div>
         <div className="sol-bento">

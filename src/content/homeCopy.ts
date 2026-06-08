@@ -84,7 +84,7 @@ export const homeCopy = {
   },
   service: {
     eyebrow: "Solution",
-    title: "Replo는 상담을 대신 받는 데서","끝나지 않습니다",
+    title: ["Replo는 상담을 대신 받는 데서", "끝나지 않습니다"],
     description: [
       "상담 운영부터 FAQ, 응대 기준, 반복 문의 자동화 후보 정리까지",
       "고객센터가 흔들리지 않도록 운영 구조를 함께 설계합니다.",
