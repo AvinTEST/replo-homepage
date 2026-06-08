@@ -26,8 +26,18 @@
 
 .diagnosis-success-shell {
   min-height: 100vh;
-  display: grid;
-  place-items: center;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 96px 0;
+}
+
+.diagnosis-success-shell .diagnosis-nav {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
 }
 
 .diagnosis-nav {
@@ -167,6 +177,13 @@
   font-size: 15px;
   line-height: 1.65;
   word-break: keep-all;
+}
+
+.diagnosis-redirect-note {
+  margin: 12px 0 0;
+  color: #868da6;
+  font-size: 13px;
+  font-weight: 700;
 }
 
 .diagnosis-metrics {
@@ -410,6 +427,10 @@
 @media (max-width: 640px) {
   .diagnosis-page {
     padding: 0 16px 40px;
+  }
+
+  .diagnosis-success-shell {
+    padding: 82px 0 40px;
   }
 
   .diagnosis-nav {

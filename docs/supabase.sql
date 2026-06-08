@@ -9,8 +9,16 @@ create table if not exists public.diagnosis_responses (
   work_email text not null,
   source text default 'homepage',
   status text default 'new',
+  webhook_status text default 'pending',
+  webhook_sent_at timestamp with time zone,
+  webhook_error text,
   created_at timestamp with time zone default now()
 );
+
+alter table public.diagnosis_responses
+add column if not exists webhook_status text default 'pending',
+add column if not exists webhook_sent_at timestamp with time zone,
+add column if not exists webhook_error text;
 
 alter table public.diagnosis_responses enable row level security;
 

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import RedirectHome from "./redirect-home";
 
 export const metadata = {
   title: "운영 진단 신청 완료 | Replo",
@@ -21,6 +22,7 @@ export default function ContactSuccessPage() {
           <p>
             입력해 주신 내용을 바탕으로 Replo 팀이 확인 후 연락드리겠습니다.
           </p>
+          <RedirectHome />
           <Link href="/" className="diagnosis-submit diagnosis-link-button">
             홈으로 돌아가기
           </Link>
