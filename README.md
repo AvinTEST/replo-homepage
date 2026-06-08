@@ -1,0 +1,40 @@
+# Replo Homepage
+
+Replo의 고객센터 운영 구독 서비스를 소개하고, 무료 운영 진단 신청을 받기 위한 Next.js MVP입니다. 공개 홈페이지는 Claude로 제작한 오프라인 HTML 번들을 `public/replo-original/index.html`에 보존해 사용하며, CTA 클릭 시 같은 화면에서 진단 신청 모달을 엽니다.
+
+고객 포털 MVP도 함께 포함되어 있어, 인증된 고객은 `/dashboard`에서 구독과 결제수단 정보를 확인할 수 있습니다. 구현 범위, 데이터 모델, 환경변수, 알려진 제한사항 및 다음 작업 우선순위는 [`CONTEXT.md`](./CONTEXT.md)에 정리되어 있습니다.
+
+## 기술 스택
+
+- Next.js 14 App Router
+- React 18 / TypeScript
+- Tailwind CSS
+- Supabase Auth / Database
+- StepPay API 연동 골격
+
+## 로컬 실행
+
+```bash
+npm install
+cp .env.example .env.local
+npm run dev
+```
+
+`.env.local`에 Supabase 프로젝트 정보를 입력해야 진단 신청 저장과 로그인 기능을 테스트할 수 있습니다. 비밀 키가 포함된 로컬 환경 파일은 Git에 커밋하지 마세요.
+
+## 주요 경로
+
+- `/`: 원본 홈페이지 번들로 리다이렉트
+- `/replo-original/index.html`: 공개 홈페이지
+- 홈페이지 CTA 모달: 무료 운영 진단 신청 폼
+- `/api/diagnosis`: 진단 신청 저장 API
+- `/login`: Supabase 이메일 OTP(매직 링크) 로그인
+- `/auth/callback`: 인증 코드와 세션 교환
+- `/dashboard`: 고객 플랜 및 결제수단 조회
+- `/demo/dashboard`: 로그인 없이 볼 수 있는 대시보드 데모
+- `/billing/payment-method`: 결제수단 변경 시작 화면
+- `/api/billing/change-payment-method`: 인증 및 구독 확인 후 StepPay 요청을 시작하는 서버 API
+
+## 현재 주의사항
+
+StepPay 연동의 엔드포인트, 인증 방식, 요청/응답 필드는 실제 계약 및 최신 API 명세로 검증되지 않았습니다. 운영 배포 전에 [`docs/DEPLOYMENT.md`](./docs/DEPLOYMENT.md)와 `CONTEXT.md`의 미완성 항목 및 보안 체크리스트를 반드시 확인하세요.
