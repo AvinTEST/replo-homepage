@@ -40,6 +40,7 @@ NEXT_PUBLIC_SITE_URL=https://replo.kr
 Optional server-only diagnosis webhook variables:
 
 ```bash
+SUPABASE_SERVICE_ROLE_KEY=
 DIAGNOSIS_WEBHOOK_URL=
 DIAGNOSIS_WEBHOOK_SECRET=
 ```
@@ -58,7 +59,7 @@ STEPPAY_ALLOWED_REDIRECT_ORIGINS=
 
 When StepPay is enabled, set `STEPPAY_ALLOWED_REDIRECT_ORIGINS` to the exact HTTPS origin(s) that StepPay may return, separated by commas. Unlisted external redirect URLs are replaced with `/dashboard`.
 
-Do not add Supabase service role keys unless a server-only admin workflow is implemented and reviewed.
+`SUPABASE_SERVICE_ROLE_KEY` is server-only and must never use the `NEXT_PUBLIC_` prefix. The diagnosis API uses it only for internal webhook delivery status updates; public lead data remains protected by RLS.
 
 ## Supabase Setup
 

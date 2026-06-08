@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 
 type DiagnosisPayload = {
@@ -128,8 +129,13 @@ export async function POST(request: Request) {
   }
 
   try {
-    const supabase = await createClient();
+    const adminClient = createAdminClient();
+    const supabase = adminClient ?? await createClient();
+    const id = crypto.randomUUID();
+    const createdAt = new Date().toISOString();
+    const webhookUrl = process.env.DIAGNOSIS_WEBHOOK_URL;
     const insertData = {
+      id,
       business_type: businessType,
       monthly_inquiries: monthlyInquiries,
       main_pain: mainPain,
@@ -140,25 +146,16 @@ export async function POST(request: Request) {
       work_email: workEmail,
       source: "homepage",
       status: "new",
-      webhook_status: "pending",
+      webhook_status: webhookUrl ? "pending" : "skipped",
+      created_at: createdAt,
     };
 
-    const { data: insertedRow, error } = await supabase
+    const { error } = await supabase
       .from("diagnosis_responses")
-      .insert(insertData)
-      .select("id, created_at")
-      .single();
+      .insert(insertData);
 
     if (error) {
       console.error("Diagnosis insert failed", error);
-      return NextResponse.json(
-        { ok: false, error: "데이터 저장 중 오류가 발생했습니다." },
-        { status: 500 },
-      );
-    }
-
-    if (!insertedRow) {
-      console.error("Diagnosis insert returned no row");
       return NextResponse.json(
         { ok: false, error: "데이터 저장 중 오류가 발생했습니다." },
         { status: 500 },
@@ -169,6 +166,8 @@ export async function POST(request: Request) {
       webhookStatus: WebhookStatus,
       webhookError?: string,
     ) => {
+      if (!adminClient) return;
+
       const updateData: {
         webhook_status: WebhookStatus;
         webhook_sent_at?: string;
@@ -182,29 +181,26 @@ export async function POST(request: Request) {
         updateData.webhook_sent_at = new Date().toISOString();
       }
 
-      const { error: updateError } = await supabase
+      const { error: updateError } = await adminClient
         .from("diagnosis_responses")
         .update(updateData)
-        .eq("id", insertedRow.id);
+        .eq("id", id);
 
       if (updateError) {
         console.error("Diagnosis webhook status update failed", updateError);
       }
     };
 
-    const webhookUrl = process.env.DIAGNOSIS_WEBHOOK_URL;
-
     if (!webhookUrl) {
-      await updateWebhookStatus("skipped");
       return NextResponse.json({ ok: true, webhookStatus: "skipped" });
     }
 
     const webhookPayload = {
       event: "diagnosis_response.created",
       source: "replo_homepage",
-      submittedAt: insertedRow.created_at ?? new Date().toISOString(),
+      submittedAt: createdAt,
       data: {
-        id: insertedRow.id,
+        id,
         businessType,
         monthlyInquiries,
         mainPain,
