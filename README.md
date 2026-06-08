@@ -41,10 +41,20 @@ STEPPAY_ALLOWED_REDIRECT_ORIGINS=https://example.steppay.io
 
 허용 origin에 없는 외부 URL은 `/dashboard`로 대체됩니다.
 
+## 홈페이지 비교 구현
+
+- `/`는 source 기반 React 홈페이지를 표시합니다.
+- `/replo-original/index.html`에는 Claude 디자인 원본 홈페이지가 비교용으로 보존되어 있습니다.
+- `/react-home`은 처음에 수작업으로 재구성한 React 비교 버전입니다.
+- `/source-home`은 Claude export ZIP의 `marketing.jsx`, `marketing2.jsx`, `ui.jsx`와 원본 CSS 클래스/규칙을 기반으로 Next.js에 포팅한 비교 버전입니다.
+- `/source-home`과 `/`는 동일한 source 기반 React 홈페이지를 렌더링하며, 원본 번들은 별도 경로에서 계속 비교할 수 있습니다.
+
 ## 주요 경로
 
-- `/`: 원본 홈페이지 번들로 리다이렉트
-- `/replo-original/index.html`: 공개 홈페이지
+- `/`: source 기반 React 공개 홈페이지
+- `/replo-original/index.html`: 보존된 Claude 원본 홈페이지
+- `/react-home`: 첫 수작업 React 비교 버전
+- `/source-home`: 원본 JSX/CSS source 기반 React 포트
 - 홈페이지 CTA 모달: 무료 운영 진단 신청 폼
 - `/api/diagnosis`: 진단 신청 저장 API
 - `/login`: Supabase 이메일 OTP(매직 링크) 로그인

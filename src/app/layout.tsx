@@ -1,4 +1,5 @@
 import "../styles/globals.css";
+import "./source-home/source-home.css";
 import type { ReactNode } from "react";
 
 const siteTitle = "CS가 더 쉬워지는 곳, Replo";
