@@ -20,7 +20,15 @@ export default function PaymentMethodPage() {
         return;
       }
       if (data.redirectUrl) {
-        window.location.href = data.redirectUrl;
+        const redirectUrl = new URL(data.redirectUrl, window.location.origin);
+        if (
+          redirectUrl.origin === window.location.origin ||
+          redirectUrl.protocol === "https:"
+        ) {
+          window.location.href = redirectUrl.toString();
+          return;
+        }
+        setMessage("결제 페이지 주소를 확인할 수 없습니다.");
         return;
       }
       setMessage("결제수단 변경 요청이 접수되었습니다.");

@@ -46,12 +46,17 @@ DIAGNOSIS_WEBHOOK_SECRET=
 
 Set `DIAGNOSIS_WEBHOOK_URL` in Vercel Project Settings -> Environment Variables, then redeploy. Do not prefix it with `NEXT_PUBLIC_`; variables with that prefix can be bundled into browser code, while the webhook URL and optional secret must stay server-only.
 
+The diagnosis API also applies a lightweight in-process IP rate limit before inserting into Supabase. For high-volume production abuse protection, add an edge/WAF rate limit or CAPTCHA in front of this endpoint.
+
 Keep these unset until StepPay production documentation is confirmed:
 
 ```bash
 STEPPAY_SECRET_TOKEN=
 STEPPAY_API_BASE_URL=
+STEPPAY_ALLOWED_REDIRECT_ORIGINS=
 ```
+
+When StepPay is enabled, set `STEPPAY_ALLOWED_REDIRECT_ORIGINS` to the exact HTTPS origin(s) that StepPay may return, separated by commas. Unlisted external redirect URLs are replaced with `/dashboard`.
 
 Do not add Supabase service role keys unless a server-only admin workflow is implemented and reviewed.
 
@@ -65,6 +70,7 @@ This creates:
 - RLS enabled
 - Public anon insert policy for the homepage diagnosis form
 - Webhook tracking columns: `webhook_status`, `webhook_sent_at`, `webhook_error`
+- Customer and billing RLS policies for `customers`, `subscriptions`, `payment_methods`, and `billing_events`
 
 After running the SQL, test one diagnosis form submission and confirm a row appears in `diagnosis_responses`. Check `webhook_status`: `skipped` means no webhook URL was configured, `sent` means delivery succeeded, and `failed` means the lead was saved but webhook delivery failed.
 
