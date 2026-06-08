@@ -31,6 +31,10 @@ export const metadata = {
     description: siteDescription,
     images: ["/og-image.png"],
   },
+  icons: {
+    icon: "/favicon.png",
+    apple: "/favicon.png",
+  },
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {

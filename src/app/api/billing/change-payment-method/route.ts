@@ -1,6 +1,27 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 
+function allowedRedirectOrigins() {
+  return (process.env.STEPPAY_ALLOWED_REDIRECT_ORIGINS ?? "")
+    .split(",")
+    .map((origin) => origin.trim())
+    .filter(Boolean);
+}
+
+function safeRedirectUrl(value: unknown) {
+  if (typeof value !== "string" || !value) return "/dashboard";
+  if (value.startsWith("/")) return value;
+
+  try {
+    const url = new URL(value);
+    if (url.protocol !== "https:") return "/dashboard";
+    if (!allowedRedirectOrigins().includes(url.origin)) return "/dashboard";
+    return url.toString();
+  } catch {
+    return "/dashboard";
+  }
+}
+
 /**
  * API handler for initiating a payment method change.
  *
@@ -100,14 +121,14 @@ export async function POST() {
 
     const data = await response.json();
     // StepPay는 결제수단 변경을 위한 리다이렉션 URL을 반환해야 합니다.
-    const redirectUrl = data?.redirectUrl ?? "/dashboard";
+    const redirectUrl = safeRedirectUrl(data?.redirectUrl);
     return NextResponse.json({ ok: true, redirectUrl });
   } catch (error) {
     console.error(error);
-    // 오류가 발생하면 대시보드로 리다이렉션하면서 오류 메시지를 전달합니다.
+    // 오류가 발생하면 내부 구성 정보는 숨기고 일반화된 메시지만 반환합니다.
     return NextResponse.json(
       {
-        error: (error as Error).message ?? "결제수단 변경 요청에 실패했습니다.",
+        error: "결제수단 변경 요청에 실패했습니다.",
         redirectUrl: "/dashboard",
       },
       { status: 500 }

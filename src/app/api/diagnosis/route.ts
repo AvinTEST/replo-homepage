@@ -13,6 +13,9 @@ type DiagnosisPayload = {
 
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 type WebhookStatus = "sent" | "failed" | "skipped";
+const rateLimitWindowMs = 10 * 60 * 1000;
+const maxRequestsPerWindow = 5;
+const diagnosisRateLimit = new Map<string, { count: number; resetAt: number }>();
 
 function clean(value: unknown) {
   return typeof value === "string" ? value.trim() : "";
@@ -23,8 +26,39 @@ function shortWebhookError(error: unknown) {
   return String(error).slice(0, 300);
 }
 
+function clientIp(request: Request) {
+  const forwardedFor = request.headers.get("x-forwarded-for");
+  if (forwardedFor) return forwardedFor.split(",")[0].trim();
+  return request.headers.get("x-real-ip") ?? "unknown";
+}
+
+function isRateLimited(request: Request) {
+  const now = Date.now();
+  const key = clientIp(request);
+  const current = diagnosisRateLimit.get(key);
+
+  if (!current || current.resetAt <= now) {
+    diagnosisRateLimit.set(key, {
+      count: 1,
+      resetAt: now + rateLimitWindowMs,
+    });
+    return false;
+  }
+
+  current.count += 1;
+  diagnosisRateLimit.set(key, current);
+  return current.count > maxRequestsPerWindow;
+}
+
 export async function POST(request: Request) {
   let payload: DiagnosisPayload;
+
+  if (isRateLimited(request)) {
+    return NextResponse.json(
+      { error: "요청이 많습니다. 잠시 후 다시 시도해 주세요." },
+      { status: 429 },
+    );
+  }
 
   try {
     payload = await request.json();

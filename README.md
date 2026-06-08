@@ -33,6 +33,14 @@ Vercel에서는 Project Settings → Environment Variables에서 `DIAGNOSIS_WEBH
 
 로컬 테스트는 webhook.site 같은 임시 수신 URL을 `DIAGNOSIS_WEBHOOK_URL`에 넣고 `/diagnosis`에서 신청을 제출한 뒤 POST 본문이 도착하는지 확인하면 됩니다. Supabase에서는 `diagnosis_responses` 테이블의 `webhook_status`, `webhook_sent_at`, `webhook_error` 컬럼을 확인하세요. URL이 없으면 `skipped`, 전송 성공 시 `sent`, 실패 시 `failed`로 기록됩니다.
 
+결제수단 변경을 실제 StepPay로 연결할 때는 StepPay가 반환하는 리다이렉트 URL의 origin을 서버 전용 환경변수에 쉼표로 등록하세요.
+
+```bash
+STEPPAY_ALLOWED_REDIRECT_ORIGINS=https://example.steppay.io
+```
+
+허용 origin에 없는 외부 URL은 `/dashboard`로 대체됩니다.
+
 ## 주요 경로
 
 - `/`: 원본 홈페이지 번들로 리다이렉트
