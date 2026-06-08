@@ -1362,6 +1362,163 @@
   margin-top: 1px;
 }
 
+.replo-source-home .expertise-sec {
+  background: var(--surface);
+}
+
+.replo-source-home .expertise-grid {
+  display: grid;
+  gap: 72px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.replo-source-home .expertise-column {
+  min-width: 0;
+}
+
+.replo-source-home .expertise-eyebrow {
+  align-items: center;
+  background: var(--violet-50);
+  border: 1px solid var(--violet-100);
+  border-radius: var(--r-pill);
+  color: var(--violet-700);
+  display: inline-flex;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: .12em;
+  margin-bottom: 26px;
+  padding: 8px 16px;
+}
+
+.replo-source-home .expertise-column .t-h1 {
+  font-size: clamp(34px, 3.6vw, 50px);
+  line-height: 1.18;
+  max-width: 620px;
+}
+
+.replo-source-home .expertise-lead {
+  color: var(--ink-500);
+  font-size: 17px;
+  line-height: 1.8;
+  margin: 24px 0 0;
+  word-break: keep-all;
+}
+
+.replo-source-home .expertise-stats {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-top: 36px;
+}
+
+.replo-source-home .expertise-stat {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  box-shadow: var(--sh-sm);
+  min-height: 130px;
+  padding: 26px 28px;
+}
+
+.replo-source-home .expertise-stat strong {
+  color: var(--violet-600);
+  display: block;
+  font-size: 38px;
+  font-weight: 900;
+  letter-spacing: -.04em;
+  line-height: 1;
+}
+
+.replo-source-home .expertise-stat span {
+  color: var(--ink-500);
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.5;
+  margin-top: 12px;
+  word-break: keep-all;
+}
+
+.replo-source-home .expertise-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 24px;
+}
+
+.replo-source-home .expertise-tags span {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  box-shadow: var(--sh-sm);
+  color: var(--ink-800);
+  font-size: 14px;
+  font-weight: 700;
+  padding: 10px 17px;
+}
+
+.replo-source-home .expertise-categories {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin-top: 38px;
+}
+
+.replo-source-home .expertise-categories span {
+  align-items: center;
+  background: var(--bg);
+  border: 1px solid var(--violet-100);
+  border-radius: var(--r-md);
+  color: var(--ink-900);
+  display: flex;
+  font-size: 14px;
+  font-weight: 700;
+  justify-content: center;
+  min-height: 62px;
+  padding: 12px;
+  text-align: center;
+  word-break: keep-all;
+}
+
+.replo-source-home .expertise-note {
+  align-items: flex-start;
+  background: linear-gradient(135deg, var(--violet-tint), var(--surface));
+  border: 1px solid var(--violet-100);
+  border-radius: var(--r-xl);
+  display: flex;
+  gap: 18px;
+  margin-top: 30px;
+  padding: 28px;
+}
+
+.replo-source-home .expertise-note-icon {
+  background: var(--violet-100);
+  border-radius: 12px;
+  color: var(--violet-600);
+  display: grid;
+  flex: none;
+  height: 48px;
+  place-items: center;
+  width: 48px;
+}
+
+.replo-source-home .expertise-note h3 {
+  color: var(--ink-900);
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: -.015em;
+  line-height: 1.4;
+  margin: 2px 0 8px;
+}
+
+.replo-source-home .expertise-note p {
+  color: var(--ink-500);
+  font-size: 14px;
+  line-height: 1.75;
+  margin: 0;
+  word-break: keep-all;
+}
+
 .replo-source-home .pricing5 {
   align-items: stretch;
   display: grid;
@@ -1479,6 +1636,105 @@
 
 .replo-source-home .tier-cta {
   margin-top: 20px;
+}
+
+.replo-source-home .matrix-toggle {
+  display: flex;
+  justify-content: center;
+  margin-top: 36px;
+}
+
+.replo-source-home .matrix-toggle .btn {
+  gap: 8px;
+}
+
+.replo-source-home .ftm-wrap {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-xl);
+  box-shadow: var(--sh-sm);
+  margin-top: 28px;
+  overflow: hidden;
+}
+
+.replo-source-home .ftm-scroll {
+  overflow-x: auto;
+}
+
+.replo-source-home .ftm {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.replo-source-home .ftm th,
+.replo-source-home .ftm td {
+  border-bottom: 1px solid var(--line-2);
+  font-size: 13px;
+  padding: 13px 16px;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.replo-source-home .ftm thead th {
+  background: var(--bg-2);
+  border-bottom: 1px solid var(--line);
+  color: var(--ink-700);
+  font-weight: 700;
+}
+
+.replo-source-home .ftm thead th.best {
+  background: var(--violet-600);
+  color: #fff;
+}
+
+.replo-source-home .ftm thead th.f-name,
+.replo-source-home .ftm td.f-name {
+  background: var(--surface);
+  color: var(--ink-800);
+  font-weight: 600;
+  left: 0;
+  position: sticky;
+  text-align: left;
+  z-index: 1;
+}
+
+.replo-source-home .ftm thead th.f-name {
+  background: var(--bg-2);
+}
+
+.replo-source-home .ftm tbody tr:hover td,
+.replo-source-home .ftm tbody tr:hover td.f-name {
+  background: var(--violet-tint);
+}
+
+.replo-source-home .ftm td.col-best {
+  background: var(--violet-tint);
+  color: var(--ink-900);
+  font-weight: 700;
+}
+
+.replo-source-home .ftm tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.replo-source-home .ftm .fk {
+  color: var(--violet-600);
+  display: inline-flex;
+}
+
+.replo-source-home .ftm .fx {
+  color: var(--ink-300);
+}
+
+.replo-source-home .ftm .f-strong {
+  color: var(--ink-900);
+  font-weight: 800;
+}
+
+.replo-source-home .ftm .f-text {
+  font-size: 11.5px;
+  min-width: 120px;
+  white-space: normal;
 }
 
 .replo-source-home .faq {
@@ -1655,9 +1911,15 @@
 @media (max-width: 1080px) {
   .replo-source-home .pricing5 { grid-template-columns: repeat(3, 1fr); }
   .replo-source-home .proc-row { grid-template-columns: repeat(3, 1fr); }
+  .replo-source-home .expertise-grid {
+    gap: 48px;
+  }
 }
 
 @media (max-width: 900px) {
+  .replo-source-home .expertise-grid {
+    grid-template-columns: 1fr;
+  }
   .replo-source-home .feat-grid,
   .replo-source-home .review-grid {
     grid-template-columns: 1fr;
@@ -1701,6 +1963,9 @@
 }
 
 @media (max-width: 720px) {
+  .replo-source-home .ftm {
+    min-width: 720px;
+  }
   .replo-source-home .pricing5 {
     grid-template-columns: 1fr 1fr;
   }
@@ -1739,6 +2004,15 @@
 }
 
 @media (max-width: 560px) {
+  .replo-source-home .expertise-stats {
+    grid-template-columns: 1fr;
+  }
+  .replo-source-home .expertise-categories {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .replo-source-home .expertise-note {
+    padding: 22px;
+  }
   .replo-source-home .check-ic {
     display: none;
   }
