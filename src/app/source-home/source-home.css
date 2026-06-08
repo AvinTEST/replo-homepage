@@ -1292,29 +1292,73 @@
   word-break: keep-all;
 }
 
-.replo-source-home .review-grid {
-  display: grid;
+.replo-source-home .review-section {
+  background: var(--bg-2);
+  overflow: hidden;
+}
+
+.replo-source-home .review-section .sec-head {
+  margin-bottom: 34px;
+}
+
+.replo-source-home .review-rail {
+  overflow: hidden;
+  padding: 4px 0 14px;
+  position: relative;
+  width: 100%;
+}
+
+.replo-source-home .review-rail::before,
+.replo-source-home .review-rail::after {
+  bottom: 0;
+  content: "";
+  pointer-events: none;
+  position: absolute;
+  top: 0;
+  width: 72px;
+  z-index: 2;
+}
+
+.replo-source-home .review-rail::before {
+  background: linear-gradient(90deg, var(--bg-2), rgba(251, 251, 254, 0));
+  left: 0;
+}
+
+.replo-source-home .review-rail::after {
+  background: linear-gradient(270deg, var(--bg-2), rgba(251, 251, 254, 0));
+  right: 0;
+}
+
+.replo-source-home .review-track {
+  animation: reploSourceReviewMarquee 34s linear infinite;
+  display: flex;
   gap: 18px;
-  grid-template-columns: repeat(3, 1fr);
-  margin-top: 52px;
+  width: max-content;
+}
+
+.replo-source-home .review-rail:hover .review-track {
+  animation-play-state: paused;
 }
 
 .replo-source-home .review-card {
   background: var(--surface);
   border: 1px solid var(--line);
-  border-radius: var(--r-lg);
-  box-shadow: var(--sh-sm);
+  border-radius: 18px;
+  box-shadow: 0 4px 16px rgba(16, 22, 48, .07), 0 1px 3px rgba(16, 22, 48, .04);
   display: flex;
   flex-direction: column;
-  gap: 18px;
-  padding: 28px 26px;
+  justify-content: space-between;
+  min-height: 238px;
+  padding: 24px;
   transition: .18s;
+  width: 360px;
 }
 
 .replo-source-home .review-stars {
   color: var(--violet-500);
   display: flex;
   gap: 3px;
+  letter-spacing: .08em;
 }
 
 .replo-source-home .review-stars svg {
@@ -1323,43 +1367,49 @@
 
 .replo-source-home .review-q {
   color: var(--ink-800);
-  flex: 1;
-  font-size: 15.5px;
-  font-weight: 500;
-  line-height: 1.7;
-  margin: 0;
+  font-size: 16px;
+  font-weight: 650;
+  line-height: 1.72;
+  margin: 18px 0 22px;
   word-break: keep-all;
 }
 
-.replo-source-home .review-by {
+.replo-source-home .review-person {
   align-items: center;
-  display: flex;
-  gap: 11px;
+  display: grid;
+  gap: 3px 12px;
+  grid-template-columns: 42px 1fr;
 }
 
-.replo-source-home .avatar {
+.replo-source-home .review-person span {
   background: var(--violet-100);
   border-radius: 50%;
   color: var(--violet-700);
   display: grid;
-  flex: none;
   font-size: 14px;
-  font-weight: 700;
-  height: 38px;
+  font-weight: 900;
+  grid-row: span 2;
+  height: 42px;
   place-items: center;
-  width: 38px;
+  width: 42px;
 }
 
-.replo-source-home .review-name {
+.replo-source-home .review-person strong {
   color: var(--ink-900);
   font-size: 14px;
-  font-weight: 700;
+  font-weight: 800;
 }
 
-.replo-source-home .review-role {
+.replo-source-home .review-person em {
   color: var(--ink-400);
   font-size: 12.5px;
-  margin-top: 1px;
+  font-style: normal;
+  font-weight: 650;
+}
+
+@keyframes reploSourceReviewMarquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(calc(-50% - 9px)); }
 }
 
 .replo-source-home .expertise-sec {
@@ -1920,14 +1970,8 @@
   .replo-source-home .expertise-grid {
     grid-template-columns: 1fr;
   }
-  .replo-source-home .feat-grid,
-  .replo-source-home .review-grid {
+  .replo-source-home .feat-grid {
     grid-template-columns: 1fr;
-  }
-  .replo-source-home .review-grid {
-    margin-left: auto;
-    margin-right: auto;
-    max-width: 560px;
   }
 }
 
@@ -1972,6 +2016,18 @@
 }
 
 @media (max-width: 680px) {
+  .replo-source-home .review-rail::before,
+  .replo-source-home .review-rail::after {
+    width: 28px;
+  }
+  .replo-source-home .review-track {
+    animation-duration: 28s;
+  }
+  .replo-source-home .review-card {
+    min-height: 248px;
+    padding: 21px;
+    width: 300px;
+  }
   .replo-source-home .proc-row {
     grid-template-columns: repeat(2, 1fr);
   }
@@ -2047,5 +2103,14 @@
   }
   .replo-source-home .cta-row .btn {
     width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .replo-source-home .review-rail {
+    overflow-x: auto;
+  }
+  .replo-source-home .review-track {
+    animation: none;
   }
 }
