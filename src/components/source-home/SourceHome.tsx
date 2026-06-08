@@ -129,7 +129,7 @@ function Hero() {
           </h1>
           <p className="t-lead lead">{homeCopy.hero.description[0]}<br />{homeCopy.hero.description[1]}</p>
           <div className="cta-row">
-            <ButtonLink size="lg" iconRight="arrowRight">{homeCopy.hero.primaryCta}</ButtonLink>
+            <ButtonLink size="lg" >{homeCopy.hero.primaryCta}</ButtonLink>
             <ButtonLink href="#solution-sec" size="lg" variant="ghost">{homeCopy.hero.secondaryCta}</ButtonLink>
           </div>
         </div>
@@ -186,7 +186,7 @@ function CauseSection() {
             <div className="shift-headline">{homeCopy.problem.commonDiagnosis.title}</div>
             <p className="shift-desc">{homeCopy.problem.structureProblem[0]}<br />{homeCopy.problem.structureProblem[1]}</p>
           </div>
-          <div className="shift-arrow"><div className="ring"><Icon name="arrowRight" size={20} /></div></div>
+          </div>
           <div className="shift-card right">
             <div className="shift-label">{homeCopy.problem.realCause.label}</div>
             <div className="shift-headline">{homeCopy.problem.realCause.title}</div>
@@ -421,7 +421,6 @@ function ImpactSection() {
           {homeCopy.impact.rows.map(([before, after]) => (
             <div className="xrow" key={before}>
               <div className="xcell before"><span className="xic"><Icon name="x" size={15} stroke={2.4} /></span>{before}</div>
-              <div className="xarrow"><Icon name="arrowRight" size={20} /></div>
               <div className="xcell after"><span className="xic"><Icon name="check" size={15} stroke={2.6} /></span>{after}</div>
             </div>
           ))}
@@ -608,7 +607,7 @@ function CtaSection() {
             <h2 className="t-h1" style={{ color: "#fff" }}>{homeCopy.finalCta.title[0]}<br />{homeCopy.finalCta.title[1]}</h2>
             <p style={{ fontSize: 17, lineHeight: 1.7, marginTop: 16 }}>{homeCopy.finalCta.description[0]}<br />{homeCopy.finalCta.description[1]}</p>
             <div className="cta-row">
-              <ButtonLink size="lg" iconRight="arrowRight" className="source-cta-white">{homeCopy.finalCta.button}</ButtonLink>
+              <ButtonLink size="lg" className="source-cta-white">{homeCopy.finalCta.button}</ButtonLink>
               <ButtonLink size="lg" className="source-cta-outline">{homeCopy.finalCta.secondaryButton}</ButtonLink>
             </div>
             <div className="cta-hint">{homeCopy.finalCta.hint}</div>
