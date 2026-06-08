@@ -22,6 +22,17 @@ npm run dev
 
 `.env.local`에 Supabase 프로젝트 정보를 입력해야 진단 신청 저장과 로그인 기능을 테스트할 수 있습니다. 비밀 키가 포함된 로컬 환경 파일은 Git에 커밋하지 마세요.
 
+진단 신청을 외부 시스템으로 전달하려면 서버 전용 환경변수를 추가합니다.
+
+```bash
+DIAGNOSIS_WEBHOOK_URL=
+DIAGNOSIS_WEBHOOK_SECRET=
+```
+
+Vercel에서는 Project Settings → Environment Variables에서 `DIAGNOSIS_WEBHOOK_URL`을 Production 환경에 추가한 뒤 재배포하세요. 이 값은 서버 API에서만 읽어야 하므로 `NEXT_PUBLIC_` 접두사를 붙이면 안 됩니다. `NEXT_PUBLIC_` 변수는 브라우저 번들에 노출될 수 있습니다.
+
+로컬 테스트는 webhook.site 같은 임시 수신 URL을 `DIAGNOSIS_WEBHOOK_URL`에 넣고 `/diagnosis`에서 신청을 제출한 뒤 POST 본문이 도착하는지 확인하면 됩니다. Supabase에서는 `diagnosis_responses` 테이블의 `webhook_status`, `webhook_sent_at`, `webhook_error` 컬럼을 확인하세요. URL이 없으면 `skipped`, 전송 성공 시 `sent`, 실패 시 `failed`로 기록됩니다.
+
 ## 주요 경로
 
 - `/`: 원본 홈페이지 번들로 리다이렉트

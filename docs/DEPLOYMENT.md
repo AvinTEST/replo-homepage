@@ -37,6 +37,15 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=
 NEXT_PUBLIC_SITE_URL=https://replo.kr
 ```
 
+Optional server-only diagnosis webhook variables:
+
+```bash
+DIAGNOSIS_WEBHOOK_URL=
+DIAGNOSIS_WEBHOOK_SECRET=
+```
+
+Set `DIAGNOSIS_WEBHOOK_URL` in Vercel Project Settings -> Environment Variables, then redeploy. Do not prefix it with `NEXT_PUBLIC_`; variables with that prefix can be bundled into browser code, while the webhook URL and optional secret must stay server-only.
+
 Keep these unset until StepPay production documentation is confirmed:
 
 ```bash
@@ -55,8 +64,9 @@ This creates:
 - `public.diagnosis_responses`
 - RLS enabled
 - Public anon insert policy for the homepage diagnosis form
+- Webhook tracking columns: `webhook_status`, `webhook_sent_at`, `webhook_error`
 
-After running the SQL, test one diagnosis form submission and confirm a row appears in `diagnosis_responses`.
+After running the SQL, test one diagnosis form submission and confirm a row appears in `diagnosis_responses`. Check `webhook_status`: `skipped` means no webhook URL was configured, `sent` means delivery succeeded, and `failed` means the lead was saved but webhook delivery failed.
 
 ## Vercel Setup
 
@@ -106,6 +116,8 @@ Before announcing the site:
 - Confirm custom dropdowns match the modal design.
 - Submit a test diagnosis request.
 - Confirm Supabase stores the row.
+- If `DIAGNOSIS_WEBHOOK_URL` is configured, confirm the webhook receiver gets a `diagnosis_response.created` POST.
+- Confirm `diagnosis_responses.webhook_status` is `sent`, `failed`, or `skipped`.
 - Confirm `/dashboard` still requires login.
 - Confirm `/demo/dashboard` remains public.
 - Confirm no card number, CVC, billing password, or raw payment data fields exist.
