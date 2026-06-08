@@ -285,6 +285,50 @@ function ApproachSection() {
   );
 }
 
+function ExpertiseSection() {
+  return (
+    <section className="sec expertise-sec" id="expertise-sec">
+      <div className="deco"><div className="deco-dots" /></div>
+      <div className="wrap expertise-grid">
+        <div className="expertise-column">
+          <span className="expertise-eyebrow">{homeCopy.expertise.team.eyebrow}</span>
+          <h2 className="t-h1">{homeCopy.expertise.team.title}</h2>
+          <p className="expertise-lead">
+            {homeCopy.expertise.team.description[0]}<br />
+            {homeCopy.expertise.team.description[1]}
+          </p>
+          <div className="expertise-stats">
+            {homeCopy.expertise.team.stats.map(({ value, label }) => (
+              <div className="expertise-stat" key={label}>
+                <strong>{value}</strong>
+                <span>{label}</span>
+              </div>
+            ))}
+          </div>
+          <div className="expertise-tags" aria-label="Replo 팀 전문 역량">
+            {homeCopy.expertise.team.capabilities.map((capability) => <span key={capability}>{capability}</span>)}
+          </div>
+        </div>
+
+        <div className="expertise-column">
+          <span className="expertise-eyebrow">{homeCopy.expertise.experience.eyebrow}</span>
+          <h2 className="t-h1">{homeCopy.expertise.experience.title[0]}<br />{homeCopy.expertise.experience.title[1]}</h2>
+          <div className="expertise-categories">
+            {homeCopy.expertise.experience.categories.map((category) => <span key={category}>{category}</span>)}
+          </div>
+          <div className="expertise-note">
+            <span className="expertise-note-icon"><Icon name="check" size={18} stroke={2.6} /></span>
+            <div>
+              <h3>{homeCopy.expertise.experience.noteTitle}</h3>
+              <p>{homeCopy.expertise.experience.noteDescription}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function ProcessSection() {
   return (
     <section className="sec-tight" id="process-sec">
@@ -437,7 +481,45 @@ function TestimonialsSection() {
   );
 }
 
+function FeatureMatrix() {
+  const { featureLabel, bestIndex, columns, rows } = homeCopy.pricing.matrix;
+
+  return (
+    <div className="ftm-wrap" id="pricing-detail">
+      <div className="ftm-scroll">
+        <table className="ftm">
+          <thead>
+            <tr>
+              <th className="f-name">{featureLabel}</th>
+              {columns.map((column, index) => <th className={index === bestIndex ? "best" : ""} key={column}>{column}</th>)}
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map(({ label, cells, kind }) => (
+              <tr key={label}>
+                <td className="f-name">{label}</td>
+                {cells.map((value, index) => {
+                  const className = index === bestIndex ? "col-best" : "";
+                  if (kind === "strong") return <td className={className} key={`${label}-${index}`}><span className="f-strong">{value}</span></td>;
+                  if (kind === "text") return <td className={`${className} f-text`} key={`${label}-${index}`}>{value}</td>;
+                  return (
+                    <td className={className} key={`${label}-${index}`}>
+                      {value ? <span className="fk"><Icon name="check" size={15} stroke={2.4} /></span> : <span className="fx">—</span>}
+                    </td>
+                  );
+                })}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
 function LandingPricing() {
+  const [showMatrix, setShowMatrix] = useState(false);
+
   return (
     <section className="sec-tight" style={{ background: "var(--bg)" }} id="pricing-sec">
       <div className="deco"><div className="deco-grid mask-top" /></div>
@@ -465,6 +547,19 @@ function LandingPricing() {
             </div>
           ))}
         </div>
+        <div className="matrix-toggle">
+          <button
+            aria-controls="pricing-detail"
+            aria-expanded={showMatrix}
+            className="btn btn-ghost"
+            onClick={() => setShowMatrix((current) => !current)}
+            type="button"
+          >
+            {showMatrix ? homeCopy.pricing.detailClose : homeCopy.pricing.detailOpen}
+            <Icon name={showMatrix ? "chevDown" : "chevRight"} size={18} />
+          </button>
+        </div>
+        {showMatrix ? <FeatureMatrix /> : null}
         <p className="t-sm" style={{ textAlign: "center", marginTop: 24 }}>{homeCopy.pricing.note}</p>
       </div>
     </section>
@@ -556,6 +651,7 @@ export function SourceHome() {
         <WhyNowSection />
         <SolutionSection />
         <ApproachSection />
+        <ExpertiseSection />
         <ProcessSection />
         <CostSection />
         <ImpactSection />
