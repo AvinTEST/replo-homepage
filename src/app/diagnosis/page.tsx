@@ -145,38 +145,6 @@ export default function DiagnosisPage() {
               연락드립니다.
             </p>
 
-            <div className="diagnosis-metrics" aria-label="진단 요약">
-              <div>
-                <strong>24h</strong>
-                <span>영업일 기준 빠른 확인</span>
-              </div>
-              <div>
-                <strong>3분</strong>
-                <span>간단한 신청 소요 시간</span>
-              </div>
-              <div>
-                <strong>0원</strong>
-                <span>초기 운영 진단 비용</span>
-              </div>
-            </div>
-
-            <div className="diagnosis-preview" aria-label="진단 결과 예시">
-              <div className="diagnosis-preview-head">
-                <span>운영 진단 리포트</span>
-                <b>예시</b>
-              </div>
-              <div className="diagnosis-preview-row">
-                <span>반복 문의 비중</span>
-                <strong>높음</strong>
-              </div>
-              <div className="diagnosis-bar">
-                <i style={{ width: "78%" }} />
-              </div>
-              <div className="diagnosis-preview-row">
-                <span>자동화 우선순위</span>
-                <strong>배송 · 교환 문의</strong>
-              </div>
-            </div>
           </section>
 
           <section className="diagnosis-card">

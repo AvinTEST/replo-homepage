@@ -186,105 +186,6 @@
   font-weight: 700;
 }
 
-.diagnosis-metrics {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 0;
-  max-width: 560px;
-  margin-top: 34px;
-  overflow: hidden;
-  border: 1px solid #e7e9f1;
-  border-radius: 16px;
-  background: rgba(255, 255, 255, 0.82);
-  box-shadow: 0 1px 2px rgba(16, 22, 48, 0.05);
-}
-
-.diagnosis-metrics div {
-  padding: 20px 18px;
-  border-right: 1px solid #e7e9f1;
-}
-
-.diagnosis-metrics div:last-child {
-  border-right: 0;
-}
-
-.diagnosis-metrics strong {
-  display: block;
-  color: #0e1430;
-  font-size: 28px;
-  font-weight: 900;
-  letter-spacing: -0.035em;
-  line-height: 1;
-}
-
-.diagnosis-metrics span {
-  display: block;
-  margin-top: 8px;
-  color: #868da6;
-  font-size: 13px;
-  font-weight: 700;
-  line-height: 1.45;
-  word-break: keep-all;
-}
-
-.diagnosis-preview {
-  max-width: 480px;
-  margin-top: 22px;
-  border: 1px solid #e7e9f1;
-  border-radius: 18px;
-  background: #fff;
-  padding: 20px;
-  box-shadow: 0 4px 16px rgba(16, 22, 48, 0.07), 0 1px 3px rgba(16, 22, 48, 0.04);
-}
-
-.diagnosis-preview-head,
-.diagnosis-preview-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-}
-
-.diagnosis-preview-head {
-  margin-bottom: 18px;
-  color: #0e1430;
-  font-size: 15px;
-  font-weight: 800;
-}
-
-.diagnosis-preview-head b {
-  border-radius: 999px;
-  background: #e6f6ee;
-  padding: 5px 9px;
-  color: #15935f;
-  font-size: 12px;
-}
-
-.diagnosis-preview-row {
-  color: #5a627e;
-  font-size: 14px;
-}
-
-.diagnosis-preview-row strong {
-  color: #0e1430;
-  font-size: 14px;
-}
-
-.diagnosis-bar {
-  height: 8px;
-  margin: 12px 0 16px;
-  overflow: hidden;
-  border-radius: 999px;
-  background: #eef0f6;
-}
-
-.diagnosis-bar i {
-  display: block;
-  height: 100%;
-  border-radius: inherit;
-  background: #5b47e0;
-}
-
 .diagnosis-form {
   display: grid;
   gap: 16px;
@@ -453,19 +354,6 @@
 
   .diagnosis-hero p {
     font-size: 16px;
-  }
-
-  .diagnosis-metrics {
-    grid-template-columns: 1fr;
-  }
-
-  .diagnosis-metrics div {
-    border-right: 0;
-    border-bottom: 1px solid #e7e9f1;
-  }
-
-  .diagnosis-metrics div:last-child {
-    border-bottom: 0;
   }
 
   .diagnosis-card {
