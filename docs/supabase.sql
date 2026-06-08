@@ -4,6 +4,7 @@ create table if not exists public.diagnosis_responses (
   monthly_inquiries text not null,
   main_pain text not null,
   company_name text not null,
+  website_url text not null,
   contact_name text not null,
   phone text not null,
   work_email text not null,
@@ -16,6 +17,7 @@ create table if not exists public.diagnosis_responses (
 );
 
 alter table public.diagnosis_responses
+add column if not exists website_url text,
 add column if not exists webhook_status text default 'pending',
 add column if not exists webhook_sent_at timestamp with time zone,
 add column if not exists webhook_error text;

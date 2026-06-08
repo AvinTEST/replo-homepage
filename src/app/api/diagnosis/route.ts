@@ -6,12 +6,15 @@ type DiagnosisPayload = {
   monthlyInquiries?: unknown;
   mainPain?: unknown;
   companyName?: unknown;
+  websiteUrl?: unknown;
   contactName?: unknown;
   phone?: unknown;
   workEmail?: unknown;
 };
 
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const hostnamePattern =
+  /^(?=.{4,253}$)(?!-)(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,}$/i;
 type WebhookStatus = "sent" | "failed" | "skipped";
 const rateLimitWindowMs = 10 * 60 * 1000;
 const maxRequestsPerWindow = 5;
@@ -19,6 +22,21 @@ const diagnosisRateLimit = new Map<string, { count: number; resetAt: number }>()
 
 function clean(value: unknown) {
   return typeof value === "string" ? value.trim() : "";
+}
+
+function normalizeWebsiteUrl(value: string) {
+  const input = value.trim();
+  const withProtocol = /^https?:\/\//i.test(input) ? input : `https://${input}`;
+
+  try {
+    const url = new URL(withProtocol);
+    const hostname = url.hostname.toLowerCase();
+    if (!["http:", "https:"].includes(url.protocol)) return "";
+    if (!hostnamePattern.test(hostname)) return "";
+    return url.toString();
+  } catch {
+    return "";
+  }
 }
 
 function shortWebhookError(error: unknown) {
@@ -73,21 +91,31 @@ export async function POST(request: Request) {
   const monthlyInquiries = clean(payload.monthlyInquiries);
   const mainPain = clean(payload.mainPain);
   const companyName = clean(payload.companyName);
+  const websiteUrlInput = clean(payload.websiteUrl);
   const contactName = clean(payload.contactName);
   const phone = clean(payload.phone);
   const workEmail = clean(payload.workEmail);
+  const websiteUrl = normalizeWebsiteUrl(websiteUrlInput);
 
   if (
     !businessType ||
     !monthlyInquiries ||
     !mainPain ||
     !companyName ||
+    !websiteUrlInput ||
     !contactName ||
     !phone ||
     !workEmail
   ) {
     return NextResponse.json(
       { error: "모든 항목을 입력해 주세요." },
+      { status: 400 },
+    );
+  }
+
+  if (!websiteUrl) {
+    return NextResponse.json(
+      { error: "홈페이지 주소 형식을 확인해 주세요." },
       { status: 400 },
     );
   }
@@ -106,6 +134,7 @@ export async function POST(request: Request) {
       monthly_inquiries: monthlyInquiries,
       main_pain: mainPain,
       company_name: companyName,
+      website_url: websiteUrl,
       contact_name: contactName,
       phone,
       work_email: workEmail,
@@ -180,6 +209,7 @@ export async function POST(request: Request) {
         monthlyInquiries,
         mainPain,
         companyName,
+        websiteUrl,
         contactName,
         phone,
         workEmail,

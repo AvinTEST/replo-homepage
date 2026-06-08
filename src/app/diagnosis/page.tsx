@@ -32,6 +32,7 @@ type DiagnosisForm = {
   monthlyInquiries: string;
   mainPain: string;
   companyName: string;
+  websiteUrl: string;
   contactName: string;
   phone: string;
   workEmail: string;
@@ -42,12 +43,29 @@ const initialForm: DiagnosisForm = {
   monthlyInquiries: "",
   mainPain: "",
   companyName: "",
+  websiteUrl: "",
   contactName: "",
   phone: "",
   workEmail: "",
 };
 
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const hostnamePattern =
+  /^(?=.{4,253}$)(?!-)(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,}$/i;
+
+function normalizeWebsiteUrl(value: string) {
+  const input = value.trim();
+  const withProtocol = /^https?:\/\//i.test(input) ? input : `https://${input}`;
+
+  try {
+    const url = new URL(withProtocol);
+    if (!["http:", "https:"].includes(url.protocol)) return "";
+    if (!hostnamePattern.test(url.hostname.toLowerCase())) return "";
+    return url.toString();
+  } catch {
+    return "";
+  }
+}
 
 export default function DiagnosisPage() {
   const [form, setForm] = useState<DiagnosisForm>(initialForm);
@@ -69,6 +87,12 @@ export default function DiagnosisPage() {
       return;
     }
 
+    const websiteUrl = normalizeWebsiteUrl(form.websiteUrl);
+    if (!websiteUrl) {
+      setError("홈페이지 주소 형식을 확인해 주세요.");
+      return;
+    }
+
     if (!emailPattern.test(form.workEmail.trim())) {
       setError("직장 이메일 형식을 확인해 주세요.");
       return;
@@ -79,7 +103,7 @@ export default function DiagnosisPage() {
       const response = await fetch("/api/diagnosis", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+        body: JSON.stringify({ ...form, websiteUrl }),
       });
       const result = await response.json();
 
@@ -117,8 +141,8 @@ export default function DiagnosisPage() {
               채용보다 먼저 진단해 보세요.
             </h1>
             <p>
-              몇 가지 정보만 남겨주시면 Replo 팀이 문의량, 운영 병목, 자동화
-              가능 영역을 검토해 연락드립니다.
+              링크 하나면 시작됩니다. 남겨주신 URL로 운영 구조를 검토하여
+              연락드립니다.
             </p>
 
             <div className="diagnosis-metrics" aria-label="진단 요약">
@@ -214,6 +238,17 @@ export default function DiagnosisPage() {
               </label>
 
               <div className="diagnosis-divider" />
+
+              <label>
+                <span>홈페이지 주소</span>
+                <input
+                  required
+                  value={form.websiteUrl}
+                  placeholder="예: replo.kr"
+                  inputMode="url"
+                  onChange={(event) => updateField("websiteUrl", event.target.value)}
+                />
+              </label>
 
               <div className="diagnosis-field-grid">
                 <label>

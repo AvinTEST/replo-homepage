@@ -69,6 +69,7 @@ This creates:
 - `public.diagnosis_responses`
 - RLS enabled
 - Public anon insert policy for the homepage diagnosis form
+- Website URL column: `website_url`
 - Webhook tracking columns: `webhook_status`, `webhook_sent_at`, `webhook_error`
 - Customer and billing RLS policies for `customers`, `subscriptions`, `payment_methods`, and `billing_events`
 
