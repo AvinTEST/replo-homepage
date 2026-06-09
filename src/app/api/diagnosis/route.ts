@@ -1,6 +1,11 @@
 import { NextResponse } from "next/server";
-import { createAdminClient } from "@/lib/supabase/admin";
-import { createClient } from "@/lib/supabase/server";
+import {
+  createAdminClient,
+  SupabaseAdminConfigurationError,
+} from "@/lib/supabase/admin";
+import {
+  checkDiagnosisRateLimit,
+} from "@/lib/rateLimit/diagnosis";
 
 type DiagnosisPayload = {
   businessType?: unknown;
@@ -17,9 +22,6 @@ const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const hostnamePattern =
   /^(?=.{4,253}$)(?!-)(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,}$/i;
 type WebhookStatus = "sent" | "failed" | "skipped";
-const rateLimitWindowMs = 10 * 60 * 1000;
-const maxRequestsPerWindow = 5;
-const diagnosisRateLimit = new Map<string, { count: number; resetAt: number }>();
 
 function clean(value: unknown) {
   return typeof value === "string" ? value.trim() : "";
@@ -45,37 +47,31 @@ function shortWebhookError(error: unknown) {
   return String(error).slice(0, 300);
 }
 
-function clientIp(request: Request) {
-  const forwardedFor = request.headers.get("x-forwarded-for");
-  if (forwardedFor) return forwardedFor.split(",")[0].trim();
-  return request.headers.get("x-real-ip") ?? "unknown";
-}
-
-function isRateLimited(request: Request) {
-  const now = Date.now();
-  const key = clientIp(request);
-  const current = diagnosisRateLimit.get(key);
-
-  if (!current || current.resetAt <= now) {
-    diagnosisRateLimit.set(key, {
-      count: 1,
-      resetAt: now + rateLimitWindowMs,
-    });
-    return false;
-  }
-
-  current.count += 1;
-  diagnosisRateLimit.set(key, current);
-  return current.count > maxRequestsPerWindow;
-}
-
 export async function POST(request: Request) {
   let payload: DiagnosisPayload;
+  const requestId = crypto.randomUUID();
 
-  if (isRateLimited(request)) {
+  try {
+    const rateLimit = await checkDiagnosisRateLimit(request);
+    if (rateLimit.limited) {
+      return NextResponse.json(
+        { error: "요청이 많습니다. 잠시 후 다시 시도해 주세요." },
+        {
+          status: 429,
+          headers: {
+            "Retry-After": String(rateLimit.retryAfterSeconds),
+          },
+        },
+      );
+    }
+  } catch (error) {
+    console.error("Diagnosis rate limiter unavailable", {
+      requestId,
+      error: error instanceof Error ? error.message : String(error),
+    });
     return NextResponse.json(
-      { error: "요청이 많습니다. 잠시 후 다시 시도해 주세요." },
-      { status: 429 },
+      { error: "운영 진단 접수가 일시적으로 지연되고 있습니다." },
+      { status: 503 },
     );
   }
 
@@ -130,7 +126,6 @@ export async function POST(request: Request) {
 
   try {
     const adminClient = createAdminClient();
-    const supabase = adminClient ?? await createClient();
     const id = crypto.randomUUID();
     const createdAt = new Date().toISOString();
     const webhookUrl = process.env.DIAGNOSIS_WEBHOOK_URL;
@@ -146,16 +141,25 @@ export async function POST(request: Request) {
       work_email: workEmail,
       source: "homepage",
       status: "new",
-      webhook_status: webhookUrl ? "pending" : "skipped",
+      webhook_status: webhookUrl ? "failed" : "skipped",
+      webhook_error: webhookUrl
+        ? "Webhook delivery has not completed"
+        : null,
       created_at: createdAt,
     };
 
-    const { error } = await supabase
+    const { error } = await adminClient
       .from("diagnosis_responses")
       .insert(insertData);
 
     if (error) {
-      console.error("Diagnosis insert failed", error);
+      console.error("Diagnosis lead persistence failed", {
+        requestId,
+        leadId: id,
+        code: error.code,
+        message: error.message,
+        details: error.details,
+      });
       return NextResponse.json(
         { ok: false, error: "데이터 저장 중 오류가 발생했습니다." },
         { status: 500 },
@@ -166,8 +170,6 @@ export async function POST(request: Request) {
       webhookStatus: WebhookStatus,
       webhookError?: string,
     ) => {
-      if (!adminClient) return;
-
       const updateData: {
         webhook_status: WebhookStatus;
         webhook_sent_at?: string;
@@ -181,13 +183,35 @@ export async function POST(request: Request) {
         updateData.webhook_sent_at = new Date().toISOString();
       }
 
-      const { error: updateError } = await adminClient
-        .from("diagnosis_responses")
-        .update(updateData)
-        .eq("id", id);
+      try {
+        const { error: updateError } = await adminClient
+          .from("diagnosis_responses")
+          .update(updateData)
+          .eq("id", id);
 
-      if (updateError) {
-        console.error("Diagnosis webhook status update failed", updateError);
+        if (updateError) {
+          console.error("Diagnosis webhook status update failed", {
+            requestId,
+            leadId: id,
+            targetStatus: webhookStatus,
+            code: updateError.code,
+            message: updateError.message,
+            details: updateError.details,
+          });
+          return false;
+        }
+        return true;
+      } catch (updateError) {
+        console.error("Diagnosis webhook status update threw", {
+          requestId,
+          leadId: id,
+          targetStatus: webhookStatus,
+          error:
+            updateError instanceof Error
+              ? updateError.message
+              : String(updateError),
+        });
+        return false;
       }
     };
 
@@ -231,19 +255,47 @@ export async function POST(request: Request) {
         throw new Error(`Webhook responded with ${webhookResponse.status}`);
       }
 
-      await updateWebhookStatus("sent");
-      return NextResponse.json({ ok: true, webhookStatus: "sent" });
+      const statusUpdated = await updateWebhookStatus("sent");
+      return NextResponse.json(
+        {
+          ok: true,
+          webhookStatus: statusUpdated ? "sent" : "failed",
+          warning: statusUpdated ? undefined : "webhook_status_update_failed",
+        },
+        { status: statusUpdated ? 200 : 202 },
+      );
     } catch (webhookError) {
       const message = shortWebhookError(webhookError);
-      console.error("Diagnosis webhook failed", webhookError);
-      await updateWebhookStatus("failed", message);
-      return NextResponse.json({ ok: true, webhookStatus: "failed" });
+      console.error("Diagnosis webhook delivery failed", {
+        requestId,
+        leadId: id,
+        error: message,
+      });
+      const statusUpdated = await updateWebhookStatus("failed", message);
+      return NextResponse.json(
+        {
+          ok: true,
+          webhookStatus: "failed",
+          warning: statusUpdated ? undefined : "webhook_status_update_failed",
+        },
+        { status: statusUpdated ? 200 : 202 },
+      );
     }
   } catch (error) {
-    console.error("Diagnosis API failed", error);
+    const isConfigurationError =
+      error instanceof SupabaseAdminConfigurationError;
+    console.error("Diagnosis API failed", {
+      requestId,
+      error: error instanceof Error ? error.message : String(error),
+      type: error instanceof Error ? error.name : "UnknownError",
+    });
     return NextResponse.json(
-      { error: "서버 설정을 확인해 주세요." },
-      { status: 500 },
+      {
+        error: isConfigurationError
+          ? "운영 진단 접수 설정을 확인해 주세요."
+          : "데이터 저장 중 오류가 발생했습니다.",
+      },
+      { status: isConfigurationError ? 503 : 500 },
     );
   }
 }

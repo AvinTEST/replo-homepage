@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "test:dashboard": "node --test tests/dashboard-service.test.ts",
     "build": "next build",
     "start": "next start"
   },

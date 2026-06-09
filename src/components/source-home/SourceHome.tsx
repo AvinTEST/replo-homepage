@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { homeCopy } from "../../content/homeCopy";
+import { track } from "../../lib/analytics";
 
 const PATHS: Record<string, string> = {
   arrowRight: "M5 12h14M13 5l7 7-7 7",
@@ -65,8 +66,19 @@ function ButtonLink({
   className?: string;
   iconRight?: string;
 }) {
+  const ctaText = typeof children === "string" ? children : "CTA";
+
   return (
-    <a className={["btn", `btn-${variant}`, size === "lg" ? "btn-lg" : size === "sm" ? "btn-sm" : "", className].filter(Boolean).join(" ")} href={href}>
+    <a
+      className={["btn", `btn-${variant}`, size === "lg" ? "btn-lg" : size === "sm" ? "btn-sm" : "", className].filter(Boolean).join(" ")}
+      href={href}
+      onClick={() =>
+        track("cta_click", {
+          cta_text: ctaText,
+          cta_destination: href,
+        })
+      }
+    >
       {children}
       {iconRight ? <Icon name={iconRight} size={size === "sm" ? 16 : 18} /> : null}
     </a>
@@ -129,7 +141,7 @@ function Hero() {
           </h1>
           <p className="t-lead lead">{homeCopy.hero.description[0]}<br />{homeCopy.hero.description[1]}</p>
           <div className="cta-row">
-            <ButtonLink size="lg" >{homeCopy.hero.primaryCta}</ButtonLink>
+            <ButtonLink size="lg">{homeCopy.hero.primaryCta}</ButtonLink>
             <ButtonLink href="#solution-sec" size="lg" variant="ghost">{homeCopy.hero.secondaryCta}</ButtonLink>
           </div>
         </div>
@@ -150,7 +162,11 @@ function ChecklistSection() {
         <div className="sec-head sec-center">
           <span className="eyebrow-pill">{homeCopy.checklist.eyebrow}</span>
           <h2 className="t-h1">{homeCopy.checklist.title[0]}</h2>
-          <p className="t-lead" style={{ marginTop: 16 }}>{homeCopy.checklist.description}</p>
+          <p className="t-lead" style={{ marginTop: 16 }}>
+            {homeCopy.checklist.description[0]}
+            <br />
+            {homeCopy.checklist.description[1]}
+          </p>
         </div>
         <div className="check-list">
           {homeCopy.checklist.items.map(({ icon, title, question }, index) => (
@@ -178,19 +194,18 @@ function CauseSection() {
         <div className="sec-head sec-center">
           <span className="eyebrow-pill">{homeCopy.problem.eyebrow}</span>
           <h2 className="t-h1">{homeCopy.problem.title[0]}<br />{homeCopy.problem.title[1]}</h2>
-          <p className="t-lead" style={{ marginTop: 16 }}>{homeCopy.problem.introduction[0]}<br />{homeCopy.problem.introduction[1]}<br />{homeCopy.problem.introduction[2]}</p>
+          <p className="t-lead" style={{ marginTop: 16 }}>{homeCopy.problem.introduction[0]}<br />{homeCopy.problem.introduction[1]}</p>
         </div>
         <div className="shift-row">
           <div className="shift-card wrong">
             <div className="shift-label">{homeCopy.problem.commonDiagnosis.label}</div>
             <div className="shift-headline">{homeCopy.problem.commonDiagnosis.title}</div>
-            <p className="shift-desc">{homeCopy.problem.structureProblem[0]}<br />{homeCopy.problem.structureProblem[1]}</p>
-          </div>
+            <p className="shift-desc">{homeCopy.problem.commonDiagnosis.description[0]}<br />{homeCopy.problem.commonDiagnosis.description[1]}</p>
           </div>
           <div className="shift-card right">
             <div className="shift-label">{homeCopy.problem.realCause.label}</div>
             <div className="shift-headline">{homeCopy.problem.realCause.title}</div>
-            <p className="shift-desc">{homeCopy.problem.conclusion}</p>
+            <p className="shift-desc">{homeCopy.problem.realCause.description[0]}<br />{homeCopy.problem.realCause.description[1]}</p>
           </div>
         </div>
       </div>
@@ -266,18 +281,25 @@ function ApproachSection() {
         <div className="sec-head sec-center" style={{ maxWidth: 820 }}>
           <span className="eyebrow-pill">{homeCopy.approach.eyebrow}</span>
           <h2 className="t-h1">{homeCopy.approach.titlePrefix}<br /><span className="hero-grad">{homeCopy.approach.titleHighlight}</span>{homeCopy.approach.titleSuffix}</h2>
+          <p className="t-lead" style={{ marginTop: 16 }}>{homeCopy.approach.description[0]}<br />{homeCopy.approach.description[1]}</p>
         </div>
         <div className="appr">
-          <div className="appr-head">
-            <div className="appr-hc old">{homeCopy.approach.oldLabel}</div>
-            <div className="appr-hc replo"><Logo /></div>
-          </div>
-          {homeCopy.approach.comparisons.map(([oldWay, reploWay]) => (
-            <div className="appr-row" key={oldWay}>
-              <div className="appr-cell old"><span className="appr-mk x"><Icon name="x" size={13} stroke={2.4} /></span>{oldWay}</div>
-              <div className="appr-cell replo"><span className="appr-mk ok"><Icon name="check" size={13} stroke={2.6} /></span>{reploWay}</div>
+          <div className="appr-scroll">
+            <div className="appr-table">
+              <div className="appr-head">
+                <div className="appr-hc category">{homeCopy.approach.categoryLabel}</div>
+                <div className="appr-hc old">{homeCopy.approach.oldLabel}</div>
+                <div className="appr-hc replo" aria-label={homeCopy.approach.reploLabel}><Logo onDark /></div>
+              </div>
+              {homeCopy.approach.comparisons.map(([category, oldWay, reploWay]) => (
+                <div className="appr-row" key={category}>
+                  <div className="appr-cell category">{category}</div>
+                  <div className="appr-cell old"><span className="appr-mk x"><Icon name="x" size={13} stroke={2.4} /></span>{oldWay}</div>
+                  <div className="appr-cell replo"><span className="appr-mk ok"><Icon name="check" size={13} stroke={2.6} /></span>{reploWay}</div>
+                </div>
+              ))}
             </div>
-          ))}
+          </div>
         </div>
         <p className="appr-foot">{homeCopy.approach.footerPrefix}<b>{homeCopy.approach.footerStrong}</b>{homeCopy.approach.footerSuffix}</p>
       </div>
@@ -416,13 +438,23 @@ function ImpactSection() {
           <h2 className="t-h1">{homeCopy.impact.title[0]}<br />{homeCopy.impact.title[1]}</h2>
           <p className="t-lead" style={{ marginTop: 16 }}>{homeCopy.impact.description}</p>
         </div>
-        <div className="xform">
-          <div className="xform-head"><span className="xh-before">{homeCopy.impact.beforeLabel}</span><span /><span className="xh-after">{homeCopy.impact.afterLabel}</span></div>
-          {homeCopy.impact.rows.map(([before, after]) => (
-            <div className="xrow" key={before}>
-              <div className="xcell before"><span className="xic"><Icon name="x" size={15} stroke={2.4} /></span>{before}</div>
-              <div className="xcell after"><span className="xic"><Icon name="check" size={15} stroke={2.6} /></span>{after}</div>
-            </div>
+        <div className="impact-pairs">
+          {homeCopy.impact.rows.map(({ label, before, after }) => (
+            <article className="impact-pair-card" key={label}>
+              <h3 className="impact-pair-label">{label}</h3>
+              <div className="impact-pair-grid">
+                <div className="impact-pair-side impact-before">
+                  <span className="impact-mini-label">{homeCopy.impact.beforeLabel}</span>
+                  <span className="impact-icon"><Icon name="x" size={15} stroke={2.4} /></span>
+                  <span className="impact-copy">{before}</span>
+                </div>
+                <div className="impact-pair-side impact-after">
+                  <span className="impact-mini-label">{homeCopy.impact.afterLabel}</span>
+                  <span className="impact-icon"><Icon name="check" size={15} stroke={2.6} /></span>
+                  <span className="impact-copy">{after}</span>
+                </div>
+              </div>
+            </article>
           ))}
         </div>
         <div className="impact-result"><p>{homeCopy.impact.resultPrefix}<strong>{homeCopy.impact.result}</strong></p></div>
@@ -447,43 +479,6 @@ function ValuesSection() {
               <h3>{title}</h3>
               <p>{description}</p>
             </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function TestimonialsSection() {
-  const rollingReviews = [...homeCopy.testimonials.items, ...homeCopy.testimonials.items];
-
-  return (
-    <section className="sec review-section" id="reviews-sec">
-      <div className="deco"><div className="deco-dots" /></div>
-      <div className="wrap">
-        <div className="sec-head sec-center">
-          <span className="eyebrow-pill">{homeCopy.testimonials.eyebrow}</span>
-          <h2 className="t-h1">{homeCopy.testimonials.title}</h2>
-        </div>
-      </div>
-      <div className="review-rail" aria-label="고객 리뷰">
-        <div className="review-track">
-          {rollingReviews.map(({ quote, name, role, brand }, index) => (
-            <article
-              className="review-card"
-              key={`${brand}-${index}`}
-              aria-hidden={index >= homeCopy.testimonials.items.length}
-            >
-              <div className="review-stars" aria-label="5점 만점">
-                {[0, 1, 2, 3, 4].map((item) => <Icon key={item} name="star" size={14} />)}
-              </div>
-              <p className="review-q">“{quote}”</p>
-              <div className="review-person">
-                <span>{name}</span>
-                <strong>{role}</strong>
-                <em>{brand}</em>
-              </div>
-            </article>
           ))}
         </div>
       </div>
@@ -666,7 +661,6 @@ export function SourceHome() {
         <CostSection />
         <ImpactSection />
         <ValuesSection />
-        <TestimonialsSection />
         <LandingPricing />
         <FaqSection />
         <CtaSection />
