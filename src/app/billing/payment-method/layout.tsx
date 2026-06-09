@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
-import "./dashboard.css";
 
 export const metadata: Metadata = {
   robots: {
@@ -9,6 +8,10 @@ export const metadata: Metadata = {
   },
 };
 
-export default function DashboardLayout({ children }: { children: ReactNode }) {
+export default function PaymentMethodLayout({
+  children,
+}: {
+  children: ReactNode;
+}) {
   return children;
 }
