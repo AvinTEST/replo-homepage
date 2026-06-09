@@ -59,7 +59,20 @@ STEPPAY_ALLOWED_REDIRECT_ORIGINS=
 
 When StepPay is enabled, set `STEPPAY_ALLOWED_REDIRECT_ORIGINS` to the exact HTTPS origin(s) that StepPay may return, separated by commas. Unlisted external redirect URLs are replaced with `/dashboard`.
 
-`SUPABASE_SERVICE_ROLE_KEY` is server-only and must never use the `NEXT_PUBLIC_` prefix. The diagnosis API uses it only for internal webhook delivery status updates; public lead data remains protected by RLS.
+`SUPABASE_SERVICE_ROLE_KEY` is server-only and must never use the
+`NEXT_PUBLIC_` prefix. The diagnosis API requires it for all lead inserts and
+webhook status updates. It does not fall back to the public anon client.
+
+The diagnosis API also requires a shared Redis store in Preview and
+Production. Configure either the Upstash integration variables
+`UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN`, or the legacy Vercel
+KV aliases `KV_REST_API_URL` and `KV_REST_API_TOKEN`. Both values in a pair
+must be present.
+
+For local development only, the API logs a warning and falls back to an
+in-memory TTL limiter when Redis is not configured or is unavailable. In
+Preview and Production it fails closed with HTTP 503 so a missing or unhealthy
+shared limiter cannot silently disable abuse protection.
 
 ## Supabase Setup
 
