@@ -186,7 +186,6 @@ function CauseSection() {
             <div className="shift-headline">{homeCopy.problem.commonDiagnosis.title}</div>
             <p className="shift-desc">{homeCopy.problem.structureProblem[0]}<br />{homeCopy.problem.structureProblem[1]}</p>
           </div>
-          </div>
           <div className="shift-card right">
             <div className="shift-label">{homeCopy.problem.realCause.label}</div>
             <div className="shift-headline">{homeCopy.problem.realCause.title}</div>
