@@ -1,10 +1,11 @@
 import { NextResponse } from "next/server";
 import { requireAdminClient } from "@/lib/integrations/service";
 import { syncChannelTalk } from "@/lib/integrations/syncChannelTalk";
+import { isValidBearerSecret } from "@/lib/security/cron";
 
 export async function POST(request: Request) {
   const secret = process.env.CRON_SECRET;
-  if (!secret || request.headers.get("authorization") !== `Bearer ${secret}`) {
+  if (!secret || !isValidBearerSecret(request.headers.get("authorization"), secret)) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 

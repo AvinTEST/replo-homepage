@@ -1,5 +1,13 @@
 import "server-only";
-import { isoDate } from "@/lib/dashboard/dates";
+import {
+  buildBillingRuleMap,
+  type BillingTaskRule,
+} from "@/lib/dashboard/billing";
+import { dateKeyInTimeZone } from "@/lib/dashboard/dates";
+import {
+  buildDailyMetricRows,
+  type OperationEventMetricRow,
+} from "@/lib/dashboard/metrics";
 import {
   channelTalkConnectorFromEncrypted,
   getChannelTalkIntegration,
@@ -8,10 +16,29 @@ import {
 
 export async function syncChannelTalk(tenantId: string, range?: { from: string; to: string }) {
   const admin = requireAdminClient();
-  const integration = await getChannelTalkIntegration(tenantId);
+  const [integration, tenantResult, rulesResult] = await Promise.all([
+    getChannelTalkIntegration(tenantId),
+    admin.from("tenants").select("timezone").eq("id", tenantId).single(),
+    admin
+      .from("billing_task_rules")
+      .select("provider, channel, task_type, is_billable, weight")
+      .eq("tenant_id", tenantId),
+  ]);
   if (!integration?.encrypted_credentials) {
     throw new Error("채널톡 credential을 먼저 등록해 주세요.");
   }
+  if (tenantResult.error) throw tenantResult.error;
+  if (rulesResult.error) throw rulesResult.error;
+  const timezone = (tenantResult.data?.timezone as string | null) || "Asia/Seoul";
+  const billingRules = buildBillingRuleMap(
+    (rulesResult.data ?? []).map((rule) => ({
+      provider: rule.provider as string,
+      channel: rule.channel as string,
+      taskType: rule.task_type as string,
+      isBillable: Boolean(rule.is_billable),
+      weight: Number(rule.weight),
+    })) satisfies BillingTaskRule[],
+  );
 
   const now = new Date();
   const from = range?.from ?? new Date(now.getTime() - 30 * 86400000).toISOString();
@@ -40,7 +67,7 @@ export async function syncChannelTalk(tenantId: string, range?: { from: string; 
       provider: event.provider,
       external_id: event.externalId,
       occurred_at: event.occurredAt,
-      date_key: isoDate(new Date(event.occurredAt)),
+      date_key: dateKeyInTimeZone(event.occurredAt, timezone),
       channel: event.channel,
       task_type: event.taskType,
       direction: event.direction,
@@ -70,52 +97,13 @@ export async function syncChannelTalk(tenantId: string, range?: { from: string; 
         .eq("date_key", dateKey);
       if (error) throw error;
 
-      const groups = new Map<string, {
-        provider: string;
-        channel: string;
-        taskType: string;
-        total: number;
-        inbound: number;
-        outbound: number;
-        answered: number;
-        missed: number;
-      }>();
-      for (const event of dayEvents ?? []) {
-        const key = `${event.provider}:${event.channel}:${event.task_type}`;
-        const current = groups.get(key) ?? {
-          provider: event.provider as string,
-          channel: event.channel as string,
-          taskType: event.task_type as string,
-          total: 0,
-          inbound: 0,
-          outbound: 0,
-          answered: 0,
-          missed: 0,
-        };
-        const count = Number(event.count);
-        current.total += count;
-        if (event.direction === "inbound") current.inbound += count;
-        if (event.direction === "outbound") current.outbound += count;
-        if (event.task_type === "전화 - 인바운드") {
-          if (event.status === "closed") current.answered += count;
-          else current.missed += count;
-        }
-        groups.set(key, current);
-      }
-      const metrics = Array.from(groups.values()).map((group) => ({
-        tenant_id: tenantId,
-        date_key: dateKey,
-        provider: group.provider,
-        channel: group.channel,
-        task_type: group.taskType,
-        total_count: group.total,
-        inbound_count: group.inbound,
-        outbound_count: group.outbound,
-        answered_count: group.answered,
-        missed_count: group.missed,
-        billable_count: group.total,
-        updated_at: new Date().toISOString(),
-      }));
+      const metrics = buildDailyMetricRows({
+        tenantId,
+        dateKey,
+        events: (dayEvents ?? []) as OperationEventMetricRow[],
+        billingRules,
+        updatedAt: new Date().toISOString(),
+      });
       if (metrics.length) {
         const { error: metricError } = await admin
           .from("daily_operation_metrics")

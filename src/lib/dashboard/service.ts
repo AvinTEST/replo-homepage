@@ -1,14 +1,12 @@
 import "server-only";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { aggregateDashboard, createDemoDashboard } from "@/lib/dashboard/demoData";
+import {
+  buildDashboardFromMetricFixtures,
+  type SupabaseMetricRow,
+} from "@/lib/dashboard/aggregate";
+import { calendarMonthRange } from "@/lib/dashboard/dates";
+import { createDemoDashboard } from "@/lib/dashboard/demoData";
 import type { DashboardResponse, Grain } from "@/types/dashboard";
-
-type MetricRow = {
-  date_key: string;
-  channel: string;
-  task_type: string;
-  total_count: number;
-};
 
 export async function loadDashboard(input: {
   tenantId: string;
@@ -30,7 +28,7 @@ export async function loadDashboard(input: {
   const [tenantResult, integrationsResult] = await Promise.all([
     admin
       .from("tenants")
-      .select("id, display_name, plan_name, monthly_plan_limit")
+      .select("id, display_name, plan_name, monthly_plan_limit, timezone")
       .eq("id", input.tenantId)
       .single(),
     admin
@@ -44,27 +42,34 @@ export async function loadDashboard(input: {
 
   if (tenantResult.error || !tenantResult.data) throw new Error("Tenant not found");
 
+  const timezone = (tenantResult.data.timezone as string | null) || "Asia/Seoul";
+  const month = calendarMonthRange(timezone);
+  const metricColumns =
+    "date_key, provider, channel, task_type, total_count, answered_count, missed_count, billable_count";
   let metricsQuery = admin
     .from("daily_operation_metrics")
-    .select("date_key, channel, task_type, total_count")
+    .select(metricColumns)
     .eq("tenant_id", input.tenantId)
     .gte("date_key", input.start)
     .lte("date_key", input.end);
   if (input.channel) metricsQuery = metricsQuery.eq("channel", input.channel);
   if (input.task) metricsQuery = metricsQuery.eq("task_type", input.task);
-  const metricsResult = await metricsQuery.order("date_key", { ascending: true });
+  const monthlyMetricsQuery = admin
+    .from("daily_operation_metrics")
+    .select(metricColumns)
+    .eq("tenant_id", input.tenantId)
+    .gte("date_key", month.start)
+    .lte("date_key", month.end)
+    .order("date_key", { ascending: true });
+  const [metricsResult, monthlyMetricsResult] = await Promise.all([
+    metricsQuery.order("date_key", { ascending: true }),
+    monthlyMetricsQuery,
+  ]);
   if (metricsResult.error) throw metricsResult.error;
-
-  const rows = ((metricsResult.data ?? []) as MetricRow[]).map((metric) => ({
-    date: metric.date_key,
-    channel: metric.channel,
-    task: metric.task_type,
-    count: Number(metric.total_count),
-    memo: "",
-  }));
+  if (monthlyMetricsResult.error) throw monthlyMetricsResult.error;
   const integration = integrationsResult.data;
 
-  return aggregateDashboard({
+  return buildDashboardFromMetricFixtures({
     tenant: {
       id: tenantResult.data.id as string,
       name: tenantResult.data.display_name as string,
@@ -74,7 +79,9 @@ export async function loadDashboard(input: {
     grain: input.grain,
     start: input.start,
     end: input.end,
-    rows,
+    referenceDate: month.end,
+    selectedMetrics: (metricsResult.data ?? []) as SupabaseMetricRow[],
+    monthlyMetrics: (monthlyMetricsResult.data ?? []) as SupabaseMetricRow[],
     sync: {
       status:
         integration?.status === "connected"

@@ -4,6 +4,23 @@ export function isoDate(date: Date) {
   return date.toISOString().slice(0, 10);
 }
 
+export function dateKeyInTimeZone(date: Date | string, timeZone = "Asia/Seoul") {
+  const parsed = typeof date === "string" ? new Date(date) : date;
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(parsed);
+  const values = new Map(parts.map((part) => [part.type, part.value]));
+  return `${values.get("year")}-${values.get("month")}-${values.get("day")}`;
+}
+
+export function calendarMonthRange(timeZone = "Asia/Seoul", now = new Date()) {
+  const end = dateKeyInTimeZone(now, timeZone);
+  return { start: `${end.slice(0, 7)}-01`, end };
+}
+
 export function defaultRange(grain: Grain) {
   const end = new Date();
   const start = new Date(end);
