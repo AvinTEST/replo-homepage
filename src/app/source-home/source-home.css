@@ -558,7 +558,7 @@
   align-items: stretch;
   display: grid;
   gap: 18px;
-  grid-template-columns: 1fr auto 1fr;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   margin-top: 48px;
 }
 
@@ -610,24 +610,6 @@
   font-size: 14.5px;
   line-height: 1.7;
   margin: 0;
-}
-
-.replo-source-home .shift-arrow {
-  color: var(--violet-300);
-  display: grid;
-  place-items: center;
-  width: 48px;
-}
-
-.replo-source-home .shift-arrow .ring {
-  background: var(--violet-50);
-  border: 1px solid var(--violet-100);
-  border-radius: 50%;
-  color: var(--violet-600);
-  display: grid;
-  height: 46px;
-  place-items: center;
-  width: 46px;
 }
 
 .replo-source-home .urg-grid {
@@ -840,14 +822,22 @@
   border-radius: var(--r-xl);
   box-shadow: var(--sh-md);
   margin: 48px auto 0;
-  max-width: 920px;
+  max-width: 1080px;
   overflow: hidden;
+}
+
+.replo-source-home .appr-scroll {
+  overflow-x: auto;
+}
+
+.replo-source-home .appr-table {
+  min-width: 820px;
 }
 
 .replo-source-home .appr-head,
 .replo-source-home .appr-row {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 160px minmax(250px, .9fr) minmax(340px, 1.25fr);
 }
 
 .replo-source-home .appr-hc {
@@ -857,6 +847,12 @@
   font-weight: 800;
   gap: 8px;
   padding: 18px 28px;
+}
+
+.replo-source-home .appr-hc.category {
+  background: var(--bg-2);
+  border-bottom: 1px solid var(--line);
+  color: var(--ink-700);
 }
 
 .replo-source-home .appr-hc.old {
@@ -885,6 +881,12 @@
   line-height: 1.5;
   padding: 17px 28px;
   word-break: keep-all;
+}
+
+.replo-source-home .appr-cell.category {
+  background: var(--bg-2);
+  color: var(--ink-800);
+  font-weight: 800;
 }
 
 .replo-source-home .appr-cell.old {
@@ -1035,7 +1037,8 @@
 }
 
 .replo-source-home .cost1 thead th.c1-replo small {
-  color: rgba(255,255,255,.75);
+  color: rgba(255,255,255,.95);
+  font-weight: 700;
 }
 
 .replo-source-home .cost1 .c1-dot {
@@ -1161,97 +1164,108 @@
   text-align: center;
 }
 
-.replo-source-home .xform {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
+.replo-source-home .impact-pairs {
+  display: grid;
+  gap: 14px;
   margin: 48px auto 0;
   max-width: 920px;
 }
 
-.replo-source-home .xform-head,
-.replo-source-home .xrow {
-  align-items: center;
-  display: grid;
-  gap: 14px;
-  grid-template-columns: 1fr 56px 1fr;
+.replo-source-home .impact-pair-card {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  box-shadow: var(--sh-sm);
+  padding: 20px;
 }
 
-.replo-source-home .xform-head {
-  padding: 0 22px;
-}
-
-.replo-source-home .xform-head span {
-  font-size: 12px;
+.replo-source-home .impact-pair-label {
+  color: var(--ink-900);
+  font-size: 15px;
   font-weight: 800;
-  letter-spacing: .05em;
-  text-transform: uppercase;
+  letter-spacing: -.01em;
+  margin: 0 0 12px;
 }
 
-.replo-source-home .xh-before {
+.replo-source-home .impact-pair-grid {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.replo-source-home .impact-pair-side {
+  align-items: center;
+  border: 1px solid var(--line-2);
+  border-radius: var(--r-md);
+  display: grid;
+  gap: 10px;
+  grid-template-columns: auto 24px minmax(0, 1fr);
+  min-height: 58px;
+  padding: 13px 15px;
+}
+
+.replo-source-home .impact-before {
+  background: var(--bg-2);
   color: var(--ink-400);
 }
 
-.replo-source-home .xh-after {
-  color: var(--violet-600);
-}
-
-.replo-source-home .xcell {
-  align-items: center;
-  background: #fff;
-  border: 1px solid var(--line);
-  border-radius: var(--r-md);
-  display: flex;
-  font-size: 14.5px;
-  font-weight: 600;
-  gap: 10px;
-  padding: 16px 18px;
-}
-
-.replo-source-home .xcell.before {
-  color: var(--ink-500);
-}
-
-.replo-source-home .xcell.after {
+.replo-source-home .impact-after {
   background: var(--violet-tint);
   border-color: var(--violet-100);
   color: var(--ink-900);
 }
 
-.replo-source-home .xic {
+.replo-source-home .impact-mini-label {
+  font-size: 10.5px;
+  font-weight: 800;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.replo-source-home .impact-before .impact-mini-label {
+  color: var(--ink-400);
+}
+
+.replo-source-home .impact-after .impact-mini-label {
+  color: var(--violet-600);
+}
+
+.replo-source-home .impact-icon {
   border-radius: 50%;
   display: grid;
-  flex: none;
   height: 24px;
   place-items: center;
   width: 24px;
 }
 
-.replo-source-home .before .xic {
+.replo-source-home .impact-before .impact-icon {
   background: #EEF0F4;
   color: var(--ink-400);
 }
 
-.replo-source-home .after .xic {
+.replo-source-home .impact-after .impact-icon {
   background: var(--violet-100);
   color: var(--violet-700);
 }
 
-.replo-source-home .xarrow {
-  color: var(--violet-500);
-  display: grid;
-  place-items: center;
+.replo-source-home .impact-copy {
+  color: inherit;
+  font-size: 14px;
+  font-weight: 650;
+  line-height: 1.5;
+  word-break: keep-all;
 }
 
 .replo-source-home .impact-result {
   color: var(--ink-700);
   font-size: 18px;
-  margin-top: 32px;
+  margin-top: 36px;
   text-align: center;
 }
 
 .replo-source-home .impact-result strong {
   color: var(--violet-700);
+  font-weight: 800;
 }
 
 .replo-source-home .feat-grid {
@@ -1513,7 +1527,7 @@
 .replo-source-home .expertise-categories {
   display: grid;
   gap: 10px;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
   margin-top: 28px;
 }
 
@@ -1993,13 +2007,6 @@
   .replo-source-home .shift-row {
     grid-template-columns: 1fr;
   }
-  .replo-source-home .shift-arrow {
-    height: 40px;
-    width: 100%;
-  }
-  .replo-source-home .shift-arrow .ring {
-    transform: rotate(90deg);
-  }
 }
 
 @media (max-width: 820px) {
@@ -2034,16 +2041,11 @@
   .replo-source-home .proc-row {
     grid-template-columns: repeat(2, 1fr);
   }
-  .replo-source-home .xform-head {
-    display: none;
-  }
-  .replo-source-home .xrow {
-    gap: 6px;
+  .replo-source-home .impact-pair-grid {
     grid-template-columns: 1fr;
   }
-  .replo-source-home .xarrow {
-    height: 26px;
-    transform: rotate(90deg);
+  .replo-source-home .impact-pair-card {
+    padding: 18px;
   }
   .replo-source-home .cta-band {
     padding: 44px 28px;
