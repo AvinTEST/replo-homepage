@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useState } from "react";
+import { track, trackLead } from "@/lib/analytics";
 
 const businessTypeOptions = [
   "자사몰을 직접 운영해요",
@@ -112,6 +113,13 @@ export default function DiagnosisPage() {
         return;
       }
 
+      const analyticsParams = {
+        form_name: "diagnosis",
+        business_type: form.businessType,
+        monthly_inquiries: form.monthlyInquiries,
+      };
+      track("form_submit", analyticsParams);
+      trackLead(analyticsParams);
       window.location.assign("/contact/success");
     } catch {
       setError("네트워크 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.");

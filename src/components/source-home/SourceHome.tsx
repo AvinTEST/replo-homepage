@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { homeCopy } from "../../content/homeCopy";
+import { track } from "../../lib/analytics";
 
 const PATHS: Record<string, string> = {
   arrowRight: "M5 12h14M13 5l7 7-7 7",
@@ -65,8 +66,19 @@ function ButtonLink({
   className?: string;
   iconRight?: string;
 }) {
+  const ctaText = typeof children === "string" ? children : "CTA";
+
   return (
-    <a className={["btn", `btn-${variant}`, size === "lg" ? "btn-lg" : size === "sm" ? "btn-sm" : "", className].filter(Boolean).join(" ")} href={href}>
+    <a
+      className={["btn", `btn-${variant}`, size === "lg" ? "btn-lg" : size === "sm" ? "btn-sm" : "", className].filter(Boolean).join(" ")}
+      href={href}
+      onClick={() =>
+        track("cta_click", {
+          cta_text: ctaText,
+          cta_destination: href,
+        })
+      }
+    >
       {children}
       {iconRight ? <Icon name={iconRight} size={size === "sm" ? 16 : 18} /> : null}
     </a>
