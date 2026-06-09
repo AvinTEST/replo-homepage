@@ -162,7 +162,11 @@ function ChecklistSection() {
         <div className="sec-head sec-center">
           <span className="eyebrow-pill">{homeCopy.checklist.eyebrow}</span>
           <h2 className="t-h1">{homeCopy.checklist.title[0]}</h2>
-          <p className="t-lead" style={{ marginTop: 16 }}>{homeCopy.checklist.description}</p>
+          <p className="t-lead" style={{ marginTop: 16 }}>
+            {homeCopy.checklist.description[0]}
+            <br />
+            {homeCopy.checklist.description[1]}
+          </p>
         </div>
         <div className="check-list">
           {homeCopy.checklist.items.map(({ icon, title, question }, index) => (

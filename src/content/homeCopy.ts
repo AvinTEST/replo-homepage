@@ -47,7 +47,10 @@ export const homeCopy = {
   checklist: {
     eyebrow: "SELF-CHECK",
     title: ["혹시, 이런 상황 아니신가요?"],
-    description: "고객센터 운영을 점검하는 5가지 질문. 하나라도 해당된다면, 문제는 사람이 아니라 운영 시스템입니다.",
+    description: [
+      "고객센터 운영을 점검하는 5가지 질문.",
+      "하나라도 해당된다면, 문제는 사람이 아니라 운영 시스템입니다.",
+    ],
     items: [
       {
         icon: "refresh",
