@@ -23,7 +23,7 @@ type UserChat = Record<string, unknown> & {
 };
 
 const API_BASE = "https://api.channel.io";
-const MAX_PAGES = 30;
+const MAX_PAGES_PER_STATE = 1000;
 
 function timestamp(value: number | string | undefined) {
   if (typeof value === "number") return new Date(value).toISOString();
@@ -31,7 +31,7 @@ function timestamp(value: number | string | undefined) {
     const parsed = new Date(value);
     if (!Number.isNaN(parsed.getTime())) return parsed.toISOString();
   }
-  return new Date().toISOString();
+  return null;
 }
 
 function redactPayload(chat: UserChat) {
@@ -92,49 +92,72 @@ export class ChannelTalkConnector implements Connector {
   }
 
   async fetchEvents(range: SyncRange) {
-    const events: NormalizedOperationEvent[] = [];
-    let since: string | null = null;
+    const events = new Map<string, NormalizedOperationEvent>();
 
-    for (let page = 0; page < MAX_PAGES; page += 1) {
-      const params = new URLSearchParams();
-      params.set("limit", "500");
-      params.set("sortOrder", "ASC");
-      for (const state of ["opened", "snoozed", "closed"]) params.append("state", state);
-      if (since) params.set("since", since);
+    for (const state of ["opened", "snoozed", "closed"]) {
+      let since: string | undefined;
+      const seenCursors = new Set<string>();
 
-      const body = await this.request<{
-        userChats?: UserChat[];
-        chats?: UserChat[];
-        next?: string | null;
-      }>(`/open/v5/user-chats?${params.toString()}`);
-      const chats = body.userChats ?? body.chats ?? [];
-
-      for (const chat of chats) {
-        const occurredAt = timestamp(chat.openedAt ?? chat.createdAt);
-        if (occurredAt < range.from || occurredAt > range.to || !chat.id) continue;
-        const medium = String(chat.contactMediumType ?? "").toLowerCase();
-        const isCall = medium.includes("phone") || medium.includes("call");
-
-        events.push({
-          provider: this.provider,
-          externalId: chat.id,
-          occurredAt,
-          channel: "채널톡",
-          taskType: isCall ? "전화 - 인바운드" : "채팅",
-          direction: "inbound",
-          status: chat.state,
-          count: 1,
-          customerExternalId: chat.userId,
-          assigneeName: chat.assigneeId,
-          metadata: { contactMediumType: chat.contactMediumType },
-          rawPayload: redactPayload(chat),
+      for (let page = 0; page < MAX_PAGES_PER_STATE; page += 1) {
+        const params = new URLSearchParams({
+          state,
+          limit: "500",
+          sortOrder: "desc",
         });
-      }
+        if (since) params.set("since", since);
 
-      since = body.next ?? null;
-      if (!since || chats.length === 0) break;
+        const body = await this.request<{
+          userChats?: UserChat[];
+          chats?: UserChat[];
+          next?: string | null;
+        }>(`/open/v5/user-chats?${params.toString()}`);
+        const chats = body.userChats ?? body.chats ?? [];
+        let oldestTimestamp: string | null = null;
+
+        for (const chat of chats) {
+          const occurredAt = timestamp(chat.openedAt ?? chat.createdAt);
+          if (!occurredAt || !chat.id) continue;
+          if (!oldestTimestamp || occurredAt < oldestTimestamp) oldestTimestamp = occurredAt;
+          if (occurredAt < range.from || occurredAt > range.to) continue;
+          const medium = String(chat.contactMediumType ?? "").toLowerCase();
+          const isCall = medium.includes("phone") || medium.includes("call");
+
+          events.set(chat.id, {
+            provider: this.provider,
+            externalId: chat.id,
+            occurredAt,
+            channel: "채널톡",
+            taskType: isCall ? "전화 - 인바운드" : "채팅",
+            direction: "inbound",
+            status: chat.state,
+            count: 1,
+            customerExternalId: chat.userId,
+            assigneeName: chat.assigneeId,
+            metadata: { contactMediumType: chat.contactMediumType },
+            rawPayload: redactPayload(chat),
+          });
+        }
+
+        const next = body.next ?? null;
+        if (
+          chats.length === 0 ||
+          !next ||
+          seenCursors.has(next) ||
+          (oldestTimestamp !== null && oldestTimestamp < range.from)
+        ) {
+          break;
+        }
+        if (page === MAX_PAGES_PER_STATE - 1) {
+          throw new ConnectorError(
+            "채널톡 동기화 페이지 한도에 도달했습니다. 조회 기간을 줄여 다시 시도해 주세요.",
+            "upstream",
+          );
+        }
+        seenCursors.add(next);
+        since = next;
+      }
     }
 
-    return events;
+    return Array.from(events.values()).sort((a, b) => a.occurredAt.localeCompare(b.occurredAt));
   }
 }
