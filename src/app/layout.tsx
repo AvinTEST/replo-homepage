@@ -6,6 +6,7 @@ import type { ReactNode } from "react";
 const siteTitle = "CS가 더 쉬워지는 곳, Replo";
 const siteDescription =
   "AI와 전문 운영팀으로 CS 운영 비용은 낮추고 고객 경험은 높입니다.";
+const gaId = process.env.NEXT_PUBLIC_GA_ID ?? "G-XSQYTWZ8NE";
 
 export const metadata = {
   metadataBase: new URL("https://replo.kr"),
@@ -53,6 +54,19 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           />
         </noscript>
         {children}
+        <Script
+          src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`}
+          strategy="afterInteractive"
+        />
+        <Script id="replo-ga4" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            window.gtag = gtag;
+            gtag('js', new Date());
+            gtag('config', ${JSON.stringify(gaId)});
+          `}
+        </Script>
         <Script id="replo-meta-pixel" strategy="afterInteractive">
           {`
             !function(f,b,e,v,n,t,s)
