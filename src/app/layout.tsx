@@ -3,9 +3,9 @@ import "./source-home/source-home.css";
 import Script from "next/script";
 import type { ReactNode } from "react";
 
-const siteTitle = "CS가 더 쉬워지는 곳, Replo";
+const siteTitle = "리플로 Replo | CS 운영 대행 · 고객센터 자동화 · CX 운영 설계";
 const siteDescription =
-  "AI와 전문 운영팀으로 CS 운영 비용은 낮추고 고객 경험은 높입니다.";
+  "CS 운영 대행부터 FAQ, 응대 기준, 반복 문의 자동화, VOC 리포트까지 고객센터 운영 구조를 함께 설계하고 운영합니다.";
 
 export const metadata = {
   metadataBase: new URL("https://replo.kr"),

@@ -8,7 +8,7 @@ export async function POST(
   { params }: { params: { tenantId: string } },
 ) {
   const access = await getTenantAccess(params.tenantId);
-  if (!access || !canManageIntegrations(access) || access.demo) {
+  if (!access || !canManageIntegrations(access)) {
     return NextResponse.json({ error: "동기화 권한이 없습니다." }, { status: 403 });
   }
   try {

@@ -5,7 +5,6 @@ import {
   type SupabaseMetricRow,
 } from "@/lib/dashboard/aggregate";
 import { calendarMonthRange } from "@/lib/dashboard/dates";
-import { createDemoDashboard } from "@/lib/dashboard/demoData";
 import type { DashboardResponse, Grain } from "@/types/dashboard";
 
 export async function loadDashboard(input: {
@@ -16,14 +15,7 @@ export async function loadDashboard(input: {
   channel?: string;
   task?: string;
 }): Promise<DashboardResponse> {
-  if (input.tenantId === "demo") {
-    return createDemoDashboard(input.grain, input.start, input.end, input.channel, input.task);
-  }
-
   const admin = createAdminClient();
-  if (!admin) {
-    throw new Error("SUPABASE_SERVICE_ROLE_KEY is not configured");
-  }
 
   const [tenantResult, integrationsResult] = await Promise.all([
     admin

@@ -197,7 +197,7 @@ export function OperationDashboard({
             <i className={data.sync.status} />
             <span>{isPending ? "데이터 갱신 중..." : data.sync.message}</span>
           </div>
-          <button type="button" className="secondary-button full" onClick={sync} disabled={isPending || !canManage || tenantId === "demo"}>
+          <button type="button" className="secondary-button full" onClick={sync} disabled={isPending || !canManage}>
             새로고침
           </button>
           <Link href={`/dashboard/${tenantId}/integrations`} className="sidebar-link">연동 관리</Link>

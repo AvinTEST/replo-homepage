@@ -16,27 +16,10 @@ type IntegrationRow = {
 };
 
 export function requireAdminClient() {
-  const admin = createAdminClient();
-  if (!admin) throw new Error("SUPABASE_SERVICE_ROLE_KEY is not configured");
-  return admin;
+  return createAdminClient();
 }
 
 export async function listIntegrations(tenantId: string): Promise<IntegrationSummary[]> {
-  if (tenantId === "demo") {
-    return [
-      {
-        id: "demo-channel-talk",
-        provider: "channel_talk",
-        displayName: "채널톡",
-        status: "connected",
-        lastSyncAt: new Date().toISOString(),
-        lastSyncStatus: "더미 데이터 연결",
-        lastError: null,
-        configured: true,
-      },
-    ];
-  }
-
   const admin = requireAdminClient();
   const { data, error } = await admin
     .from("channel_integrations")

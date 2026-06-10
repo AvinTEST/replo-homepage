@@ -34,7 +34,7 @@ export default async function ChannelTalkIntegrationPage({
           </div>
           <Link className="secondary-button" href={`/dashboard/${params.tenantId}/integrations`}>연동 목록</Link>
         </header>
-        {canManageIntegrations(access) && !access.demo ? (
+        {canManageIntegrations(access) ? (
           <ChannelTalkCredentialForm
             tenantId={params.tenantId}
             configured={integration?.configured ?? false}

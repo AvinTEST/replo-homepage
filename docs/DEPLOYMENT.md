@@ -24,8 +24,10 @@ Expected production routes:
 - `/replo-original/index.html`: public homepage
 - Homepage CTA modal: diagnosis request form
 - `/api/diagnosis`: diagnosis request insert API
+- `/signup`: public SaaS signup and email verification request
+- `/login`: existing-user magic-link login
+- `/auth/callback`: Supabase code exchange and customer initialization
 - `/dashboard`: protected customer dashboard
-- `/demo/dashboard`: public demo dashboard
 
 ## Required Environment Variables
 
@@ -59,7 +61,20 @@ STEPPAY_ALLOWED_REDIRECT_ORIGINS=
 
 When StepPay is enabled, set `STEPPAY_ALLOWED_REDIRECT_ORIGINS` to the exact HTTPS origin(s) that StepPay may return, separated by commas. Unlisted external redirect URLs are replaced with `/dashboard`.
 
-`SUPABASE_SERVICE_ROLE_KEY` is server-only and must never use the `NEXT_PUBLIC_` prefix. The diagnosis API uses it only for internal webhook delivery status updates; public lead data remains protected by RLS.
+`SUPABASE_SERVICE_ROLE_KEY` is server-only and must never use the
+`NEXT_PUBLIC_` prefix. The diagnosis API requires it for all lead inserts and
+webhook status updates. It does not fall back to the public anon client.
+
+The diagnosis API also requires a shared Redis store in Preview and
+Production. Configure either the Upstash integration variables
+`UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN`, or the legacy Vercel
+KV aliases `KV_REST_API_URL` and `KV_REST_API_TOKEN`. Both values in a pair
+must be present.
+
+For local development only, the API logs a warning and falls back to an
+in-memory TTL limiter when Redis is not configured or is unavailable. In
+Preview and Production it fails closed with HTTP 503 so a missing or unhealthy
+shared limiter cannot silently disable abuse protection.
 
 ## Supabase Setup
 
@@ -73,6 +88,19 @@ This creates:
 - Website URL column: `website_url`
 - Webhook tracking columns: `webhook_status`, `webhook_sent_at`, `webhook_error`
 - Customer and billing RLS policies for `customers`, `subscriptions`, `payment_methods`, and `billing_events`
+
+Configure Supabase Authentication URL settings:
+
+```text
+Site URL: https://replo.kr
+Redirect URL: https://replo.kr/auth/callback
+Local development redirect: http://localhost:3000/auth/callback
+```
+
+The signup callback creates the authenticated user's `customers` row through
+the user's server-side Supabase session. RLS limits inserts, updates, and reads
+to rows where `customers.user_id = auth.uid()`. The service role key remains
+server-only and is not required in the browser authentication flow.
 
 After running the SQL, test one diagnosis form submission and confirm a row appears in `diagnosis_responses`. Check `webhook_status`: `skipped` means no webhook URL was configured, `sent` means delivery succeeded, and `failed` means the lead was saved but webhook delivery failed.
 
@@ -126,8 +154,11 @@ Before announcing the site:
 - Confirm Supabase stores the row.
 - If `DIAGNOSIS_WEBHOOK_URL` is configured, confirm the webhook receiver gets a `diagnosis_response.created` POST.
 - Confirm `diagnosis_responses.webhook_status` is `sent`, `failed`, or `skipped`.
+- Complete a signup and confirm the verification email returns to `https://replo.kr/auth/callback`.
+- Confirm the callback creates one `customers` row for the authenticated user.
+- Confirm a new user without a subscription can open `/dashboard`.
+- Confirm `/login` does not create a new Auth user for an unknown email.
 - Confirm `/dashboard` still requires login.
-- Confirm `/demo/dashboard` remains public.
 - Confirm no card number, CVC, billing password, or raw payment data fields exist.
 
 ## Post-Launch

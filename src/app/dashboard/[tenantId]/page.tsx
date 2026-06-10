@@ -16,9 +16,7 @@ export default async function TenantDashboardPage({
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  const developmentPreview =
-    params.tenantId === "demo" && process.env.NODE_ENV !== "production";
-  if (!user && !developmentPreview) redirect(`/login?next=/dashboard/${params.tenantId}`);
+  if (!user) redirect(`/login?next=/dashboard/${params.tenantId}`);
 
   const access = await getTenantAccess(params.tenantId);
   if (!access) notFound();

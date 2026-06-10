@@ -30,7 +30,7 @@ export function FinalCTASection() {
           <p>고객센터 운영을 더 단순하고 명확하게.</p>
           <div className="flex flex-col gap-1 sm:items-end">
             <a className="hover:text-[#5B47E0]" href="mailto:sales@replo.kr">sales@replo.kr</a>
-            <a className="hover:text-[#5B47E0]" href="tel:070-4138-0499">070-4138-0499</a>
+            <a className="hover:text-[#5B47E0]" href="tel:010-8006-5444">010-8006-5444</a>
           </div>
         </div>
       </footer>
