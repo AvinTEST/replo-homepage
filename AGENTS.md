@@ -6,12 +6,14 @@ The original Claude-designed homepage at `public/replo-original/index.html` is t
 
 The current diagnosis form direction is single-page dropdown-based, not multi-step. Do not use large radio option cards for the current version.
 
-Do not expose login as the main public CTA unless explicitly instructed. Public homepage CTAs should route users toward `/diagnosis`.
+Do not expose login as the main public CTA unless explicitly instructed. Public homepage CTAs should route users toward `/contact`.
 
 Preserve these routes unless a task explicitly changes them:
 
 - `/`
 - `/replo-original/index.html`
+- `/contact`
+- `/diagnosis` (redirects to `/contact`)
 - `/login`
 - `/auth/callback`
 - `/dashboard`
