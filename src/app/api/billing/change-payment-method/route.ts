@@ -9,16 +9,16 @@ function allowedRedirectOrigins() {
 }
 
 function safeRedirectUrl(value: unknown) {
-  if (typeof value !== "string" || !value) return "/dashboard";
+  if (typeof value !== "string" || !value) return "/mypage";
   if (value.startsWith("/")) return value;
 
   try {
     const url = new URL(value);
-    if (url.protocol !== "https:") return "/dashboard";
-    if (!allowedRedirectOrigins().includes(url.origin)) return "/dashboard";
+    if (url.protocol !== "https:") return "/mypage";
+    if (!allowedRedirectOrigins().includes(url.origin)) return "/mypage";
     return url.toString();
   } catch {
-    return "/dashboard";
+    return "/mypage";
   }
 }
 
@@ -129,7 +129,7 @@ export async function POST() {
     return NextResponse.json(
       {
         error: "결제수단 변경 요청에 실패했습니다.",
-        redirectUrl: "/dashboard",
+        redirectUrl: "/mypage",
       },
       { status: 500 }
     );

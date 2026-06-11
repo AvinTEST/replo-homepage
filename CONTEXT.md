@@ -1,10 +1,10 @@
 # Replo Homepage 프로젝트 맥락
 
-> 최종 코드 정리 기준일: 2026-06-10
+> 최종 코드 정리 기준일: 2026-06-11
 
 ## 1. 프로젝트 목적
 
-Replo 공개 홈페이지, 운영 진단 신청, 가입형 SaaS 고객 포털을 제공하는 Next.js 프로젝트입니다. 신규 사용자는 이메일 인증으로 가입하고, 인증 완료 후 자신의 고객 정보와 플랜 및 결제수단 상태를 `/dashboard`에서 확인합니다.
+Replo 공개 홈페이지, 운영 진단 신청, 가입형 SaaS 고객 포털을 제공하는 Next.js 프로젝트입니다. 신규 사용자는 이메일 인증으로 가입하고, 인증 완료 후 `/mypage`에서 고객 정보, 플랜, 계약·정책 및 결제수단 상태를 확인합니다. `/dashboard`는 CS 운영 현황을 확인하는 운영 대시보드입니다.
 
 ## 2. 인증 흐름
 
@@ -15,24 +15,25 @@ Replo 공개 홈페이지, 운영 진단 신청, 가입형 SaaS 고객 포털을
 3. 가입 정보는 Supabase Auth user metadata에 저장됩니다.
 4. 이메일 링크는 `{NEXT_PUBLIC_SITE_URL}/auth/callback`으로 돌아옵니다.
 5. 콜백이 인증 코드를 세션으로 교환한 뒤 `customers.user_id` 기준으로 고객 row를 멱등 생성합니다.
-6. 사용자는 `/dashboard`로 이동합니다.
+6. 사용자는 `/mypage`로 이동합니다.
 
 ### 기존 사용자 로그인
 
 1. 사용자가 `/login`에서 기존 계정 이메일을 입력합니다.
 2. `signInWithOtp`를 `shouldCreateUser: false`로 호출하므로 로그인 화면에서는 신규 Auth 사용자를 만들지 않습니다.
 3. 인증 코드가 없거나 교환에 실패하면 `/login?error=auth_failed`로 이동합니다.
-4. 정상 인증된 사용자만 `/dashboard`로 이동합니다.
+4. 정상 인증된 사용자만 `/mypage`로 이동합니다.
 
 운영 빌드에서 `NEXT_PUBLIC_SITE_URL`이 없거나 localhost를 가리키면 인증 링크는 `https://replo.kr/auth/callback`을 안전한 fallback으로 사용합니다. 로컬 개발에서는 현재 브라우저 origin을 사용할 수 있습니다.
 
-## 3. 고객 및 대시보드 흐름
+## 3. 고객 포털 및 대시보드 흐름
 
-- `/dashboard`는 서버에서 현재 Supabase 사용자를 확인하고 비로그인 사용자를 `/login`으로 보냅니다.
+- `/mypage`와 `/dashboard`는 서버에서 현재 Supabase 사용자를 확인하고 비로그인 사용자를 `/login`으로 보냅니다.
 - 고객 row가 없으면 Auth metadata로 생성을 다시 시도합니다.
 - 고객 초기화에 실패하면 재로그인 또는 고객센터 문의 안내를 표시합니다.
-- `subscriptions`와 `payment_methods`는 `maybeSingle()`로 조회합니다.
-- 신규 가입자에게 구독이 없어도 계정 상태, 플랜 선택 전 상태, 결제수단 미등록 상태를 정상 표시합니다.
+- `/mypage`에서 `subscriptions`와 `payment_methods`를 `maybeSingle()`로 조회하고 최근 `billing_events`를 확인합니다.
+- 신규 가입자에게 구독이 없어도 마이페이지에서 플랜 선택 전 상태와 결제수단 미등록 상태를 정상 표시합니다.
+- `/dashboard` 루트는 CS 운영 지표 요약을 표시하며, 현재 지표는 별도 mock data 파일에서 관리합니다.
 - `tenant_users` 멤버십이 있는 운영 고객은 `/dashboard/[tenantId]` 상세 운영 대시보드로 이동할 수 있습니다.
 
 ## 4. 데이터 모델
@@ -100,7 +101,9 @@ Replo 공개 홈페이지, 운영 진단 신청, 가입형 SaaS 고객 포털을
 | `src/app/login/page.tsx` | 기존 사용자 매직 링크 로그인 |
 | `src/app/auth/callback/route.ts` | 코드 교환 및 customer 초기화 |
 | `src/lib/customers/initialize.ts` | 고객 row 멱등 생성 |
-| `src/app/dashboard/page.tsx` | 가입형 고객 포털 |
+| `src/app/mypage/page.tsx` | 계정, 플랜, 결제, 응대 가이드, 권한 정보 |
+| `src/app/dashboard/page.tsx` | CS 운영 현황 요약 대시보드 |
+| `src/data/operations-dashboard.ts` | 운영 대시보드 mock 지표 |
 | `src/app/dashboard/[tenantId]/page.tsx` | 연결 고객의 운영 상세 대시보드 |
 | `src/app/api/billing/change-payment-method/route.ts` | 인증 및 구독 확인 후 StepPay 요청 |
 
@@ -110,5 +113,6 @@ Replo 공개 홈페이지, 운영 진단 신청, 가입형 SaaS 고객 포털을
 - Supabase Auth URL 설정에 운영 및 로컬 callback 등록
 - 최신 migration 적용
 - 가입 인증 후 `customers` row가 한 개만 생성되는지 확인
-- 구독 없는 신규 사용자가 `/dashboard`를 정상 조회하는지 확인
+- 구독 없는 신규 사용자가 `/mypage`를 정상 조회하는지 확인
+- 인증된 사용자가 `/dashboard` 운영 현황을 조회하는지 확인
 - StepPay는 공식 계약 API 명세와 운영 credential 확인 후 활성화

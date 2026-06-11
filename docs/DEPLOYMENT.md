@@ -29,7 +29,8 @@ Expected production routes:
 - `/signup`: public SaaS signup and email verification request
 - `/login`: existing-user magic-link login
 - `/auth/callback`: Supabase code exchange and customer initialization
-- `/dashboard`: protected customer dashboard
+- `/mypage`: protected customer account, plan, billing, guide, and access information
+- `/dashboard`: protected CS operations dashboard
 
 ## Required Environment Variables
 
@@ -61,7 +62,7 @@ STEPPAY_API_BASE_URL=
 STEPPAY_ALLOWED_REDIRECT_ORIGINS=
 ```
 
-When StepPay is enabled, set `STEPPAY_ALLOWED_REDIRECT_ORIGINS` to the exact HTTPS origin(s) that StepPay may return, separated by commas. Unlisted external redirect URLs are replaced with `/dashboard`.
+When StepPay is enabled, set `STEPPAY_ALLOWED_REDIRECT_ORIGINS` to the exact HTTPS origin(s) that StepPay may return, separated by commas. Unlisted external redirect URLs are replaced with `/mypage`.
 
 `SUPABASE_SERVICE_ROLE_KEY` is server-only and must never use the
 `NEXT_PUBLIC_` prefix. The diagnosis API requires it for all lead inserts and
@@ -158,8 +159,9 @@ Before announcing the site:
 - Confirm `diagnosis_responses.webhook_status` is `sent`, `failed`, or `skipped`.
 - Complete a signup and confirm the verification email returns to `https://replo.kr/auth/callback`.
 - Confirm the callback creates one `customers` row for the authenticated user.
-- Confirm a new user without a subscription can open `/dashboard`.
+- Confirm a new user without a subscription can open `/mypage`.
 - Confirm `/login` does not create a new Auth user for an unknown email.
+- Confirm `/mypage` still requires login.
 - Confirm `/dashboard` still requires login.
 - Confirm no card number, CVC, billing password, or raw payment data fields exist.
 

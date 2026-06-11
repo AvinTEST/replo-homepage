@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 
 export default function PaymentMethodPage() {
@@ -53,6 +54,12 @@ export default function PaymentMethodPage() {
         >
           {loading ? "요청 중..." : "결제수단 변경 시작하기"}
         </button>
+        <Link
+          href="/mypage#billing"
+          className="ml-3 mt-8 inline-flex rounded-xl border border-gray-200 px-5 py-3 font-semibold text-gray-700"
+        >
+          마이페이지로 돌아가기
+        </Link>
         {message && <p className="mt-4 text-sm text-gray-600">{message}</p>}
       </div>
     </main>

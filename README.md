@@ -2,7 +2,7 @@
 
 Replo의 고객센터 운영 구독 서비스를 소개하고, 무료 운영 진단 신청을 받기 위한 Next.js MVP입니다. 공개 홈페이지는 Claude로 제작한 오프라인 HTML 번들을 `public/replo-original/index.html`에 보존해 사용하며, CTA 클릭 시 같은 화면에서 진단 신청 모달을 엽니다.
 
-가입형 고객 포털도 함께 포함되어 있어, 사용자는 회원가입과 이메일 인증 후 `/dashboard`에서 계정, 플랜, 결제수단 상태를 확인할 수 있습니다. 구현 범위와 데이터 모델은 [`CONTEXT.md`](./CONTEXT.md)에 정리되어 있습니다.
+가입형 고객 포털도 함께 포함되어 있어, 사용자는 회원가입과 이메일 인증 후 `/mypage`에서 계정, 플랜, 계약·정책, 결제, 응대 가이드와 권한 정보를 확인할 수 있습니다. `/dashboard`는 CS 운영 현황을 확인하는 화면입니다. 구현 범위와 데이터 모델은 [`CONTEXT.md`](./CONTEXT.md)에 정리되어 있습니다.
 
 ## 기술 스택
 
@@ -49,7 +49,7 @@ Vercel에서는 Project Settings → Environment Variables에서 `DIAGNOSIS_WEBH
 STEPPAY_ALLOWED_REDIRECT_ORIGINS=https://example.steppay.io
 ```
 
-허용 origin에 없는 외부 URL은 `/dashboard`로 대체됩니다.
+허용 origin에 없는 외부 URL은 `/mypage`로 대체됩니다.
 
 ## 홈페이지 비교 구현
 
@@ -70,7 +70,8 @@ STEPPAY_ALLOWED_REDIRECT_ORIGINS=https://example.steppay.io
 - `/signup`: 신규 가입 정보 입력 및 이메일 인증 요청
 - `/login`: 기존 사용자의 Supabase 매직 링크 로그인
 - `/auth/callback`: 인증 코드 교환 및 customer 초기화
-- `/dashboard`: 인증된 사용자의 계정, 플랜 및 결제수단 조회
+- `/mypage`: 고객 계정, 이용 플랜, 계약·정책, 결제, 응대 가이드, 권한 정보 확인
+- `/dashboard`: 인증된 사용자의 CS 운영 현황 대시보드
 - `/billing/payment-method`: 결제수단 변경 시작 화면
 - `/api/billing/change-payment-method`: 인증 및 구독 확인 후 StepPay 요청을 시작하는 서버 API
 
@@ -80,7 +81,8 @@ STEPPAY_ALLOWED_REDIRECT_ORIGINS=https://example.steppay.io
 2. Supabase Auth가 이메일 인증 링크를 발송하며 가입 정보는 Auth user metadata에 보존됩니다.
 3. `/auth/callback`이 인증 코드를 세션으로 교환하고 `customers.user_id` 기준으로 고객 row를 멱등 생성합니다.
 4. 기존 사용자는 `/login`에서만 로그인 링크를 요청합니다. 이 화면은 `shouldCreateUser: false`로 신규 계정을 만들지 않습니다.
-5. 인증된 사용자는 `/dashboard`에 진입하며, 구독이 없어도 플랜 선택 전 상태를 확인할 수 있습니다.
+5. 인증된 사용자는 `/mypage`에 진입하며, 구독이 없어도 플랜 선택 전 상태를 확인할 수 있습니다.
+6. `/dashboard`에서 월간 문의 처리 현황과 운영 이슈를 확인할 수 있습니다.
 
 Supabase Auth 설정:
 

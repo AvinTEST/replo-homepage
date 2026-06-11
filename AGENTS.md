@@ -16,6 +16,7 @@ Preserve these routes unless a task explicitly changes them:
 - `/diagnosis` (redirects to `/contact`)
 - `/login`
 - `/auth/callback`
+- `/mypage`
 - `/dashboard`
 - `/billing/payment-method`
 - `/api/billing/change-payment-method`
