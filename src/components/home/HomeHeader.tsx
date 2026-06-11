@@ -33,7 +33,7 @@ export function HomeHeader() {
         </nav>
 
         <a
-          href="/diagnosis"
+          href="/contact"
           className="inline-flex h-9 items-center justify-center rounded-xl bg-[#5B47E0] px-4 text-[13px] font-bold text-white shadow-[0_8px_24px_rgba(91,71,224,0.22)] transition hover:bg-[#4D3BC7] focus:outline-none focus:ring-2 focus:ring-[#5B47E0] focus:ring-offset-2 sm:h-10 sm:px-5"
         >
           무료 진단 받기

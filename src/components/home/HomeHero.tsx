@@ -16,7 +16,7 @@ export function HomeHero() {
         </p>
         <div className="mt-10 flex w-full flex-col items-center justify-center gap-3 sm:w-auto sm:flex-row">
           <a
-            href="/diagnosis"
+            href="/contact"
             className="inline-flex h-[52px] w-full items-center justify-center rounded-2xl bg-[#5B47E0] px-7 text-base font-bold text-white shadow-[0_14px_32px_rgba(91,71,224,0.24)] transition hover:bg-[#4D3BC7] sm:w-auto"
           >
             무료 운영 진단 받기

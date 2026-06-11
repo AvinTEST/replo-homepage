@@ -162,7 +162,7 @@ export function PricingSection() {
                   ))}
                 </ul>
                 <a
-                  href="/diagnosis"
+                  href="/contact"
                   className={`mt-7 inline-flex h-10 items-center justify-center rounded-xl text-sm font-extrabold shadow-[0_10px_24px_rgba(91,71,224,0.18)] ${
                     plan.recommended ? "bg-white text-[#5B47E0]" : "bg-[#5B47E0] text-white"
                   }`}
@@ -174,7 +174,7 @@ export function PricingSection() {
           </div>
 
           <div className="mt-9 text-center">
-            <a href="/diagnosis" className="inline-flex h-11 items-center justify-center rounded-xl border border-[#D8DDE8] bg-white px-6 text-sm font-extrabold text-[#2C3357]">
+            <a href="/contact" className="inline-flex h-11 items-center justify-center rounded-xl border border-[#D8DDE8] bg-white px-6 text-sm font-extrabold text-[#2C3357]">
               플랜별 기능 전체 비교
             </a>
             <p className="mt-5 text-xs leading-5 text-[#7B8198]">모든 금액은 부가세 별도 · 초과 상담은 건당 과금됩니다.</p>

@@ -23,6 +23,8 @@ Expected production routes:
 - `/`: redirects to `/replo-original/index.html`
 - `/replo-original/index.html`: public homepage
 - Homepage CTA modal: diagnosis request form
+- `/contact`: public diagnosis request page
+- `/diagnosis`: permanent redirect to `/contact`
 - `/api/diagnosis`: diagnosis request insert API
 - `/signup`: public SaaS signup and email verification request
 - `/login`: existing-user magic-link login

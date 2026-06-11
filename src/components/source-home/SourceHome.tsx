@@ -52,7 +52,7 @@ function Logo({ onDark = false }: { onDark?: boolean }) {
 
 function ButtonLink({
   children,
-  href = "/diagnosis",
+  href = "/contact",
   variant = "primary",
   size,
   className = "",

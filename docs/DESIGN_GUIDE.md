@@ -33,7 +33,7 @@ Use a modern system sans stack or Pretendard when available. Headings should be 
 Use centered, constrained layouts for public forms and content-heavy sections. Prefer generous whitespace over dense dashboards on public pages. Keep page sections visually simple: white or soft background bands, restrained borders, and predictable spacing.
 
 ## Button Rules
-Primary CTAs use purple fill with white text. Secondary buttons use white background with a light border. Buttons should have clear labels and be large enough to tap on mobile. Public homepage CTAs should direct users toward diagnosis, not login.
+Primary CTAs use purple fill with white text. Secondary buttons use white background with a light border. Buttons should have clear labels and be large enough to tap on mobile. Public homepage CTAs should direct users toward `/contact`, not login.
 
 ## Card Rules
 Cards should be white, lightly bordered, and modestly rounded. Use cards for grouped content, forms, pricing tiers, or dashboard modules. Avoid nested decorative cards and heavy shadows.
@@ -58,12 +58,12 @@ The diagnosis form should be:
 - Easy to complete quickly
 
 ## Public Homepage Rules
-The public homepage visual design must remain the Claude-designed bundle. Hide or de-emphasize public-facing login buttons unless explicitly instructed. Main public CTAs should lead to `/diagnosis`.
+The public homepage visual design must remain the Claude-designed bundle. Hide or de-emphasize public-facing login buttons unless explicitly instructed. Main public CTAs should lead to `/contact`.
 
 Do not change the original hero copy or nav labels without explicit instruction.
 
 ## Auth And Customer Portal Rules
-The real customer dashboard at `/dashboard` should remain protected by Supabase Auth. Public pages such as `/diagnosis` must not require login. Customer portal UI should stay calm, compact, and operational rather than decorative.
+The real customer dashboard at `/dashboard` should remain protected by Supabase Auth. Public pages such as `/contact` must not require login. Customer portal UI should stay calm, compact, and operational rather than decorative.
 
 ## Accessibility Basics
 Use semantic labels for form fields. Preserve keyboard access for buttons and links. Maintain high contrast and visible focus states. Tap targets should be comfortable on mobile.

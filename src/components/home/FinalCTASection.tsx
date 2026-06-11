@@ -13,10 +13,10 @@ export function FinalCTASection() {
             URL 하나만 보내주시면 현재 고객센터 운영 구조를 진단하고, 가장 먼저 정리해야 할 기준을 안내해 드립니다.
           </p>
           <div className="mt-10 flex flex-col justify-center gap-3 sm:flex-row">
-            <a href="/diagnosis" className="inline-flex h-[52px] items-center justify-center rounded-2xl bg-white px-7 text-base font-extrabold text-[#5B47E0]">
+            <a href="/contact" className="inline-flex h-[52px] items-center justify-center rounded-2xl bg-white px-7 text-base font-extrabold text-[#5B47E0]">
               무료 운영 진단 받기
             </a>
-            <a href="/diagnosis" className="inline-flex h-[52px] items-center justify-center rounded-2xl border border-white/30 px-7 text-base font-extrabold text-white">
+            <a href="/contact" className="inline-flex h-[52px] items-center justify-center rounded-2xl border border-white/30 px-7 text-base font-extrabold text-white">
               서비스 문의하기
             </a>
           </div>

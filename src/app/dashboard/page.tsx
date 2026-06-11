@@ -134,7 +134,7 @@ export default async function DashboardPage() {
               </Link>
             ) : (
               <Link
-                href="/diagnosis"
+                href="/contact"
                 className="inline-flex rounded-xl bg-[#5B47E0] px-5 py-3 font-semibold text-white"
               >
                 플랜 상담 신청
