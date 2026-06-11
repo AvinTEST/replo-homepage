@@ -62,9 +62,6 @@ The public homepage visual design must remain the Claude-designed bundle. Hide o
 
 Do not change the original hero copy or nav labels without explicit instruction.
 
-## Auth And Customer Portal Rules
-The customer mypage at `/mypage` and operations dashboard at `/dashboard` should remain protected by Supabase Auth. Public pages such as `/contact` must not require login. Customer portal UI should stay calm, compact, and operational rather than decorative.
-
 ## Accessibility Basics
 Use semantic labels for form fields. Preserve keyboard access for buttons and links. Maintain high contrast and visible focus states. Tap targets should be comfortable on mobile.
 
