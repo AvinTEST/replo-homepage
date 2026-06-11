@@ -23,7 +23,7 @@ Replo 공개 홈페이지, 운영 진단 신청, 가입형 SaaS 고객 포털을
 3. 인증 코드가 없거나 교환에 실패하면 `/login?error=auth_failed`로 이동합니다.
 4. 정상 인증된 사용자는 멤버십에 따라 `/mypage` 또는 `/onboarding`으로 이동합니다.
 
-운영 빌드에서 `NEXT_PUBLIC_SITE_URL`이 없거나 localhost를 가리키면 인증 링크는 `https://replo.kr/auth/callback`을 안전한 fallback으로 사용합니다. 로컬 개발에서는 현재 브라우저 origin을 사용할 수 있습니다.
+`NEXT_PUBLIC_SITE_URL`이 설정되어 있으면 해당 origin을 사용합니다. 값이 없거나 운영 빌드에서 localhost를 가리키면 브라우저의 현재 origin을 우선 사용하고, 서버에서는 Vercel의 `VERCEL_URL`을 fallback으로 사용합니다. 최종 fallback은 운영 빌드의 `https://replo.kr`, 로컬 빌드의 `http://localhost:3000`입니다.
 
 ## 3. 고객 포털 및 대시보드 흐름
 
@@ -78,7 +78,7 @@ RLS는 `customer_members`의 active membership을 기준으로 고객사 범위�
 | --- | --- | --- |
 | `NEXT_PUBLIC_SUPABASE_URL` | 브라우저 공개 가능 | Supabase 프로젝트 URL |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | 브라우저 공개 가능 | Supabase anon key, RLS 필수 |
-| `NEXT_PUBLIC_SITE_URL` | 브라우저 공개 가능 | 로컬 `http://localhost:3000`, 운영 `https://replo.kr` |
+| `NEXT_PUBLIC_SITE_URL` | 브라우저 공개 가능 | 로컬 `http://localhost:3000`, 개발/검수 `https://dev.replo.kr`, 운영 `https://replo.kr` |
 | `SUPABASE_SERVICE_ROLE_KEY` | 서버 전용 | 진단 API 및 운영 서버 작업 |
 | `INTEGRATION_ENCRYPTION_KEY` | 서버 전용 | 채널톡 Access Key/Secret AES-256-GCM 암호화 |
 | `STEPPAY_SECRET_TOKEN` | 서버 전용 | StepPay 연동 확정 후 사용 |

@@ -4,6 +4,8 @@ Replo의 고객센터 운영 구독 서비스를 소개하고, 무료 운영 진
 
 가입형 고객 포털도 함께 포함되어 있어, 사용자는 Google 인증과 회사 온보딩 후 `/mypage`에서 계정, 플랜, 결제, 멤버, 브랜드별 채널 연동, 응대 가이드와 권한 정보를 확인할 수 있습니다. `/dashboard`는 CS 운영 현황을 확인하는 화면입니다. 구현 범위와 데이터 모델은 [`CONTEXT.md`](./CONTEXT.md)에 정리되어 있습니다.
 
+개발/검수용 `dev.replo.kr` 환경 분리 기준과 수동 설정 항목은 [`docs/DEV_ENVIRONMENT.md`](./docs/DEV_ENVIRONMENT.md)를 참고하세요.
+
 ## 기술 스택
 
 - Next.js 14 App Router
@@ -27,6 +29,9 @@ npm run dev
 ```bash
 # 로컬
 NEXT_PUBLIC_SITE_URL=http://localhost:3000
+
+# 개발/검수
+NEXT_PUBLIC_SITE_URL=https://dev.replo.kr
 
 # 운영
 NEXT_PUBLIC_SITE_URL=https://replo.kr
