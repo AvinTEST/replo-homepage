@@ -2,33 +2,15 @@
 
 import Link from "next/link";
 import { FormEvent, useState } from "react";
+import { AuthFrame } from "@/components/auth/AuthFrame";
+import { GoogleAuthButton } from "@/components/auth/GoogleAuthButton";
 import { getAuthCallbackUrl } from "@/lib/auth/redirect";
 import { createClient } from "@/lib/supabase/client";
 
-type SignupForm = {
-  email: string;
-  companyName: string;
-  contactName: string;
-  phone: string;
-  websiteUrl: string;
-};
-
-const initialForm: SignupForm = {
-  email: "",
-  companyName: "",
-  contactName: "",
-  phone: "",
-  websiteUrl: "",
-};
-
 export default function SignupPage() {
-  const [form, setForm] = useState(initialForm);
+  const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
   const [submitting, setSubmitting] = useState(false);
-
-  function updateField(field: keyof SignupForm, value: string) {
-    setForm((current) => ({ ...current, [field]: value }));
-  }
 
   async function handleSignup(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -37,112 +19,71 @@ export default function SignupPage() {
 
     const supabase = createClient();
     const { error } = await supabase.auth.signInWithOtp({
-      email: form.email.trim(),
+      email: email.trim(),
       options: {
         emailRedirectTo: getAuthCallbackUrl(),
         shouldCreateUser: true,
-        data: {
-          company_name: form.companyName.trim(),
-          contact_name: form.contactName.trim(),
-          phone: form.phone.trim(),
-          website_url: form.websiteUrl.trim(),
-        },
       },
     });
 
     setSubmitting(false);
-    if (error) {
-      setMessage("회원가입 요청을 처리하지 못했습니다. 입력 정보를 확인하고 다시 시도해 주세요.");
-      return;
-    }
-
     setMessage(
-      "회원가입 인증 메일을 보냈습니다. 이메일의 인증 링크를 누르면 마이페이지로 이동합니다.",
+      error
+        ? "회원가입 인증 메일을 보내지 못했습니다. 이메일을 확인하고 다시 시도해 주세요."
+        : "회원가입 인증 메일을 보냈습니다. 인증 후 회사와 브랜드 정보를 입력합니다.",
     );
   }
 
   return (
-    <main className="min-h-screen bg-[#F7F6FF] px-6 py-12">
-      <form
-        onSubmit={handleSignup}
-        className="mx-auto w-full max-w-xl rounded-3xl bg-white p-8 shadow-xl"
-      >
-        <h1 className="text-2xl font-bold text-gray-900">Replo 회원가입</h1>
-        <p className="mt-2 text-sm leading-6 text-gray-500">
-          계정과 고객 정보를 만든 뒤 이메일 인증 링크를 보내드립니다.
-        </p>
+    <AuthFrame
+      title="Replo를 시작해 보세요."
+      description="Google 계정 또는 업무용 이메일로 가입한 뒤 회사 워크스페이스를 만들 수 있습니다."
+    >
+      <div className="mt-7">
+        <GoogleAuthButton label="Google로 회원가입" />
+      </div>
 
-        <div className="mt-7 grid gap-5 sm:grid-cols-2">
-          <label className="block text-sm font-semibold text-gray-700 sm:col-span-2">
-            이메일
-            <input
-              type="email"
-              required
-              autoComplete="email"
-              value={form.email}
-              onChange={(event) => updateField("email", event.target.value)}
-              className="mt-2 w-full rounded-xl border border-gray-200 px-4 py-3 font-normal outline-none focus:border-[#5B47E0]"
-            />
-          </label>
-          <label className="block text-sm font-semibold text-gray-700">
-            회사명
-            <input
-              required
-              autoComplete="organization"
-              value={form.companyName}
-              onChange={(event) => updateField("companyName", event.target.value)}
-              className="mt-2 w-full rounded-xl border border-gray-200 px-4 py-3 font-normal outline-none focus:border-[#5B47E0]"
-            />
-          </label>
-          <label className="block text-sm font-semibold text-gray-700">
-            담당자명
-            <input
-              required
-              autoComplete="name"
-              value={form.contactName}
-              onChange={(event) => updateField("contactName", event.target.value)}
-              className="mt-2 w-full rounded-xl border border-gray-200 px-4 py-3 font-normal outline-none focus:border-[#5B47E0]"
-            />
-          </label>
-          <label className="block text-sm font-semibold text-gray-700">
-            전화번호 또는 연락처
-            <input
-              required
-              autoComplete="tel"
-              value={form.phone}
-              onChange={(event) => updateField("phone", event.target.value)}
-              className="mt-2 w-full rounded-xl border border-gray-200 px-4 py-3 font-normal outline-none focus:border-[#5B47E0]"
-            />
-          </label>
-          <label className="block text-sm font-semibold text-gray-700">
-            홈페이지 또는 서비스 URL
-            <input
-              type="url"
-              required
-              autoComplete="url"
-              placeholder="https://example.com"
-              value={form.websiteUrl}
-              onChange={(event) => updateField("websiteUrl", event.target.value)}
-              className="mt-2 w-full rounded-xl border border-gray-200 px-4 py-3 font-normal outline-none focus:border-[#5B47E0]"
-            />
-          </label>
-        </div>
+      <div className="my-6 flex items-center gap-4 text-xs font-semibold text-slate-400">
+        <span className="h-px flex-1 bg-[#E8E6EF]" />
+        또는 이메일로 회원가입
+        <span className="h-px flex-1 bg-[#E8E6EF]" />
+      </div>
 
+      <form onSubmit={handleSignup}>
+        <label htmlFor="signup-email" className="block text-sm font-bold text-[#373248]">
+          업무용 이메일
+        </label>
+        <input
+          id="signup-email"
+          type="email"
+          required
+          autoComplete="email"
+          placeholder="name@company.com"
+          value={email}
+          onChange={(event) => setEmail(event.target.value)}
+          className="mt-2 h-[52px] w-full rounded-xl border border-[#D8D6E3] bg-white px-4 text-[15px] outline-none transition placeholder:text-slate-300 focus:border-[#5B47E0] focus:ring-4 focus:ring-[#5B47E0]/10"
+        />
         <button
           type="submit"
           disabled={submitting}
-          className="mt-7 w-full rounded-xl bg-[#5B47E0] px-4 py-3 font-semibold text-white disabled:opacity-60"
+          className="mt-4 h-[52px] w-full rounded-xl bg-[#5B47E0] px-4 text-[15px] font-bold text-white shadow-[0_8px_20px_rgba(91,71,224,0.22)] transition hover:bg-[#4D39D0] focus:outline-none focus:ring-4 focus:ring-[#5B47E0]/20 disabled:opacity-60"
         >
-          {submitting ? "요청 중..." : "이메일 인증하고 가입하기"}
+          {submitting ? "인증 메일 전송 중..." : "이메일로 가입하기"}
         </button>
-        {message ? <p className="mt-4 text-sm leading-6 text-gray-600" role="status">{message}</p> : null}
-        <p className="mt-6 text-center text-sm text-gray-500">
-          이미 계정이 있으신가요?{" "}
-          <Link href="/login" className="font-semibold text-[#5B47E0]">
-            로그인
-          </Link>
-        </p>
       </form>
-    </main>
+
+      {message ? (
+        <p className="mt-4 rounded-xl bg-[#F7F6FF] px-4 py-3 text-sm leading-6 text-[#5745C9]" role="status">
+          {message}
+        </p>
+      ) : null}
+
+      <p className="mt-7 text-center text-sm text-slate-500">
+        이미 계정이 있으신가요?{" "}
+        <Link href="/login" className="font-bold text-[#5B47E0] hover:text-[#4631C8]">
+          로그인
+        </Link>
+      </p>
+    </AuthFrame>
   );
 }

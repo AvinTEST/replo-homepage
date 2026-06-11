@@ -42,3 +42,15 @@ export function decryptCredentials(value: string) {
 
   return JSON.parse(decrypted.toString("utf8")) as Record<string, string>;
 }
+
+export function encryptCredentialValue(value: string) {
+  return encryptCredentials({ value });
+}
+
+export function decryptCredentialValue(value: string) {
+  const decrypted = decryptCredentials(value);
+  if (typeof decrypted.value !== "string") {
+    throw new Error("Encrypted credential value is invalid");
+  }
+  return decrypted.value;
+}

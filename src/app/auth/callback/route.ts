@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { ensureCustomerForUser } from "@/lib/customers/initialize";
+import { syncProfileAndLegacyMembership } from "@/lib/customers/access";
 import { createClient } from "@/lib/supabase/server";
 
 export async function GET(request: Request) {
@@ -24,6 +24,14 @@ export async function GET(request: Request) {
     return NextResponse.redirect(`${origin}/login?error=auth_failed`);
   }
 
-  await ensureCustomerForUser(supabase, user);
-  return NextResponse.redirect(`${origin}/mypage`);
+  try {
+    const customerId = await syncProfileAndLegacyMembership(user);
+    return NextResponse.redirect(`${origin}${customerId ? "/mypage" : "/onboarding"}`);
+  } catch (error) {
+    console.error(
+      "Failed to initialize authenticated user:",
+      error instanceof Error ? error.message : "unknown error",
+    );
+    return NextResponse.redirect(`${origin}/login?error=auth_failed`);
+  }
 }

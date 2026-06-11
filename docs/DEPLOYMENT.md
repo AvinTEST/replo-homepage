@@ -46,6 +46,7 @@ Optional server-only diagnosis webhook variables:
 
 ```bash
 SUPABASE_SERVICE_ROLE_KEY=
+INTEGRATION_ENCRYPTION_KEY=
 DIAGNOSIS_WEBHOOK_URL=
 DIAGNOSIS_WEBHOOK_SECRET=
 ```
@@ -100,10 +101,17 @@ Redirect URL: https://replo.kr/auth/callback
 Local development redirect: http://localhost:3000/auth/callback
 ```
 
-The signup callback creates the authenticated user's `customers` row through
-the user's server-side Supabase session. RLS limits inserts, updates, and reads
-to rows where `customers.user_id = auth.uid()`. The service role key remains
-server-only and is not required in the browser authentication flow.
+Enable the Google provider under Supabase Authentication → Providers and enter
+the Google OAuth Client ID and Secret. Add the Supabase project callback shown
+on that provider screen (for example,
+`https://<project-ref>.supabase.co/auth/v1/callback`) to Google Cloud's
+Authorized redirect URIs.
+
+The application callback syncs the authenticated profile, accepts pending
+member invitations, and sends users without a workspace to `/onboarding`.
+Customer access is determined by active `customer_members`, not a single
+`customers.user_id`. The service role key and `INTEGRATION_ENCRYPTION_KEY`
+remain server-only and must never be exposed to browser code.
 
 After running the SQL, test one diagnosis form submission and confirm a row appears in `diagnosis_responses`. Check `webhook_status`: `skipped` means no webhook URL was configured, `sent` means delivery succeeded, and `failed` means the lead was saved but webhook delivery failed.
 

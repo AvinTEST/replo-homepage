@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { getCurrentCustomerAccess } from "@/lib/customers/access";
 import { createClient } from "@/lib/supabase/server";
 
 function allowedRedirectOrigins() {
@@ -30,30 +31,15 @@ function safeRedirectUrl(value: unknown) {
  * StepPay, replace the redirect URL logic with a call to StepPay's API.
  */
 export async function POST() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
+  const access = await getCurrentCustomerAccess();
+  if (!access) {
     return NextResponse.json(
       { error: "로그인이 필요합니다." },
       { status: 401 }
     );
   }
-
-  // Find the customer record for the logged in user
-  const { data: customer } = await supabase
-    .from("customers")
-    .select("id")
-    .eq("user_id", user.id)
-    .single();
-  if (!customer) {
-    return NextResponse.json(
-      { error: "고객 정보를 찾을 수 없습니다." },
-      { status: 404 }
-    );
-  }
+  const { customer } = access;
+  const supabase = await createClient();
 
   // Find the subscription so we know which StepPay subscription to update
   const { data: subscription } = await supabase

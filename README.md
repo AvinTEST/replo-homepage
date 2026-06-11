@@ -2,7 +2,7 @@
 
 Replo의 고객센터 운영 구독 서비스를 소개하고, 무료 운영 진단 신청을 받기 위한 Next.js MVP입니다. 공개 홈페이지는 Claude로 제작한 오프라인 HTML 번들을 `public/replo-original/index.html`에 보존해 사용하며, CTA 클릭 시 같은 화면에서 진단 신청 모달을 엽니다.
 
-가입형 고객 포털도 함께 포함되어 있어, 사용자는 회원가입과 이메일 인증 후 `/mypage`에서 계정, 플랜, 계약·정책, 결제, 응대 가이드와 권한 정보를 확인할 수 있습니다. `/dashboard`는 CS 운영 현황을 확인하는 화면입니다. 구현 범위와 데이터 모델은 [`CONTEXT.md`](./CONTEXT.md)에 정리되어 있습니다.
+가입형 고객 포털도 함께 포함되어 있어, 사용자는 Google 인증과 회사 온보딩 후 `/mypage`에서 계정, 플랜, 결제, 멤버, 브랜드별 채널 연동, 응대 가이드와 권한 정보를 확인할 수 있습니다. `/dashboard`는 CS 운영 현황을 확인하는 화면입니다. 구현 범위와 데이터 모델은 [`CONTEXT.md`](./CONTEXT.md)에 정리되어 있습니다.
 
 ## 기술 스택
 
@@ -67,28 +67,42 @@ STEPPAY_ALLOWED_REDIRECT_ORIGINS=https://example.steppay.io
 - `/source-home`: 원본 JSX/CSS source 기반 React 포트
 - 홈페이지 CTA 모달: 무료 운영 진단 신청 폼
 - `/api/diagnosis`: 진단 신청 저장 API
-- `/signup`: 신규 가입 정보 입력 및 이메일 인증 요청
-- `/login`: 기존 사용자의 Supabase 매직 링크 로그인
-- `/auth/callback`: 인증 코드 교환 및 customer 초기화
-- `/mypage`: 고객 계정, 이용 플랜, 계약·정책, 결제, 응대 가이드, 권한 정보 확인
+- `/signup`: Google 신규 회원가입 시작
+- `/login`: Google 기본 로그인 및 이메일 보조 로그인
+- `/auth/callback`: Supabase OAuth/인증 코드 교환 및 멤버 초대 수락
+- `/onboarding`: 신규 고객사와 첫 브랜드 생성
+- `/mypage`: 고객 계정, 이용 플랜, 결제, 멤버, 연동 채널, 응대 가이드, 권한 정보 확인
 - `/dashboard`: 인증된 사용자의 CS 운영 현황 대시보드
 - `/billing/payment-method`: 결제수단 변경 시작 화면
 - `/api/billing/change-payment-method`: 인증 및 구독 확인 후 StepPay 요청을 시작하는 서버 API
 
 ## 가입 및 인증 흐름
 
-1. 신규 사용자는 `/signup`에서 이메일과 회사 정보를 입력합니다.
-2. Supabase Auth가 이메일 인증 링크를 발송하며 가입 정보는 Auth user metadata에 보존됩니다.
-3. `/auth/callback`이 인증 코드를 세션으로 교환하고 `customers.user_id` 기준으로 고객 row를 멱등 생성합니다.
-4. 기존 사용자는 `/login`에서만 로그인 링크를 요청합니다. 이 화면은 `shouldCreateUser: false`로 신규 계정을 만들지 않습니다.
-5. 인증된 사용자는 `/mypage`에 진입하며, 구독이 없어도 플랜 선택 전 상태를 확인할 수 있습니다.
-6. `/dashboard`에서 월간 문의 처리 현황과 운영 이슈를 확인할 수 있습니다.
+1. 신규 사용자는 `/signup`에서 Google OAuth를 시작합니다. 카카오 로그인은 현재 제공하지 않습니다.
+2. `/auth/callback`이 인증 코드를 세션으로 교환하고 프로필 및 기존 초대 여부를 확인합니다.
+3. 고객사 멤버십이 없으면 `/onboarding`에서 회사와 첫 브랜드를 생성하고 owner 역할을 부여합니다.
+4. 기존 사용자는 `/login`에서 Google 로그인을 사용합니다. 이메일 OTP는 `shouldCreateUser: false`인 보조 로그인입니다.
+5. 초대받은 이메일로 인증하면 대기 중인 `member_invites`가 `customer_members` 멤버십으로 전환됩니다.
+6. 인증된 사용자는 `/mypage`에 진입하며, 구독이 없어도 플랜 선택 전 상태를 확인할 수 있습니다.
+7. `/dashboard`에서 월간 문의 처리 현황과 운영 이슈를 확인할 수 있습니다.
 
 Supabase Auth 설정:
 
 - Site URL: `https://replo.kr`
 - Redirect URL: `https://replo.kr/auth/callback`
 - 로컬 Redirect URL: `http://localhost:3000/auth/callback`
+- Authentication → Providers에서 Google provider 활성화
+- Google Cloud OAuth Client의 Authorized redirect URI에 Supabase가 안내하는 callback URL 등록
+
+## 멤버 및 채널톡 연동
+
+- 고객사 권한은 `customer_members`의 `owner`, `admin`, `editor`, `viewer` 역할로 관리합니다.
+- owner/admin만 멤버 초대, 역할 변경, 멤버 삭제와 채널 연동 변경을 수행할 수 있습니다.
+- editor/viewer는 멤버와 연동 상태를 조회할 수 있습니다.
+- 채널톡은 고객사 기준 연결 상태인 연동을 최대 10개까지 등록할 수 있습니다.
+- Access Key와 Access Secret은 서버 전용 `INTEGRATION_ENCRYPTION_KEY`로 암호화하며 Secret은 화면에 다시 표시하지 않습니다.
+- 채널톡 추가 전 상담·고객·주문 데이터의 개인정보 처리 위탁 동의가 필요합니다.
+- 최신 스키마는 `supabase/migrations/202606110001_customer_workspaces.sql`에 있습니다.
 
 ## 현재 주의사항
 

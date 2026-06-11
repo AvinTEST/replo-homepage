@@ -9,7 +9,7 @@ import {
   urgentIssues,
   vocHighlights,
 } from "@/data/operations-dashboard";
-import { ensureCustomerForUser } from "@/lib/customers/initialize";
+import { getCurrentCustomerAccess } from "@/lib/customers/access";
 import { createClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
@@ -25,8 +25,9 @@ export default async function DashboardPage() {
   } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
-  const customer = await ensureCustomerForUser(supabase, user);
-  if (!customer) redirect("/mypage");
+  const access = await getCurrentCustomerAccess();
+  if (!access) redirect("/onboarding");
+  const customer = access.customer;
 
   const { data: membership } = await supabase
     .from("tenant_users")

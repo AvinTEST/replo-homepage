@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { ensureCustomerForUser } from "@/lib/customers/initialize";
+import { IntegrationManagement } from "@/components/mypage/IntegrationManagement";
+import { MemberManagement } from "@/components/mypage/MemberManagement";
+import { getCurrentCustomerAccess } from "@/lib/customers/access";
 import { createClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
@@ -9,6 +11,8 @@ const mypageMenus = [
   { href: "#account", label: "계정 정보" },
   { href: "#plan", label: "이용 플랜" },
   { href: "#billing", label: "결제 및 청구" },
+  { href: "#members", label: "멤버 관리" },
+  { href: "#integrations", label: "연동 채널 관리" },
   { href: "#guide", label: "응대 가이드" },
   { href: "#access", label: "권한 및 데이터 접근" },
 ];
@@ -66,25 +70,9 @@ export default async function MyPage() {
   } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
-  const customer = await ensureCustomerForUser(supabase, user);
-  if (!customer) {
-    return (
-      <main className="min-h-screen bg-[#F7F6FF] px-6 py-12">
-        <div className="mx-auto max-w-3xl rounded-3xl bg-white p-8 shadow-sm">
-          <h1 className="text-2xl font-bold text-gray-900">계정 초기 설정이 필요합니다.</h1>
-          <p className="mt-3 text-gray-600">
-            다시 로그인해 보시고, 문제가 계속되면 Replo 고객센터에 문의해 주세요.
-          </p>
-          <Link
-            href="/login"
-            className="mt-6 inline-flex rounded-xl bg-[#5B47E0] px-5 py-3 font-semibold text-white"
-          >
-            다시 로그인하기
-          </Link>
-        </div>
-      </main>
-    );
-  }
+  const access = await getCurrentCustomerAccess();
+  if (!access) redirect("/onboarding");
+  const customer = access.customer;
 
   const [subscriptionResult, paymentMethodResult, billingEventsResult, membershipResult] =
     await Promise.all([
@@ -179,11 +167,11 @@ export default async function MyPage() {
           <dl className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {[
               ["회사명", customer.company_name],
-              ["담당자명", customer.contact_name || "미등록"],
+              ["대표 담당자", customer.representative_name || customer.contact_name || "미등록"],
               ["로그인 이메일", user.email || customer.email],
-              ["연락처", customer.phone || "미등록"],
-              ["사업자 정보", "준비 중"],
-              ["세금계산서 이메일", "준비 중"],
+              ["사업자 정보", customer.business_number || "미등록"],
+              ["세금계산서 이메일", customer.billing_email || "미등록"],
+              ["내 권한", access.membership.role],
             ].map(([label, value]) => (
               <div key={label} className="rounded-2xl bg-slate-50 p-4">
                 <dt className="text-xs font-semibold text-slate-500">{label}</dt>
@@ -306,6 +294,10 @@ export default async function MyPage() {
             </div>
           </div>
         </section>
+
+        <MemberManagement />
+
+        <IntegrationManagement />
 
         <section id="guide" className="mt-5 scroll-mt-24 rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
           <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#5B47E0]">Response Guide</p>

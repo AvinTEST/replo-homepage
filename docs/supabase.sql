@@ -1,3 +1,8 @@
+-- Bootstrap schema for the original diagnosis and billing tables.
+-- After this file, apply every file in supabase/migrations in filename order.
+-- The workspace membership, brand, ChannelTalk integration, consent, audit log,
+-- and current RLS model live in 202606110001_customer_workspaces.sql.
+
 create table if not exists public.diagnosis_responses (
   id uuid primary key default gen_random_uuid(),
   business_type text not null,
