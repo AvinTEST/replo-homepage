@@ -22,6 +22,7 @@ const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const hostnamePattern =
   /^(?=.{4,253}$)(?!-)(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,}$/i;
 type WebhookStatus = "sent" | "failed" | "skipped";
+const webhookTimeoutMs = 10_000;
 
 function clean(value: unknown) {
   return typeof value === "string" ? value.trim() : "";
@@ -249,6 +250,7 @@ export async function POST(request: Request) {
         method: "POST",
         headers,
         body: JSON.stringify(webhookPayload),
+        signal: AbortSignal.timeout(webhookTimeoutMs),
       });
 
       if (!webhookResponse.ok) {

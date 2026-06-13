@@ -2,6 +2,7 @@ import { createHash } from "node:crypto";
 
 const windowMs = 10 * 60 * 1000;
 const maxRequests = 5;
+const redisTimeoutMs = 5_000;
 const memoryStore = new Map<string, { count: number; resetAt: number }>();
 let didWarnAboutMemoryFallback = false;
 
@@ -96,6 +97,7 @@ async function redisRateLimit(
     },
     body: JSON.stringify(["EVAL", script, "1", key, String(windowMs)]),
     cache: "no-store",
+    signal: AbortSignal.timeout(redisTimeoutMs),
   });
 
   if (!response.ok) {
