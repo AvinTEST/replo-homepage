@@ -73,7 +73,7 @@ function ButtonLink({
   );
 }
 
-function MarketingNav() {
+function MarketingNav({ showPortalLogin }: { showPortalLogin: boolean }) {
   const [menu, setMenu] = useState(false);
   return (
     <header className="mnav">
@@ -87,6 +87,11 @@ function MarketingNav() {
           ))}
         </nav>
         <div className="mnav-cta">
+          {showPortalLogin ? (
+            <ButtonLink href="/login" variant="ghost" size="sm">
+              로그인
+            </ButtonLink>
+          ) : null}
           <ButtonLink size="sm">{homeCopy.navigation.cta}</ButtonLink>
           <button className="mnav-burger" type="button" onClick={() => setMenu(true)} aria-label="메뉴 열기">
             <Icon name="menu" size={26} />
@@ -105,6 +110,11 @@ function MarketingNav() {
             <a key={id} href={`#${id}`} onClick={() => setMenu(false)}>{label}</a>
           ))}
           <div className="col gap-10" style={{ marginTop: 18 }}>
+            {showPortalLogin ? (
+              <ButtonLink href="/login" variant="ghost">
+                로그인
+              </ButtonLink>
+            ) : null}
             <ButtonLink>{homeCopy.navigation.cta}</ButtonLink>
           </div>
         </div>
@@ -629,11 +639,11 @@ function Footer() {
   );
 }
 
-export function SourceHome() {
+export function SourceHome({ showPortalLogin = false }: { showPortalLogin?: boolean }) {
   return (
     <div className="replo-source-home">
       <div className="mkt">
-        <MarketingNav />
+        <MarketingNav showPortalLogin={showPortalLogin} />
         <Hero />
         <ChecklistSection />
         <CauseSection />
