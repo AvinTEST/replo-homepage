@@ -7,6 +7,8 @@ import { GoogleAuthButton } from "@/components/auth/GoogleAuthButton";
 import { getAuthCallbackUrl } from "@/lib/auth/redirect";
 import { createClient } from "@/lib/supabase/client";
 
+const googleAuthEnabled = process.env.NEXT_PUBLIC_ENABLE_GOOGLE_AUTH === "true";
+
 export default function SignupPage() {
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
@@ -37,19 +39,27 @@ export default function SignupPage() {
   return (
     <AuthFrame
       title="Replo를 시작해 보세요."
-      description="Google 계정 또는 업무용 이메일로 가입한 뒤 회사 워크스페이스를 만들 수 있습니다."
+      description={
+        googleAuthEnabled
+          ? "Google 계정 또는 업무용 이메일로 가입한 뒤 회사 워크스페이스를 만들 수 있습니다."
+          : "업무용 이메일로 가입한 뒤 회사 워크스페이스를 만들 수 있습니다."
+      }
     >
-      <div className="mt-7">
-        <GoogleAuthButton label="Google로 회원가입" />
-      </div>
+      {googleAuthEnabled ? (
+        <>
+          <div className="mt-7">
+            <GoogleAuthButton label="Google로 회원가입" />
+          </div>
 
-      <div className="my-6 flex items-center gap-4 text-xs font-semibold text-slate-400">
-        <span className="h-px flex-1 bg-[#E8E6EF]" />
-        또는 이메일로 회원가입
-        <span className="h-px flex-1 bg-[#E8E6EF]" />
-      </div>
+          <div className="my-6 flex items-center gap-4 text-xs font-semibold text-slate-400">
+            <span className="h-px flex-1 bg-[#E8E6EF]" />
+            또는 이메일로 회원가입
+            <span className="h-px flex-1 bg-[#E8E6EF]" />
+          </div>
+        </>
+      ) : null}
 
-      <form onSubmit={handleSignup}>
+      <form onSubmit={handleSignup} className={googleAuthEnabled ? undefined : "mt-7"}>
         <label htmlFor="signup-email" className="block text-sm font-bold text-[#373248]">
           업무용 이메일
         </label>

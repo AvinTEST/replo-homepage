@@ -7,6 +7,8 @@ import { GoogleAuthButton } from "@/components/auth/GoogleAuthButton";
 import { getAuthCallbackUrl } from "@/lib/auth/redirect";
 import { createClient } from "@/lib/supabase/client";
 
+const googleAuthEnabled = process.env.NEXT_PUBLIC_ENABLE_GOOGLE_AUTH === "true";
+
 export default function LoginPage({
   searchParams,
 }: {
@@ -45,7 +47,11 @@ export default function LoginPage({
   return (
     <AuthFrame
       title="다시 만나서 반갑습니다."
-      description="Google 계정 또는 가입한 이메일로 Replo 워크스페이스에 로그인하세요."
+      description={
+        googleAuthEnabled
+          ? "Google 계정 또는 가입한 이메일로 Replo 워크스페이스에 로그인하세요."
+          : "가입한 이메일로 Replo 워크스페이스에 로그인하세요."
+      }
     >
       {authError ? (
         <p className="mt-6 rounded-xl border border-rose-100 bg-rose-50 px-4 py-3 text-sm leading-6 text-rose-700" role="alert">
@@ -53,17 +59,21 @@ export default function LoginPage({
         </p>
       ) : null}
 
-      <div className="mt-7">
-        <GoogleAuthButton label="Google로 계속하기" />
-      </div>
+      {googleAuthEnabled ? (
+        <>
+          <div className="mt-7">
+            <GoogleAuthButton label="Google로 계속하기" />
+          </div>
 
-      <div className="my-6 flex items-center gap-4 text-xs font-semibold text-slate-400">
-        <span className="h-px flex-1 bg-[#E8E6EF]" />
-        또는 이메일로 로그인
-        <span className="h-px flex-1 bg-[#E8E6EF]" />
-      </div>
+          <div className="my-6 flex items-center gap-4 text-xs font-semibold text-slate-400">
+            <span className="h-px flex-1 bg-[#E8E6EF]" />
+            또는 이메일로 로그인
+            <span className="h-px flex-1 bg-[#E8E6EF]" />
+          </div>
+        </>
+      ) : null}
 
-      <form onSubmit={handleLogin}>
+      <form onSubmit={handleLogin} className={googleAuthEnabled ? undefined : "mt-7"}>
         <label htmlFor="login-email" className="block text-sm font-bold text-[#373248]">
           이메일
         </label>
