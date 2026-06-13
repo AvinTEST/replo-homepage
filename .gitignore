@@ -5,6 +5,9 @@ node_modules/
 .next/
 out/
 
+# Generated QA and export artifacts
+outputs/
+
 # Local environment files
 .env
 .env.local
