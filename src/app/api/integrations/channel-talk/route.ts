@@ -5,6 +5,7 @@ import {
   getCurrentCustomerAccess,
 } from "@/lib/customers/access";
 import { encryptedChannelTalkCredentials } from "@/lib/integrations/customerIntegrations";
+import { isSameOriginRequest } from "@/lib/security/sameOrigin";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 const CONSENT_TYPE = "channel_talk_personal_data_outsourcing";
@@ -15,10 +16,20 @@ function value(body: Record<string, unknown>, key: string, max = 200) {
 }
 
 export async function POST(request: Request) {
+  if (!isSameOriginRequest(request)) {
+    return NextResponse.json({ error: "허용되지 않은 요청입니다." }, { status: 403 });
+  }
+
   const access = await getCurrentCustomerAccess();
   if (!access) return NextResponse.json({ error: "로그인이 필요합니다." }, { status: 401 });
   if (!canManageCustomer(access)) {
     return NextResponse.json({ error: "채널을 연동할 권한이 없습니다." }, { status: 403 });
+  }
+  if (!access.customer.tenant_id) {
+    return NextResponse.json(
+      { error: "운영 워크스페이스 연결이 필요합니다. 운영팀에 문의해 주세요." },
+      { status: 409 },
+    );
   }
 
   const body = (await request.json().catch(() => ({}))) as Record<string, unknown>;
@@ -74,7 +85,7 @@ export async function POST(request: Request) {
     const { data: integration, error: integrationError } = await admin
       .from("channel_integrations")
       .insert({
-        tenant_id: null,
+        tenant_id: access.customer.tenant_id,
         customer_id: access.customer.id,
         brand_id: brand.id,
         provider: "channel_talk",

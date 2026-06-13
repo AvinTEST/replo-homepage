@@ -74,7 +74,7 @@ export default async function MyPage() {
   if (!access) redirect("/onboarding");
   const customer = access.customer;
 
-  const [subscriptionResult, paymentMethodResult, billingEventsResult, membershipResult] =
+  const [subscriptionResult, paymentMethodResult, billingEventsResult] =
     await Promise.all([
       supabase
         .from("subscriptions")
@@ -92,18 +92,11 @@ export default async function MyPage() {
         .eq("customer_id", customer.id)
         .order("created_at", { ascending: false })
         .limit(5),
-      supabase
-        .from("tenant_users")
-        .select("tenant_id")
-        .eq("user_id", user.id)
-        .limit(1)
-        .maybeSingle(),
     ]);
 
   const subscription = subscriptionResult.data;
   const paymentMethod = paymentMethodResult.data;
   const billingEvents = billingEventsResult.data ?? [];
-  const membership = membershipResult.data;
   const accountStatus =
     customer.status === "active"
       ? "이용 중"
@@ -134,9 +127,9 @@ export default async function MyPage() {
               >
                 운영 대시보드
               </Link>
-              {membership ? (
+              {customer.tenant_id ? (
                 <Link
-                  href={`/dashboard/${membership.tenant_id}`}
+                  href={`/dashboard/${customer.tenant_id}`}
                   className="rounded-xl border border-white/30 px-4 py-2 text-sm font-semibold"
                 >
                   실시간 상세 운영
@@ -252,7 +245,7 @@ export default async function MyPage() {
               href="/billing/payment-method"
               className="inline-flex rounded-xl bg-[#5B47E0] px-5 py-3 text-sm font-bold text-white"
             >
-              결제수단 변경
+              결제수단 변경 요청하기
             </Link>
           </div>
           <div className="mt-6 grid gap-4 lg:grid-cols-2">

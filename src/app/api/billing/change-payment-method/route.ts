@@ -1,123 +1,122 @@
 import { NextResponse } from "next/server";
+import {
+  configuredRedirectOrigins,
+  paymentMethodChangeMode,
+  safePaymentRedirect,
+} from "@/lib/billing/paymentMethodChange";
 import { getCurrentCustomerAccess } from "@/lib/customers/access";
-import { createClient } from "@/lib/supabase/server";
+import { isSameOriginRequest } from "@/lib/security/sameOrigin";
+import { createAdminClient } from "@/lib/supabase/admin";
 
-function allowedRedirectOrigins() {
-  return (process.env.STEPPAY_ALLOWED_REDIRECT_ORIGINS ?? "")
-    .split(",")
-    .map((origin) => origin.trim())
-    .filter(Boolean);
-}
-
-function safeRedirectUrl(value: unknown) {
-  if (typeof value !== "string" || !value) return "/mypage";
-  if (value.startsWith("/")) return value;
-
-  try {
-    const url = new URL(value);
-    if (url.protocol !== "https:") return "/mypage";
-    if (!allowedRedirectOrigins().includes(url.origin)) return "/mypage";
-    return url.toString();
-  } catch {
-    return "/mypage";
+export async function POST(request: Request) {
+  if (!isSameOriginRequest(request)) {
+    return NextResponse.json({ error: "허용되지 않은 요청입니다." }, { status: 403 });
   }
-}
 
-/**
- * API handler for initiating a payment method change.
- *
- * This route requires the user to be authenticated. It logs an event in
- * the billing_events table and returns a redirect URL. When integrating
- * StepPay, replace the redirect URL logic with a call to StepPay's API.
- */
-export async function POST() {
   const access = await getCurrentCustomerAccess();
   if (!access) {
-    return NextResponse.json(
-      { error: "로그인이 필요합니다." },
-      { status: 401 }
-    );
+    return NextResponse.json({ error: "로그인이 필요합니다." }, { status: 401 });
   }
-  const { customer } = access;
-  const supabase = await createClient();
 
-  // Find the subscription so we know which StepPay subscription to update
-  const { data: subscription } = await supabase
+  const admin = createAdminClient();
+  const { data: subscription, error: subscriptionError } = await admin
     .from("subscriptions")
     .select("id, steppay_subscription_id")
-    .eq("customer_id", customer.id)
-    .single();
-  if (!subscription) {
+    .eq("customer_id", access.customer.id)
+    .limit(1)
+    .maybeSingle();
+  if (subscriptionError) {
     return NextResponse.json(
-      { error: "구독 정보를 찾을 수 없습니다." },
-      { status: 404 }
+      { error: "구독 정보를 확인하지 못했습니다." },
+      { status: 500 },
     );
   }
 
-  // Log an event so that we can track the status of this request
-  await supabase.from("billing_events").insert({
-    customer_id: customer.id,
-    subscription_id: subscription.id,
-    event_type: "payment_method_change_requested",
-    status: "requested",
-    message: "결제수단 변경 요청이 생성되었습니다.",
+  const mode = paymentMethodChangeMode({
+    token: process.env.STEPPAY_SECRET_TOKEN,
+    apiBaseUrl: process.env.STEPPAY_API_BASE_URL,
+    allowedOrigins: process.env.STEPPAY_ALLOWED_REDIRECT_ORIGINS,
+    stepPaySubscriptionId: subscription?.steppay_subscription_id,
   });
+  const manualMessage = subscription
+    ? "결제수단 변경 요청이 접수되었습니다. 운영팀 확인 후 안내드리겠습니다."
+    : "아직 구독 정보가 없어 운영팀 상담 요청으로 접수되었습니다.";
 
-  // StepPay 결제수단 변경 요청을 생성합니다. 이 API는 StepPay 고객 ID와 구독 ID를 이용해
-  // 결제수단 변경 URL을 반환합니다. 서버에서만 토큰을 사용해야 하므로 환경변수에
-  // STEPPAY_SECRET_TOKEN을 설정해 주어야 합니다. API 명세에 맞추어 URL이나
-  // 요청 파라미터를 수정하십시오.
+  const { error: eventError } = await admin.from("billing_events").insert({
+    customer_id: access.customer.id,
+    subscription_id: subscription?.id ?? null,
+    event_type: "payment_method_change_requested",
+    status: mode === "steppay" ? "requested" : "manual_review",
+    message:
+      mode === "steppay"
+        ? "결제수단 변경 요청이 생성되었습니다."
+        : manualMessage,
+  });
+  if (eventError) {
+    return NextResponse.json(
+      { error: "결제수단 변경 요청을 기록하지 못했습니다." },
+      { status: 500 },
+    );
+  }
 
-  // StepPay API 엔드포인트. 필요한 경우 버전이나 경로를 수정하세요.
-  const steppayEndpoint =
-    process.env.STEPPAY_API_BASE_URL ??
-    "https://api.steppay.io/v1/subscriptions";
+  if (mode === "manual" || !subscription?.steppay_subscription_id) {
+    return NextResponse.json(
+      { ok: true, mode: "manual", message: manualMessage },
+      { status: 202 },
+    );
+  }
+
+  const baseUrl = process.env.STEPPAY_API_BASE_URL!.replace(/\/+$/, "");
+  const allowedOrigins = configuredRedirectOrigins(
+    process.env.STEPPAY_ALLOWED_REDIRECT_ORIGINS,
+  );
 
   try {
-    // 토큰이 없으면 오류를 반환합니다.
-    const token = process.env.STEPPAY_SECRET_TOKEN;
-    if (!token) {
-      throw new Error(
-        "STEPPAY_SECRET_TOKEN 환경변수가 설정되어 있지 않습니다."
-      );
-    }
-    // StepPay API 호출: 구독 ID로 결제수단 변경 URL을 요청합니다.
     const response = await fetch(
-      `${steppayEndpoint}/${subscription.steppay_subscription_id}/payment-method`,
+      `${baseUrl}/${encodeURIComponent(
+        subscription.steppay_subscription_id,
+      )}/payment-method`,
       {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${process.env.STEPPAY_SECRET_TOKEN}`,
         },
-        body: JSON.stringify({
-          // 필요에 따라 추가 필드를 전달할 수 있습니다.
-        }),
-      }
+        body: JSON.stringify({}),
+        cache: "no-store",
+      },
     );
-
     if (!response.ok) {
-      const errorBody = await response.text();
-      console.error(
-        `StepPay API error: ${response.status} ${response.statusText}`,
-        errorBody
-      );
-      throw new Error("StepPay API 호출에 실패했습니다.");
+      throw new Error(`StepPay request failed with status ${response.status}`);
     }
 
-    const data = await response.json();
-    // StepPay는 결제수단 변경을 위한 리다이렉션 URL을 반환해야 합니다.
-    const redirectUrl = safeRedirectUrl(data?.redirectUrl);
-    return NextResponse.json({ ok: true, redirectUrl });
+    const body = (await response.json()) as { redirectUrl?: unknown };
+    const redirectUrl = safePaymentRedirect(body.redirectUrl, allowedOrigins);
+    if (!redirectUrl) {
+      throw new Error("StepPay returned an unapproved redirect URL");
+    }
+
+    return NextResponse.json({ ok: true, mode: "steppay", redirectUrl });
   } catch (error) {
-    console.error(error);
-    // 오류가 발생하면 내부 구성 정보는 숨기고 일반화된 메시지만 반환합니다.
+    console.error(
+      "Failed to start StepPay payment method change:",
+      error instanceof Error ? error.message : "unknown error",
+    );
+    await admin.from("billing_events").insert({
+      customer_id: access.customer.id,
+      subscription_id: subscription.id,
+      event_type: "payment_method_change_failed",
+      status: "failed",
+      message: "외부 결제 페이지 연결에 실패해 운영팀 확인이 필요합니다.",
+    });
     return NextResponse.json(
       {
-        error: "결제수단 변경 요청에 실패했습니다.",
-        redirectUrl: "/mypage",
+        ok: true,
+        mode: "manual",
+        message:
+          "외부 결제 페이지를 열지 못해 운영팀 확인 요청으로 전환되었습니다.",
       },
-      { status: 500 }
+      { status: 202 },
     );
   }
 }

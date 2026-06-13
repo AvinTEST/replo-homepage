@@ -32,8 +32,9 @@ Replo 공개 홈페이지, 운영 진단 신청, 가입형 SaaS 고객 포털을
 - 초대받은 사용자는 인증 콜백에서 이메일이 일치하는 pending invite를 수락합니다.
 - `/mypage`에서 `subscriptions`와 `payment_methods`를 `maybeSingle()`로 조회하고 최근 `billing_events`를 확인합니다.
 - 신규 가입자에게 구독이 없어도 마이페이지에서 플랜 선택 전 상태와 결제수단 미등록 상태를 정상 표시합니다.
-- `/dashboard` 루트는 CS 운영 지표 요약을 표시하며, 현재 지표는 별도 mock data 파일에서 관리합니다.
-- `tenant_users` 멤버십이 있는 운영 고객은 `/dashboard/[tenantId]` 상세 운영 대시보드로 이동할 수 있습니다.
+- `/dashboard` 루트는 샘플 배지를 포함한 예시 지표를 표시하며, sample data 파일에서 관리합니다.
+- `customers.tenant_id`가 고객 포털과 운영 모델의 기준 연결입니다.
+- 운영 metric이 있는 고객만 루트 화면에서 `/dashboard/[tenantId]` 실데이터 링크를 확인합니다.
 
 ## 4. 데이터 모델
 
@@ -58,7 +59,9 @@ Replo 공개 홈페이지, 운영 진단 신청, 가입형 SaaS 고객 포털을
 
 ### `tenants` / `tenant_users`
 
-실제 운영 데이터가 연결된 고객사의 상세 운영 대시보드 권한을 관리합니다. 고객 포털 가입과 운영 데이터 연결은 분리되어 있습니다.
+실제 운영 데이터가 연결된 고객사의 상세 운영 대시보드 권한을 관리합니다. 신규
+온보딩은 customer와 tenant를 함께 만들며, 멤버 초대/역할 변경도 `tenant_users`와
+동기화합니다.
 
 ## 5. RLS와 고객 초기화
 
@@ -83,6 +86,8 @@ RLS는 `customer_members`의 active membership을 기준으로 고객사 범위�
 | `INTEGRATION_ENCRYPTION_KEY` | 서버 전용 | 채널톡 Access Key/Secret AES-256-GCM 암호화 |
 | `STEPPAY_SECRET_TOKEN` | 서버 전용 | StepPay 연동 확정 후 사용 |
 | `STEPPAY_API_BASE_URL` | 서버 설정 | StepPay API base URL |
+| `STEPPAY_ALLOWED_REDIRECT_ORIGINS` | 서버 전용 | 허용된 StepPay HTTPS redirect origin |
+| `ADMIN_EMAILS` | 서버 전용 | `/admin` 접근 허용 이메일 목록 |
 
 ## 7. Supabase Auth URL 설정
 
@@ -119,3 +124,5 @@ RLS는 `customer_members`의 active membership을 기준으로 고객사 범위�
 - 구독 없는 신규 사용자가 `/mypage`를 정상 조회하는지 확인
 - 인증된 사용자가 `/dashboard` 운영 현황을 조회하는지 확인
 - StepPay는 공식 계약 API 명세와 운영 credential 확인 후 활성화
+- `npm run check:env`와 `npm test` 통과
+- `docs/QA_OPERATIONAL_READINESS.md`의 권한 격리 및 fallback 항목 확인

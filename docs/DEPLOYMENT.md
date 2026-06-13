@@ -18,6 +18,10 @@ npm install
 npm run build
 ```
 
+이 브랜치는 Node.js 20 이상이 필요합니다. `npm audit --omit=dev`의 Next.js 잔여
+advisory를 해소하는 Next 16/React 19 마이그레이션 전까지는 내부 Preview 검수
+용도로만 사용하고 Production으로 승격하지 않습니다.
+
 Expected production routes:
 
 - `/`: redirects to `/replo-original/index.html`
@@ -63,6 +67,16 @@ STEPPAY_API_BASE_URL=
 STEPPAY_ALLOWED_REDIRECT_ORIGINS=
 ```
 
+Unset 상태에서는 결제수단 변경 요청이 `billing_events`에 수동 검토 요청으로
+기록되고 외부 결제 페이지를 열지 않습니다. 세 값 중 일부만 설정하는 구성은
+허용하지 않습니다.
+
+내부 운영자 화면을 사용할 환경에는 allowlist를 설정합니다.
+
+```bash
+ADMIN_EMAILS=operator@example.com
+```
+
 When StepPay is enabled, set `STEPPAY_ALLOWED_REDIRECT_ORIGINS` to the exact HTTPS origin(s) that StepPay may return, separated by commas. Unlisted external redirect URLs are replaced with `/mypage`.
 
 `SUPABASE_SERVICE_ROLE_KEY` is server-only and must never use the
@@ -82,7 +96,10 @@ shared limiter cannot silently disable abuse protection.
 
 ## Supabase Setup
 
-Run `docs/supabase.sql` in the Supabase SQL Editor.
+새 프로젝트는 `docs/supabase.sql`을 실행한 뒤 `supabase/migrations`를 파일명
+순서대로 모두 적용합니다. 기존 프로젝트도 migration history와 실제 테이블을
+대조해야 합니다. 운영 대시보드 migration이 빠진 상태에서 portal 코드만 배포하면
+온보딩과 상세 대시보드가 실패합니다.
 
 This creates:
 
@@ -179,3 +196,5 @@ Before announcing the site:
 - Monitor Supabase inserts and API errors.
 - Add notification automation for new diagnosis requests if needed.
 - Implement StepPay only after the official API documentation and production credentials are available.
+- Run `npm run check:env`, `npm test`, and `npm run build`.
+- Do not apply portal migrations to the production Supabase project from a `dev` preview deployment.

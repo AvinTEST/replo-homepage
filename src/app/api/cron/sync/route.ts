@@ -15,9 +15,16 @@ export async function POST(request: Request) {
       .from("channel_integrations")
       .select("tenant_id")
       .eq("provider", "channel_talk")
-      .eq("status", "connected");
+      .eq("status", "connected")
+      .not("tenant_id", "is", null);
     if (error) throw error;
-    const tenantIds = Array.from(new Set((data ?? []).map((row) => row.tenant_id as string)));
+    const tenantIds = Array.from(
+      new Set(
+        (data ?? [])
+          .map((row) => row.tenant_id)
+          .filter((tenantId): tenantId is string => typeof tenantId === "string"),
+      ),
+    );
     const results = [];
     for (const tenantId of tenantIds) {
       try {

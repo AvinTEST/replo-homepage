@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { defaultRange, validDate } from "@/lib/dashboard/dates";
 import { loadDashboard } from "@/lib/dashboard/service";
-import { getTenantAccess } from "@/lib/tenants/auth";
+import { getTenantAuthorization } from "@/lib/tenants/auth";
 import type { Grain } from "@/types/dashboard";
 
 export const dynamic = "force-dynamic";
@@ -10,8 +10,13 @@ export async function GET(
   request: NextRequest,
   { params }: { params: { tenantId: string } },
 ) {
-  const access = await getTenantAccess(params.tenantId);
-  if (!access) return NextResponse.json({ error: "접근 권한이 없습니다." }, { status: 403 });
+  const authorization = await getTenantAuthorization(params.tenantId);
+  if (!authorization.authenticated) {
+    return NextResponse.json({ error: "로그인이 필요합니다." }, { status: 401 });
+  }
+  if (!authorization.access) {
+    return NextResponse.json({ error: "접근 권한이 없습니다." }, { status: 404 });
+  }
 
   const grainValue = request.nextUrl.searchParams.get("grain");
   const grain: Grain =

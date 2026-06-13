@@ -246,6 +246,12 @@ export function OperationDashboard({
 
       <main className="dashboard-main">
         {error ? <div className="dashboard-error">{error}</div> : null}
+        {!data.range.lastDataDate ? (
+          <div className="dashboard-error">
+            아직 동기화된 운영 데이터가 없습니다. 연동 정보를 확인하고 첫 동기화를
+            실행해 주세요.
+          </div>
+        ) : null}
         <section>
           <SectionHead title="월 플랜 사용량" sub="이번 달 차감 대상 항목 기준" />
           <div className="plan-grid">

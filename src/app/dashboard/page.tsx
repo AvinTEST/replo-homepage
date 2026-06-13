@@ -8,7 +8,7 @@ import {
   statusBreakdown,
   urgentIssues,
   vocHighlights,
-} from "@/data/operations-dashboard";
+} from "@/data/sample-operations-dashboard";
 import { getCurrentCustomerAccess } from "@/lib/customers/access";
 import { createClient } from "@/lib/supabase/server";
 
@@ -29,12 +29,13 @@ export default async function DashboardPage() {
   if (!access) redirect("/onboarding");
   const customer = access.customer;
 
-  const { data: membership } = await supabase
-    .from("tenant_users")
-    .select("tenant_id")
-    .eq("user_id", user.id)
-    .limit(1)
-    .maybeSingle();
+  const metricsResult = customer.tenant_id
+    ? await supabase
+        .from("daily_operation_metrics")
+        .select("id", { count: "exact", head: true })
+        .eq("tenant_id", customer.tenant_id)
+    : { count: 0 };
+  const hasOperationalMetrics = (metricsResult.count ?? 0) > 0;
 
   const summaryCards = [
     { label: "총 문의 수", value: `${formatNumber(operationsSummary.totalTickets)}건` },
@@ -49,7 +50,10 @@ export default async function DashboardPage() {
       <div className="mx-auto max-w-7xl">
         <header className="flex flex-col gap-5 rounded-3xl bg-[#5B47E0] p-7 text-white shadow-sm lg:flex-row lg:items-end lg:justify-between">
           <div>
-            <p className="text-sm font-semibold text-white/70">CS 운영 대시보드</p>
+            <span className="inline-flex rounded-full bg-white px-3 py-1 text-xs font-bold text-[#5B47E0]">
+              샘플 데이터 · 운영 데이터 연결 전
+            </span>
+            <p className="mt-4 text-sm font-semibold text-white/70">CS 운영 대시보드</p>
             <h1 className="mt-2 text-3xl font-bold">{customer.company_name}</h1>
             <p className="mt-3 max-w-2xl text-sm leading-6 text-white/80">
               {operationsSummary.period} 고객 문의 흐름과 주요 운영 이슈를 한눈에 확인하세요.
@@ -63,9 +67,9 @@ export default async function DashboardPage() {
             >
               마이페이지
             </Link>
-            {membership ? (
+            {customer.tenant_id && hasOperationalMetrics ? (
               <Link
-                href={`/dashboard/${membership.tenant_id}`}
+                href={`/dashboard/${customer.tenant_id}`}
                 className="rounded-xl bg-white px-4 py-2 text-sm font-semibold text-[#5B47E0]"
               >
                 실시간 상세 운영 보기
@@ -73,6 +77,13 @@ export default async function DashboardPage() {
             ) : null}
           </nav>
         </header>
+
+        {customer.tenant_id && !hasOperationalMetrics ? (
+          <p className="mt-5 rounded-2xl border border-amber-200 bg-amber-50 px-5 py-4 text-sm font-medium text-amber-900">
+            아직 동기화된 운영 데이터가 없습니다. 채널 연동과 첫 동기화가 완료되면
+            실시간 상세 운영 화면을 사용할 수 있습니다.
+          </p>
+        ) : null}
 
         <section className="mt-6">
           <div className="flex items-end justify-between gap-4">
@@ -206,10 +217,16 @@ export default async function DashboardPage() {
             </p>
           </div>
           <Link
-            href={membership ? `/dashboard/${membership.tenant_id}/reports` : "/contact"}
+            href={
+              customer.tenant_id && hasOperationalMetrics
+                ? `/dashboard/${customer.tenant_id}/reports`
+                : customer.tenant_id
+                  ? `/dashboard/${customer.tenant_id}/integrations`
+                  : "/contact"
+            }
             className="inline-flex justify-center rounded-xl bg-white px-5 py-3 text-sm font-bold text-[#111C33]"
           >
-            운영 리포트 보기
+            {hasOperationalMetrics ? "운영 리포트 보기" : "운영 데이터 연결 확인"}
           </Link>
         </section>
       </div>

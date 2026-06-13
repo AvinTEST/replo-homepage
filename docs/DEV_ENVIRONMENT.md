@@ -138,9 +138,12 @@ Google Client ID와 Client Secret은 각 Supabase 프로젝트의 Google Auth Pr
 
 ## 테스트 순서
 
-1. `dev` 브랜치를 push하고 Preview 배포가 생성되는지 확인합니다.
-2. `https://dev.replo.kr`에서 회원가입과 Google 로그인을 테스트합니다.
-3. OAuth 이후 `https://dev.replo.kr/auth/callback`을 거쳐 `/mypage`로 이동하는지 확인합니다.
-4. 개발 Supabase에서 profile, customer, membership row 생성 여부를 확인합니다.
-5. 진단, 채널 연동, 결제 기능이 운영 DB와 운영 외부 API를 호출하지 않는지 확인합니다.
-6. `https://replo.kr`의 로그인과 공개 페이지가 기존 상태인지 확인합니다.
+1. 개발 Supabase에 모든 migration을 파일명 순서대로 적용합니다.
+2. `npm run check:env`, `npm test`, `npm run build`를 실행합니다.
+3. `dev` 브랜치를 push하고 Preview 배포가 생성되는지 확인합니다.
+4. `https://dev.replo.kr`에서 회원가입과 Google 로그인을 테스트합니다.
+5. OAuth 이후 `https://dev.replo.kr/auth/callback`을 거쳐 `/mypage`로 이동하는지 확인합니다.
+6. 개발 Supabase에서 profile, customer, brand, tenant, 두 membership row 생성 여부를 확인합니다.
+7. 진단, 채널 연동, 결제 기능이 운영 DB와 운영 외부 API를 호출하지 않는지 확인합니다.
+8. [`QA_OPERATIONAL_READINESS.md`](./QA_OPERATIONAL_READINESS.md)를 완료합니다.
+9. `https://replo.kr`의 공개 페이지가 기존 상태인지 확인합니다.

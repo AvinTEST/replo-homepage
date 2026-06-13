@@ -112,3 +112,38 @@ Supabase Auth 설정:
 ## 현재 주의사항
 
 StepPay 연동의 엔드포인트, 인증 방식, 요청/응답 필드는 실제 계약 및 최신 API 명세로 검증되지 않았습니다. 운영 배포 전에 [`docs/DEPLOYMENT.md`](./docs/DEPLOYMENT.md)와 `CONTEXT.md`의 미완성 항목 및 보안 체크리스트를 반드시 확인하세요.
+
+## dev 운영 검수
+
+`dev` 포털은 customer와 tenant를 하나의 워크스페이스로 연결합니다. 신규 온보딩은
+하나의 DB 함수 안에서 customer, owner membership, brand, tenant, tenant membership을
+원자적으로 생성합니다. 채널톡 연동은 이 tenant를 sync 대상으로 사용합니다.
+
+```bash
+npm install
+npm run check:env
+npm test
+npm run build
+```
+
+개발 Supabase에는 `supabase/migrations`를 파일명 순서대로 적용해야 합니다.
+특히 `202606090001_operations_dashboard.sql`과
+`202606130001_operational_readiness.sql`이 없으면 상세 대시보드와 동기화가 동작하지
+않습니다. 전체 검수 절차는
+[`docs/QA_OPERATIONAL_READINESS.md`](./docs/QA_OPERATIONAL_READINESS.md)를 따릅니다.
+
+현재 운영 가능 범위:
+
+- Google 인증, 온보딩, 고객/tenant 권한 연결
+- customer 범위 멤버 관리와 채널톡 credential 저장
+- 검증된 ChannelTalk credential을 사용한 수동/cron sync
+- 샘플과 실데이터가 구분된 대시보드
+- allowlist 기반 읽기 전용 `/admin`
+
+의도적으로 제한된 범위:
+
+- StepPay는 모든 운영 env와 구독 ID가 갖춰지기 전까지 운영팀 수동 처리로 접수
+- 네이버, 쿠팡, 카카오, Cafe24 connector는 준비 중
+- 실제 ChannelTalk credential이 없으면 sync 성공을 mock으로 대체하지 않음
+- 개발용 Supabase가 분리되지 않은 상태에서는 portal migration을 운영 DB에 적용하지 않음
+- Next 14 잔여 보안 advisory가 있어 Next 16/React 19 마이그레이션 전에는 프로덕션 승격 금지

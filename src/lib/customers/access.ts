@@ -15,6 +15,7 @@ export type CustomerAccess = {
   };
   customer: {
     id: string;
+    tenant_id: string | null;
     company_name: string;
     contact_name: string | null;
     phone: string | null;
@@ -26,6 +27,39 @@ export type CustomerAccess = {
     representative_name: string | null;
   };
 };
+
+export function tenantRoleForCustomerRole(
+  role: CustomerRole,
+): "owner" | "admin" | "manager" | "viewer" {
+  if (role === "owner" || role === "admin") return role;
+  if (role === "editor") return "manager";
+  return "viewer";
+}
+
+async function syncTenantMembership(
+  admin: ReturnType<typeof createAdminClient>,
+  customerId: string,
+  userId: string,
+  role: CustomerRole,
+) {
+  const { data: customer, error: customerError } = await admin
+    .from("customers")
+    .select("tenant_id")
+    .eq("id", customerId)
+    .maybeSingle();
+  if (customerError) throw customerError;
+  if (!customer?.tenant_id) return;
+
+  const { error } = await admin.from("tenant_users").upsert(
+    {
+      tenant_id: customer.tenant_id,
+      user_id: userId,
+      role: tenantRoleForCustomerRole(role),
+    },
+    { onConflict: "tenant_id,user_id" },
+  );
+  if (error) throw error;
+}
 
 function metadataText(user: User, key: string) {
   const value = user.user_metadata?.[key];
@@ -59,13 +93,21 @@ export async function syncProfileAndLegacyMembership(user: User) {
 
   const { data: existingMembership, error: membershipError } = await admin
     .from("customer_members")
-    .select("customer_id")
+    .select("customer_id, role")
     .eq("user_id", user.id)
     .eq("status", "active")
     .limit(1)
     .maybeSingle();
   if (membershipError) throw membershipError;
-  if (existingMembership) return existingMembership.customer_id as string;
+  if (existingMembership) {
+    await syncTenantMembership(
+      admin,
+      existingMembership.customer_id as string,
+      user.id,
+      existingMembership.role as CustomerRole,
+    );
+    return existingMembership.customer_id as string;
+  }
 
   const { data: pendingInvite, error: inviteError } = await admin
     .from("member_invites")
@@ -89,6 +131,12 @@ export async function syncProfileAndLegacyMembership(user: User) {
       { onConflict: "customer_id,user_id" },
     );
     if (acceptError) throw acceptError;
+    await syncTenantMembership(
+      admin,
+      pendingInvite.customer_id as string,
+      user.id,
+      pendingInvite.role as CustomerRole,
+    );
 
     await admin
       .from("member_invites")
@@ -117,6 +165,7 @@ export async function syncProfileAndLegacyMembership(user: User) {
     { onConflict: "customer_id,user_id" },
   );
   if (insertError) throw insertError;
+  await syncTenantMembership(admin, legacyCustomer.id as string, user.id, "owner");
   return legacyCustomer.id as string;
 }
 
@@ -141,7 +190,7 @@ export async function getCurrentCustomerAccess(): Promise<CustomerAccess | null>
   const { data: customer, error: customerError } = await admin
     .from("customers")
     .select(
-      "id, company_name, contact_name, phone, website_url, email, status, business_number, billing_email, representative_name",
+      "id, tenant_id, company_name, contact_name, phone, website_url, email, status, business_number, billing_email, representative_name",
     )
     .eq("id", membership.customer_id)
     .maybeSingle();

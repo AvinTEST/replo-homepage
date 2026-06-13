@@ -6,11 +6,16 @@ import {
   type CustomerRole,
 } from "@/lib/customers/access";
 import { getAuthCallbackUrl } from "@/lib/auth/redirect";
+import { isSameOriginRequest } from "@/lib/security/sameOrigin";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 const INVITABLE_ROLES: CustomerRole[] = ["admin", "editor", "viewer"];
 
 export async function POST(request: Request) {
+  if (!isSameOriginRequest(request)) {
+    return NextResponse.json({ error: "허용되지 않은 요청입니다." }, { status: 403 });
+  }
+
   const access = await getCurrentCustomerAccess();
   if (!access) return NextResponse.json({ error: "로그인이 필요합니다." }, { status: 401 });
   if (!canManageCustomer(access)) {

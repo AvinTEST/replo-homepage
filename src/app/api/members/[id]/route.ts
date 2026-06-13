@@ -4,6 +4,7 @@ import {
   getCurrentCustomerAccess,
   type CustomerRole,
 } from "@/lib/customers/access";
+import { isSameOriginRequest } from "@/lib/security/sameOrigin";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 const EDITABLE_ROLES: CustomerRole[] = ["owner", "admin", "editor", "viewer"];
@@ -34,6 +35,10 @@ export async function PATCH(
   request: Request,
   { params }: { params: { id: string } },
 ) {
+  if (!isSameOriginRequest(request)) {
+    return NextResponse.json({ error: "허용되지 않은 요청입니다." }, { status: 403 });
+  }
+
   const access = await getCurrentCustomerAccess();
   if (!access) return NextResponse.json({ error: "로그인이 필요합니다." }, { status: 401 });
   if (!canManageCustomer(access)) {
@@ -58,11 +63,15 @@ export async function PATCH(
   }
 
   const admin = createAdminClient();
-  const { error } = await admin
-    .from("customer_members")
-    .update({ role: body.role, updated_at: new Date().toISOString() })
-    .eq("id", target.id);
-  if (error) return NextResponse.json({ error: "역할을 변경하지 못했습니다." }, { status: 500 });
+  const { error } = await admin.rpc("update_customer_member_role", {
+    p_customer_id: access.customer.id,
+    p_member_id: target.id,
+    p_role: body.role,
+  });
+  if (error) {
+    const status = error.message.includes("last_owner") ? 409 : 500;
+    return NextResponse.json({ error: "역할을 변경하지 못했습니다." }, { status });
+  }
 
   await admin.from("audit_logs").insert({
     customer_id: access.customer.id,
@@ -76,9 +85,13 @@ export async function PATCH(
 }
 
 export async function DELETE(
-  _request: Request,
+  request: Request,
   { params }: { params: { id: string } },
 ) {
+  if (!isSameOriginRequest(request)) {
+    return NextResponse.json({ error: "허용되지 않은 요청입니다." }, { status: 403 });
+  }
+
   const access = await getCurrentCustomerAccess();
   if (!access) return NextResponse.json({ error: "로그인이 필요합니다." }, { status: 401 });
   if (!canManageCustomer(access)) {
@@ -95,8 +108,14 @@ export async function DELETE(
   }
 
   const admin = createAdminClient();
-  const { error } = await admin.from("customer_members").delete().eq("id", target.id);
-  if (error) return NextResponse.json({ error: "멤버를 삭제하지 못했습니다." }, { status: 500 });
+  const { error } = await admin.rpc("delete_customer_member", {
+    p_customer_id: access.customer.id,
+    p_member_id: target.id,
+  });
+  if (error) {
+    const status = error.message.includes("last_owner") ? 409 : 500;
+    return NextResponse.json({ error: "멤버를 삭제하지 못했습니다." }, { status });
+  }
 
   await admin.from("audit_logs").insert({
     customer_id: access.customer.id,

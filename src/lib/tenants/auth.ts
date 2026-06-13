@@ -7,12 +7,15 @@ export type TenantAccess = {
   role: "owner" | "admin" | "manager" | "viewer";
 };
 
-export async function getTenantAccess(tenantId: string): Promise<TenantAccess | null> {
+export async function getTenantAuthorization(tenantId: string): Promise<{
+  authenticated: boolean;
+  access: TenantAccess | null;
+}> {
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return null;
+  if (!user) return { authenticated: false, access: null };
 
   const { data } = await supabase
     .from("tenant_users")
@@ -21,12 +24,19 @@ export async function getTenantAccess(tenantId: string): Promise<TenantAccess | 
     .eq("user_id", user.id)
     .maybeSingle();
 
-  if (!data) return null;
+  if (!data) return { authenticated: true, access: null };
   return {
-    userId: user.id,
-    tenantId: data.tenant_id as string,
-    role: data.role as TenantAccess["role"],
+    authenticated: true,
+    access: {
+      userId: user.id,
+      tenantId: data.tenant_id as string,
+      role: data.role as TenantAccess["role"],
+    },
   };
+}
+
+export async function getTenantAccess(tenantId: string): Promise<TenantAccess | null> {
+  return (await getTenantAuthorization(tenantId)).access;
 }
 
 export function canManageIntegrations(access: TenantAccess) {

@@ -1,67 +1,19 @@
-"use client";
+import { redirect } from "next/navigation";
+import { PaymentMethodRequest } from "@/components/billing/PaymentMethodRequest";
+import { getCurrentCustomerAccess } from "@/lib/customers/access";
+import { createClient } from "@/lib/supabase/server";
 
-import Link from "next/link";
-import { useState } from "react";
+export const dynamic = "force-dynamic";
 
-export default function PaymentMethodPage() {
-  const [message, setMessage] = useState("");
-  const [loading, setLoading] = useState(false);
+export default async function PaymentMethodPage() {
+  const access = await getCurrentCustomerAccess();
+  if (!access) redirect("/login?next=/billing/payment-method");
 
-  async function handleChangePaymentMethod() {
-    setLoading(true);
-    setMessage("");
-    try {
-      const res = await fetch("/api/billing/change-payment-method", {
-        method: "POST",
-      });
-      const data = await res.json();
-      setLoading(false);
-      if (!res.ok) {
-        setMessage(data.error ?? "결제수단 변경 요청에 실패했습니다.");
-        return;
-      }
-      if (data.redirectUrl) {
-        const redirectUrl = new URL(data.redirectUrl, window.location.origin);
-        if (
-          redirectUrl.origin === window.location.origin ||
-          redirectUrl.protocol === "https:"
-        ) {
-          window.location.href = redirectUrl.toString();
-          return;
-        }
-        setMessage("결제 페이지 주소를 확인할 수 없습니다.");
-        return;
-      }
-      setMessage("결제수단 변경 요청이 접수되었습니다.");
-    } catch (e) {
-      setLoading(false);
-      setMessage("결제수단 변경 요청 중 오류가 발생했습니다.");
-    }
-  }
+  const supabase = await createClient();
+  const { count } = await supabase
+    .from("subscriptions")
+    .select("id", { count: "exact", head: true })
+    .eq("customer_id", access.customer.id);
 
-  return (
-    <main className="min-h-screen bg-[#F7F6FF] px-6 py-12">
-      <div className="mx-auto max-w-2xl rounded-3xl bg-white p-8 shadow">
-        <h1 className="text-2xl font-bold text-gray-900">결제수단 변경</h1>
-        <p className="mt-3 text-gray-600">
-          카드 정보는 Replo에 직접 저장하지 않습니다. 안전한 결제사 페이지를 통해
-          결제수단을 변경합니다.
-        </p>
-        <button
-          onClick={handleChangePaymentMethod}
-          disabled={loading}
-          className="mt-8 rounded-xl bg-[#5B47E0] px-5 py-3 font-semibold text-white disabled:opacity-60"
-        >
-          {loading ? "요청 중..." : "결제수단 변경 시작하기"}
-        </button>
-        <Link
-          href="/mypage#billing"
-          className="ml-3 mt-8 inline-flex rounded-xl border border-gray-200 px-5 py-3 font-semibold text-gray-700"
-        >
-          마이페이지로 돌아가기
-        </Link>
-        {message && <p className="mt-4 text-sm text-gray-600">{message}</p>}
-      </div>
-    </main>
-  );
+  return <PaymentMethodRequest hasSubscription={(count ?? 0) > 0} />;
 }
