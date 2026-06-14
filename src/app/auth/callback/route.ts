@@ -11,18 +11,15 @@ export async function GET(request: Request) {
   }
 
   const supabase = await createClient();
-  const { error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
-  if (exchangeError) {
+  const {
+    data: { session },
+    error: exchangeError,
+  } = await supabase.auth.exchangeCodeForSession(code);
+  if (exchangeError || !session?.user) {
     return NextResponse.redirect(`${origin}/?login=1&error=auth_failed`);
   }
 
-  const {
-    data: { user },
-    error: userError,
-  } = await supabase.auth.getUser();
-  if (userError || !user) {
-    return NextResponse.redirect(`${origin}/?login=1&error=auth_failed`);
-  }
+  const user = session.user;
 
   try {
     const customerId = await syncProfileAndLegacyMembership(user);
