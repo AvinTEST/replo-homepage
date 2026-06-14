@@ -32,6 +32,19 @@ export async function GET(request: Request) {
       "Failed to initialize authenticated user:",
       error instanceof Error ? error.message : "unknown error",
     );
-    return NextResponse.redirect(`${origin}/?login=1&error=auth_failed`);
+
+    // Existing members can continue through RLS even if an admin-only profile
+    // synchronization step is temporarily unavailable.
+    const { data: membership } = await supabase
+      .from("customer_members")
+      .select("customer_id")
+      .eq("user_id", user.id)
+      .eq("status", "active")
+      .limit(1)
+      .maybeSingle();
+
+    return NextResponse.redirect(
+      `${origin}${membership?.customer_id ? "/dashboard" : "/onboarding"}`,
+    );
   }
 }

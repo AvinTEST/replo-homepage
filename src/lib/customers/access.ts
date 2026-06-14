@@ -128,8 +128,7 @@ export async function getCurrentCustomerAccess(): Promise<CustomerAccess | null>
   } = await supabase.auth.getUser();
   if (!user) return null;
 
-  const admin = createAdminClient();
-  const { data: membership, error: membershipError } = await admin
+  const { data: membership, error: membershipError } = await supabase
     .from("customer_members")
     .select("id, customer_id, role, status")
     .eq("user_id", user.id)
@@ -139,19 +138,14 @@ export async function getCurrentCustomerAccess(): Promise<CustomerAccess | null>
     .maybeSingle();
   if (membershipError || !membership) return null;
 
-  const { data: customer, error: customerError } = await admin
+  const { data: customer, error: customerError } = await supabase
     .from("customers")
     .select(
       "id, company_name, contact_name, phone, website_url, email, status, business_number, billing_email, representative_name, tenant_id",
     )
     .eq("id", membership.customer_id)
     .maybeSingle();
-  if (customerError || !customer) return null;
-
-  await admin
-    .from("customer_members")
-    .update({ last_seen_at: new Date().toISOString() })
-    .eq("id", membership.id);
+  if (customerError || !customer?.tenant_id) return null;
 
   return {
     user,
