@@ -155,6 +155,10 @@ test("tenant timezone determines date_key", () => {
     calendarMonthRange("Asia/Seoul", new Date("2026-05-31T16:00:00.000Z")),
     { start: "2026-06-01", end: "2026-06-01" },
   );
+  assert.deepEqual(
+    calendarMonthRange("Asia/Seoul", new Date("2026-05-20T03:00:00.000Z")),
+    { start: "2026-05-01", end: "2026-05-20" },
+  );
 });
 
 test("CSV cells neutralize spreadsheet formulas", () => {

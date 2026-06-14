@@ -132,6 +132,14 @@ Data-heavy portal routes must always provide visible loading feedback.
 - Loading skeletons should preserve the normal rail, sidebar, card, and panel geometry to avoid layout jumps.
 - Do not replace portal loading feedback with a blank screen, an isolated spinner, or text-only loading.
 
+### Dashboard Date Defaults
+
+- The operations dashboard opens with daily data for the current calendar month.
+- Use the tenant-facing `Asia/Seoul` date: start at the first day of the current month and end at today.
+- Example: May opens as May 1 through today in May; June opens as June 1 through today in June.
+- Keep explicit user-selected start and end dates when refreshing or filtering.
+- The reports route may keep its separate long-range reporting period.
+
 ### Portal Implementation Don'ts
 
 Do not:

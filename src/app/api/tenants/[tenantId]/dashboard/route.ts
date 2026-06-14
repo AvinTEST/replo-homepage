@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { defaultRange, validDate } from "@/lib/dashboard/dates";
+import { calendarMonthRange, validDate } from "@/lib/dashboard/dates";
 import { loadDashboard } from "@/lib/dashboard/service";
 import { getTenantAccess } from "@/lib/tenants/auth";
 import type { Grain } from "@/types/dashboard";
@@ -16,7 +16,7 @@ export async function GET(
   const grainValue = request.nextUrl.searchParams.get("grain");
   const grain: Grain =
     grainValue === "week" || grainValue === "month" ? grainValue : "day";
-  const fallback = defaultRange(grain);
+  const fallback = calendarMonthRange("Asia/Seoul");
   const start = validDate(request.nextUrl.searchParams.get("start")) ?? fallback.start;
   const end = validDate(request.nextUrl.searchParams.get("end")) ?? fallback.end;
   if (start > end) {

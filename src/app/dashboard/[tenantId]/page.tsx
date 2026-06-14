@@ -1,6 +1,6 @@
 import { notFound, redirect } from "next/navigation";
 import { OperationDashboard } from "@/components/dashboard/OperationDashboard";
-import { defaultRange } from "@/lib/dashboard/dates";
+import { calendarMonthRange } from "@/lib/dashboard/dates";
 import { loadDashboard } from "@/lib/dashboard/service";
 import { createClient } from "@/lib/supabase/server";
 import { getTenantAccess } from "@/lib/tenants/auth";
@@ -20,10 +20,10 @@ export default async function TenantDashboardPage({
 
   const access = await getTenantAccess(params.tenantId);
   if (!access) notFound();
-  const range = defaultRange("week");
+  const range = calendarMonthRange("Asia/Seoul");
   const initialData = await loadDashboard({
     tenantId: params.tenantId,
-    grain: "week",
+    grain: "day",
     start: range.start,
     end: range.end,
   });
