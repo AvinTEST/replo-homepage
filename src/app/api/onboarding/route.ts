@@ -36,72 +36,28 @@ export async function POST(request: Request) {
     .maybeSingle();
   if (existing) return NextResponse.json({ ok: true, customerId: existing.customer_id });
 
-  const { data: customer, error: customerError } = await admin
-    .from("customers")
-    .insert({
-      user_id: user.id,
-      company_name: companyName,
-      contact_name: representativeName,
-      representative_name: representativeName,
-      business_number: text(body.businessNumber, 40) || null,
-      billing_email: text(body.billingEmail) || user.email,
-      website_url: text(body.websiteUrl, 500) || null,
-      email: user.email,
-      status: "pending_plan",
-    })
-    .select("id")
-    .single();
-  if (customerError || !customer) {
+  const { data, error } = await admin.rpc("initialize_customer_workspace", {
+    p_user_id: user.id,
+    p_email: user.email,
+    p_company_name: companyName,
+    p_representative_name: representativeName,
+    p_brand_name: brandName,
+    p_business_number: text(body.businessNumber, 40) || "",
+    p_billing_email: text(body.billingEmail) || user.email,
+    p_website_url: text(body.websiteUrl, 500) || "",
+    p_avatar_url:
+      typeof user.user_metadata?.avatar_url === "string"
+        ? user.user_metadata.avatar_url
+        : "",
+  });
+  const workspace = Array.isArray(data) ? data[0] : data;
+  if (error || !workspace?.customer_id) {
     return NextResponse.json({ error: "고객사 정보를 만들지 못했습니다." }, { status: 500 });
   }
 
-  const now = new Date().toISOString();
-  const { error: relatedError } = await admin.from("customer_members").insert({
-    customer_id: customer.id,
-    user_id: user.id,
-    role: "owner",
-    status: "active",
-    last_seen_at: now,
+  return NextResponse.json({
+    ok: true,
+    customerId: workspace.customer_id,
+    tenantId: workspace.tenant_id,
   });
-  if (relatedError) {
-    await admin.from("customers").delete().eq("id", customer.id);
-    return NextResponse.json({ error: "소유자 권한을 만들지 못했습니다." }, { status: 500 });
-  }
-
-  const { error: brandError } = await admin.from("brands").insert({
-    customer_id: customer.id,
-    name: brandName,
-    website_url: text(body.websiteUrl, 500) || null,
-    status: "active",
-  });
-  if (brandError) {
-    await admin.from("customers").delete().eq("id", customer.id);
-    return NextResponse.json({ error: "브랜드 정보를 만들지 못했습니다." }, { status: 500 });
-  }
-
-  await Promise.all([
-    admin.from("profiles").upsert(
-      {
-        user_id: user.id,
-        name: representativeName,
-        email: user.email,
-        avatar_url:
-          typeof user.user_metadata?.avatar_url === "string"
-            ? user.user_metadata.avatar_url
-            : null,
-        updated_at: now,
-      },
-      { onConflict: "user_id" },
-    ),
-    admin.from("audit_logs").insert({
-      customer_id: customer.id,
-      actor_user_id: user.id,
-      action: "workspace.created",
-      target_type: "customer",
-      target_id: customer.id,
-      metadata: { brand_name: brandName },
-    }),
-  ]);
-
-  return NextResponse.json({ ok: true, customerId: customer.id });
 }

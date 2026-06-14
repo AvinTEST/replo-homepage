@@ -74,7 +74,7 @@ export default async function MyPage() {
   if (!access) redirect("/onboarding");
   const customer = access.customer;
 
-  const [subscriptionResult, paymentMethodResult, billingEventsResult, membershipResult] =
+  const [subscriptionResult, paymentMethodResult, billingEventsResult] =
     await Promise.all([
       supabase
         .from("subscriptions")
@@ -92,18 +92,11 @@ export default async function MyPage() {
         .eq("customer_id", customer.id)
         .order("created_at", { ascending: false })
         .limit(5),
-      supabase
-        .from("tenant_users")
-        .select("tenant_id")
-        .eq("user_id", user.id)
-        .limit(1)
-        .maybeSingle(),
     ]);
 
   const subscription = subscriptionResult.data;
   const paymentMethod = paymentMethodResult.data;
   const billingEvents = billingEventsResult.data ?? [];
-  const membership = membershipResult.data;
   const accountStatus =
     customer.status === "active"
       ? "이용 중"
@@ -134,14 +127,12 @@ export default async function MyPage() {
               >
                 운영 대시보드
               </Link>
-              {membership ? (
-                <Link
-                  href={`/dashboard/${membership.tenant_id}`}
-                  className="rounded-xl border border-white/30 px-4 py-2 text-sm font-semibold"
-                >
-                  실시간 상세 운영
-                </Link>
-              ) : null}
+              <Link
+                href={`/dashboard/${access.tenantId}`}
+                className="rounded-xl border border-white/30 px-4 py-2 text-sm font-semibold"
+              >
+                실시간 상세 운영
+              </Link>
             </div>
           </div>
         </header>

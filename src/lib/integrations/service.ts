@@ -1,7 +1,10 @@
 import "server-only";
 import { ChannelTalkConnector } from "@/lib/connectors/channelTalkConnector";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { decryptCredentials } from "@/lib/security/integrationCredentials";
+import {
+  decryptCredentials,
+  decryptCredentialValue,
+} from "@/lib/security/integrationCredentials";
 import type { IntegrationSummary } from "@/types/dashboard";
 
 type IntegrationRow = {
@@ -10,6 +13,8 @@ type IntegrationRow = {
   display_name: string;
   status: IntegrationSummary["status"];
   encrypted_credentials: string | null;
+  access_key_encrypted: string | null;
+  access_secret_encrypted: string | null;
   last_sync_at: string | null;
   last_sync_status: string | null;
   last_error: string | null;
@@ -24,7 +29,7 @@ export async function listIntegrations(tenantId: string): Promise<IntegrationSum
   const { data, error } = await admin
     .from("channel_integrations")
     .select(
-      "id, provider, display_name, status, encrypted_credentials, last_sync_at, last_sync_status, last_error",
+      "id, provider, display_name, status, encrypted_credentials, access_key_encrypted, access_secret_encrypted, last_sync_at, last_sync_status, last_error",
     )
     .eq("tenant_id", tenantId)
     .order("display_name");
@@ -38,24 +43,44 @@ export async function listIntegrations(tenantId: string): Promise<IntegrationSum
     lastSyncAt: item.last_sync_at,
     lastSyncStatus: item.last_sync_status,
     lastError: item.last_error,
-    configured: Boolean(item.encrypted_credentials),
+    configured: Boolean(
+      item.encrypted_credentials ||
+        (item.access_key_encrypted && item.access_secret_encrypted),
+    ),
   }));
 }
 
-export async function getChannelTalkIntegration(tenantId: string) {
+export async function getChannelTalkIntegration(tenantId: string, integrationId?: string) {
   const admin = requireAdminClient();
-  const { data, error } = await admin
+  let query = admin
     .from("channel_integrations")
     .select("*")
     .eq("tenant_id", tenantId)
-    .eq("provider", "channel_talk")
+    .eq("provider", "channel_talk");
+  if (integrationId) query = query.eq("id", integrationId);
+  const { data, error } = await query
+    .order("created_at", { ascending: true })
+    .limit(1)
     .maybeSingle();
   if (error) throw error;
   return data;
 }
 
-export function channelTalkConnectorFromEncrypted(encryptedCredentials: string) {
-  const credentials = decryptCredentials(encryptedCredentials);
+export function channelTalkConnectorFromIntegration(integration: {
+  encrypted_credentials?: string | null;
+  access_key_encrypted?: string | null;
+  access_secret_encrypted?: string | null;
+}) {
+  const credentials = integration.encrypted_credentials
+    ? decryptCredentials(integration.encrypted_credentials)
+    : {
+        accessKey: integration.access_key_encrypted
+          ? decryptCredentialValue(integration.access_key_encrypted)
+          : "",
+        accessSecret: integration.access_secret_encrypted
+          ? decryptCredentialValue(integration.access_secret_encrypted)
+          : "",
+      };
   if (!credentials.accessKey || !credentials.accessSecret) {
     throw new Error("채널톡 credential이 완전하지 않습니다.");
   }

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { requireAdminClient } from "@/lib/integrations/service";
 import { syncChannelTalk } from "@/lib/integrations/syncChannelTalk";
+import { validSyncTargets } from "@/lib/integrations/syncTargets";
 import { isValidBearerSecret } from "@/lib/security/cron";
 
 export async function POST(request: Request) {
@@ -13,17 +14,20 @@ export async function POST(request: Request) {
     const admin = requireAdminClient();
     const { data, error } = await admin
       .from("channel_integrations")
-      .select("tenant_id")
+      .select("id, tenant_id")
       .eq("provider", "channel_talk")
       .eq("status", "connected");
     if (error) throw error;
-    const tenantIds = Array.from(new Set((data ?? []).map((row) => row.tenant_id as string)));
+    const targets = validSyncTargets(data ?? []);
     const results = [];
-    for (const tenantId of tenantIds) {
+    for (const target of targets) {
       try {
-        results.push({ tenantId, ...(await syncChannelTalk(tenantId)) });
+        results.push({
+          ...target,
+          ...(await syncChannelTalk(target.tenantId, target.integrationId)),
+        });
       } catch {
-        results.push({ tenantId, ok: false });
+        results.push({ ...target, ok: false });
       }
     }
     return NextResponse.json({ ok: true, results });

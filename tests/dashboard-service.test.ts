@@ -11,6 +11,7 @@ import {
 } from "../src/lib/dashboard/dates.ts";
 import { buildDailyMetricRows } from "../src/lib/dashboard/metrics.ts";
 import { isValidBearerSecret } from "../src/lib/security/cron.ts";
+import { validSyncTargets } from "../src/lib/integrations/syncTargets.ts";
 import {
   buildDashboardFromMetricFixtures,
   type SupabaseMetricRow,
@@ -165,4 +166,19 @@ test("cron bearer secret validation uses a constant-time digest comparison", () 
   assert.equal(isValidBearerSecret("Bearer correct-secret", "correct-secret"), true);
   assert.equal(isValidBearerSecret("Bearer wrong-secret", "correct-secret"), false);
   assert.equal(isValidBearerSecret(null, "correct-secret"), false);
+});
+
+test("cron sync targets reject null tenancy and preserve multiple integrations", () => {
+  assert.deepEqual(
+    validSyncTargets([
+      { id: "integration-a", tenant_id: "tenant-1" },
+      { id: "integration-b", tenant_id: "tenant-1" },
+      { id: "integration-a", tenant_id: "tenant-1" },
+      { id: "integration-c", tenant_id: null },
+    ]),
+    [
+      { integrationId: "integration-a", tenantId: "tenant-1" },
+      { integrationId: "integration-b", tenantId: "tenant-1" },
+    ],
+  );
 });

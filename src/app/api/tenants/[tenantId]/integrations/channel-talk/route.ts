@@ -25,22 +25,37 @@ export async function POST(
     });
     await connector.testConnection();
     const admin = requireAdminClient();
-    const { error } = await admin.from("channel_integrations").upsert(
-      {
+    const { data: existing, error: existingError } = await admin
+      .from("channel_integrations")
+      .select("id")
+      .eq("tenant_id", params.tenantId)
+      .eq("provider", "channel_talk")
+      .is("customer_id", null)
+      .maybeSingle();
+    if (existingError) throw existingError;
+
+    const integration = {
+      tenant_id: params.tenantId,
+      provider: "channel_talk",
+      display_name: "채널톡",
+      status: "connected",
+      encrypted_credentials: encryptCredentials({
+        accessKey: body.accessKey.trim(),
+        accessSecret: body.accessSecret.trim(),
+      }),
+      last_sync_status: "연결 테스트 성공",
+      last_error: null,
+      updated_at: new Date().toISOString(),
+    };
+    const { error } = existing
+      ? await admin
+        .from("channel_integrations")
+        .update(integration)
+        .eq("id", existing.id)
+      : await admin.from("channel_integrations").insert({
+        ...integration,
         tenant_id: params.tenantId,
-        provider: "channel_talk",
-        display_name: "채널톡",
-        status: "connected",
-        encrypted_credentials: encryptCredentials({
-          accessKey: body.accessKey.trim(),
-          accessSecret: body.accessSecret.trim(),
-        }),
-        last_sync_status: "연결 테스트 성공",
-        last_error: null,
-        updated_at: new Date().toISOString(),
-      },
-      { onConflict: "tenant_id,provider" },
-    );
+      });
     if (error) throw error;
     return NextResponse.json({ ok: true, message: "채널톡 연결 정보를 안전하게 저장했습니다." });
   } catch (error) {

@@ -1,8 +1,10 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useMemo, useState, useTransition } from "react";
 import { createCsv } from "@/lib/dashboard/csv";
+import { createClient } from "@/lib/supabase/client";
 import type { DashboardResponse, Grain } from "@/types/dashboard";
 
 const number = new Intl.NumberFormat("ko-KR");
@@ -104,6 +106,16 @@ function SectionHead({ title, sub }: { title: string; sub: string }) {
   );
 }
 
+function NavIcon({ type }: { type: "dashboard" | "report" | "integration" | "account" }) {
+  const paths = {
+    dashboard: <><rect x="3" y="3" width="7" height="7" rx="2" /><rect x="14" y="3" width="7" height="7" rx="2" /><rect x="3" y="14" width="7" height="7" rx="2" /><rect x="14" y="14" width="7" height="7" rx="2" /></>,
+    report: <><path d="M5 20V10" /><path d="M12 20V4" /><path d="M19 20v-7" /><path d="M3 20h18" /></>,
+    integration: <><path d="M8 12h8" /><path d="M12 8v8" /><rect x="3" y="3" width="18" height="18" rx="5" /></>,
+    account: <><circle cx="12" cy="8" r="3" /><path d="M5 20c.7-4 3-6 7-6s6.3 2 7 6" /></>,
+  };
+  return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">{paths[type]}</svg>;
+}
+
 export function OperationDashboard({
   tenantId,
   initialData,
@@ -113,6 +125,7 @@ export function OperationDashboard({
   initialData: DashboardResponse;
   canManage: boolean;
 }) {
+  const router = useRouter();
   const [data, setData] = useState(initialData);
   const [grain, setGrain] = useState<Grain>(initialData.range.grain);
   const [start, setStart] = useState(initialData.range.start);
@@ -173,26 +186,42 @@ export function OperationDashboard({
   }, [data.charts.trend]);
 
   const usage = Math.min(100, Math.max(0, data.planUsage.usageRate));
+  const signOut = async () => {
+    await createClient().auth.signOut();
+    router.replace("/login");
+    router.refresh();
+  };
 
   return (
     <div className="ops-dashboard">
-      <header className="dashboard-topbar">
-        <div className="dashboard-brand">
-          <Link href="/" className="dashboard-logo">Replo<span>✦</span></Link>
-          <i />
-          <strong>{data.tenant.name} 운영 대시보드</strong>
+      <nav className="dashboard-rail" aria-label="주요 메뉴">
+        <Link href="/" className="rail-logo" aria-label="Replo 홈">R<sup>+</sup></Link>
+        <div className="rail-menu">
+          <Link href={`/dashboard/${tenantId}`} className="rail-link active" aria-label="대시보드"><NavIcon type="dashboard" /><span>대시보드</span></Link>
+          <Link href={`/dashboard/${tenantId}/reports`} className="rail-link" aria-label="리포트"><NavIcon type="report" /><span>리포트</span></Link>
+          <Link href={`/dashboard/${tenantId}/integrations`} className="rail-link" aria-label="연동 관리"><NavIcon type="integration" /><span>연동</span></Link>
+          <Link href="/mypage" className="rail-link" aria-label="계정 관리"><NavIcon type="account" /><span>계정</span></Link>
         </div>
-        <div className="dashboard-badges">
-          <span>{data.range.start} ~ {data.range.end}</span>
-          <span>{grain === "day" ? "일간" : grain === "week" ? "주간" : "월간"}</span>
-          <span>마지막 데이터: {data.range.lastDataDate ?? "없음"}</span>
-          {channel ? <span className="active">채널: {channel}</span> : null}
-        </div>
-      </header>
+        <button type="button" className="rail-profile" onClick={() => router.push("/mypage")} aria-label="마이페이지">
+          {data.tenant.name.slice(0, 1)}
+        </button>
+      </nav>
 
       <aside className="dashboard-sidebar">
+        <div className="sidebar-workspace">
+          <span>WORKSPACE</span>
+          <strong>{data.tenant.name}</strong>
+          <small>{data.tenant.planName} 플랜</small>
+        </div>
+        <div className="sidebar-navigation">
+          <p>운영</p>
+          <Link href={`/dashboard/${tenantId}`} className="active">운영 대시보드</Link>
+          <Link href={`/dashboard/${tenantId}/reports`}>운영 리포트</Link>
+          <Link href={`/dashboard/${tenantId}/integrations`}>연동 채널 관리</Link>
+          <Link href="/mypage">워크스페이스 설정</Link>
+        </div>
         <div className="sidebar-group">
-          <h2>연동 상태</h2>
+          <h2>데이터 연동</h2>
           <div className="sync-status">
             <i className={data.sync.status} />
             <span>{isPending ? "데이터 갱신 중..." : data.sync.message}</span>
@@ -242,9 +271,23 @@ export function OperationDashboard({
             </div>
           ) : null}
         </div>
+        <button type="button" className="sidebar-logout" onClick={signOut}>로그아웃</button>
       </aside>
 
       <main className="dashboard-main">
+        <header className="dashboard-page-header">
+          <div>
+            <p>OPERATIONS</p>
+            <h1>운영 대시보드</h1>
+            <span>{data.tenant.name}의 고객 운영 현황을 확인합니다.</span>
+          </div>
+          <div className="dashboard-badges">
+            <span>{data.range.start} ~ {data.range.end}</span>
+            <span>{grain === "day" ? "일간" : grain === "week" ? "주간" : "월간"}</span>
+            <span>마지막 데이터: {data.range.lastDataDate ?? "없음"}</span>
+            {channel ? <span className="active">채널: {channel}</span> : null}
+          </div>
+        </header>
         {error ? <div className="dashboard-error">{error}</div> : null}
         <section>
           <SectionHead title="월 플랜 사용량" sub="이번 달 차감 대상 항목 기준" />

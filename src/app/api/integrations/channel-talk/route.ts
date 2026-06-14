@@ -74,7 +74,7 @@ export async function POST(request: Request) {
     const { data: integration, error: integrationError } = await admin
       .from("channel_integrations")
       .insert({
-        tenant_id: null,
+        tenant_id: access.tenantId,
         customer_id: access.customer.id,
         brand_id: brand.id,
         provider: "channel_talk",

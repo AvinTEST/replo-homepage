@@ -32,7 +32,7 @@ export function GoogleAuthButton({ label }: { label: string }) {
         type="button"
         onClick={handleGoogleAuth}
         disabled={loading}
-        className="flex h-[52px] w-full items-center justify-center gap-3 rounded-xl border border-[#D8D6E3] bg-white px-4 text-[15px] font-bold text-[#29253D] transition hover:border-[#A99FF0] hover:bg-[#FAF9FF] focus:outline-none focus:ring-4 focus:ring-[#5B47E0]/10 disabled:opacity-60"
+        className="google-auth-button"
       >
         <svg aria-hidden="true" viewBox="0 0 24 24" className="h-5 w-5">
           <path fill="#4285F4" d="M21.35 12.22c0-.74-.07-1.45-.19-2.13H12v4.03h5.24a4.48 4.48 0 0 1-1.94 2.94v2.62h3.14c1.84-1.7 2.91-4.2 2.91-7.46Z" />

@@ -12,10 +12,12 @@ export async function POST(
     return NextResponse.json({ error: "동기화 권한이 없습니다." }, { status: 403 });
   }
   try {
-    const connected = await listIntegrations(params.tenantId);
+    const connected = (await listIntegrations(params.tenantId)).filter(
+      (item) => item.provider === "channel_talk" && item.status === "connected",
+    );
     const results = [];
-    if (connected.some((item) => item.provider === "channel_talk" && item.status === "connected")) {
-      results.push(await syncChannelTalk(params.tenantId));
+    for (const integration of connected) {
+      results.push(await syncChannelTalk(params.tenantId, integration.id));
     }
     return NextResponse.json({ ok: true, results });
   } catch (error) {

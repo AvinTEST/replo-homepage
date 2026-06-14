@@ -7,6 +7,7 @@ export type CustomerRole = "owner" | "admin" | "editor" | "viewer";
 
 export type CustomerAccess = {
   user: User;
+  tenantId: string;
   membership: {
     id: string;
     customer_id: string;
@@ -141,7 +142,7 @@ export async function getCurrentCustomerAccess(): Promise<CustomerAccess | null>
   const { data: customer, error: customerError } = await admin
     .from("customers")
     .select(
-      "id, company_name, contact_name, phone, website_url, email, status, business_number, billing_email, representative_name",
+      "id, company_name, contact_name, phone, website_url, email, status, business_number, billing_email, representative_name, tenant_id",
     )
     .eq("id", membership.customer_id)
     .maybeSingle();
@@ -154,6 +155,7 @@ export async function getCurrentCustomerAccess(): Promise<CustomerAccess | null>
 
   return {
     user,
+    tenantId: customer.tenant_id as string,
     membership: membership as CustomerAccess["membership"],
     customer: customer as CustomerAccess["customer"],
   };

@@ -26,7 +26,7 @@ export async function GET(request: Request) {
 
   try {
     const customerId = await syncProfileAndLegacyMembership(user);
-    return NextResponse.redirect(`${origin}${customerId ? "/mypage" : "/onboarding"}`);
+    return NextResponse.redirect(`${origin}${customerId ? "/dashboard" : "/onboarding"}`);
   } catch (error) {
     console.error(
       "Failed to initialize authenticated user:",

@@ -9,22 +9,26 @@ import {
   type OperationEventMetricRow,
 } from "@/lib/dashboard/metrics";
 import {
-  channelTalkConnectorFromEncrypted,
+  channelTalkConnectorFromIntegration,
   getChannelTalkIntegration,
   requireAdminClient,
 } from "@/lib/integrations/service";
 
-export async function syncChannelTalk(tenantId: string, range?: { from: string; to: string }) {
+export async function syncChannelTalk(
+  tenantId: string,
+  integrationId: string,
+  range?: { from: string; to: string },
+) {
   const admin = requireAdminClient();
   const [integration, tenantResult, rulesResult] = await Promise.all([
-    getChannelTalkIntegration(tenantId),
+    getChannelTalkIntegration(tenantId, integrationId),
     admin.from("tenants").select("timezone").eq("id", tenantId).single(),
     admin
       .from("billing_task_rules")
       .select("provider, channel, task_type, is_billable, weight")
       .eq("tenant_id", tenantId),
   ]);
-  if (!integration?.encrypted_credentials) {
+  if (!integration) {
     throw new Error("채널톡 credential을 먼저 등록해 주세요.");
   }
   if (tenantResult.error) throw tenantResult.error;
@@ -59,7 +63,7 @@ export async function syncChannelTalk(tenantId: string, range?: { from: string; 
   if (jobError) throw jobError;
 
   try {
-    const connector = channelTalkConnectorFromEncrypted(integration.encrypted_credentials);
+    const connector = channelTalkConnectorFromIntegration(integration);
     const events = await connector.fetchEvents({ from, to });
     const payload = events.map((event) => ({
       tenant_id: tenantId,
@@ -84,7 +88,9 @@ export async function syncChannelTalk(tenantId: string, range?: { from: string; 
     if (payload.length) {
       const { error } = await admin
         .from("operation_events")
-        .upsert(payload, { onConflict: "tenant_id,provider,external_id" });
+        .upsert(payload, {
+          onConflict: "tenant_id,integration_id,provider,external_id",
+        });
       if (error) throw error;
     }
 
@@ -127,6 +133,7 @@ export async function syncChannelTalk(tenantId: string, range?: { from: string; 
         .update({
           status: "connected",
           last_sync_at: new Date().toISOString(),
+          last_synced_at: new Date().toISOString(),
           last_sync_status: `${events.length}건 동기화`,
           last_error: null,
           updated_at: new Date().toISOString(),

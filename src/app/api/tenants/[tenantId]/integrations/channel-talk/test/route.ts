@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { ChannelTalkConnector } from "@/lib/connectors/channelTalkConnector";
 import {
-  channelTalkConnectorFromEncrypted,
+  channelTalkConnectorFromIntegration,
   getChannelTalkIntegration,
 } from "@/lib/integrations/service";
 import { canManageIntegrations, getTenantAccess } from "@/lib/tenants/auth";
@@ -28,8 +28,8 @@ export async function POST(
       });
     } else {
       const integration = await getChannelTalkIntegration(params.tenantId);
-      if (!integration?.encrypted_credentials) throw new Error("저장된 credential이 없습니다.");
-      connector = channelTalkConnectorFromEncrypted(integration.encrypted_credentials);
+      if (!integration) throw new Error("저장된 credential이 없습니다.");
+      connector = channelTalkConnectorFromIntegration(integration);
     }
     return NextResponse.json(await connector.testConnection());
   } catch (error) {
