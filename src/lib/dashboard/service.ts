@@ -7,6 +7,23 @@ import {
 import { calendarMonthRange } from "@/lib/dashboard/dates";
 import type { DashboardResponse, Grain } from "@/types/dashboard";
 
+export async function loadPortalTenant(tenantId: string) {
+  const admin = createAdminClient();
+  const { data, error } = await admin
+    .from("tenants")
+    .select("id, display_name, plan_name")
+    .eq("id", tenantId)
+    .single();
+
+  if (error || !data) throw new Error("Tenant not found");
+
+  return {
+    id: data.id as string,
+    name: (data.display_name as string | null) || "워크스페이스",
+    planName: (data.plan_name as string | null) || "미등록",
+  };
+}
+
 export async function loadDashboard(input: {
   tenantId: string;
   grain: Grain;

@@ -12,29 +12,6 @@
   font-family: Pretendard, "DM Sans", Arial, sans-serif;
 }
 .mypage-shell * { box-sizing: border-box; }
-.mypage-rail {
-  position: sticky; top: 0; height: 100vh; z-index: 20;
-  display: flex; flex-direction: column; align-items: center;
-  border-right: 1px solid var(--border); background: #fff; padding: 22px 10px 16px;
-}
-.mypage-rail-logo {
-  width: 44px; height: 44px; display: grid; place-items: center; border-radius: 13px;
-  background: var(--purple); color: #fff; font-size: 20px; font-weight: 900;
-  letter-spacing: -.06em; text-decoration: none;
-}
-.mypage-rail-logo sup { color: #d8d1ff; font-size: 10px; }
-.mypage-rail-links { display: flex; flex: 1; flex-direction: column; gap: 8px; margin-top: 34px; }
-.mypage-rail-links a {
-  width: 54px; min-height: 58px; display: flex; flex-direction: column; align-items: center;
-  justify-content: center; gap: 5px; border-radius: 12px; color: #8a94a5;
-  font-size: 10px; font-weight: 700; text-decoration: none;
-}
-.mypage-rail-links a b { font-size: 12px; letter-spacing: .04em; }
-.mypage-rail-links a:hover, .mypage-rail-links a.active { background: var(--purple-soft); color: var(--purple); }
-.mypage-avatar {
-  width: 38px; height: 38px; border: 0; border-radius: 12px; background: #e9e6ff;
-  color: var(--purple); font: inherit; font-size: 13px; font-weight: 900; cursor: pointer;
-}
 .mypage-menu {
   position: sticky; top: 0; height: 100vh; display: flex; flex-direction: column;
   border-right: 1px solid var(--border); background: #fff; padding: 28px 18px 20px;
@@ -130,21 +107,16 @@
   .current-plan-summary { grid-template-columns: repeat(2, 1fr); }
 }
 @media (max-width: 760px) {
+  .mypage-form-grid, .plan-choice-grid, .current-plan-summary { grid-template-columns: 1fr; }
+  .mypage-card-head, .payment-placeholder, .enterprise-row { align-items: flex-start; flex-direction: column; }
+}
+@media (max-width: 640px) {
   .mypage-shell { display: block; padding-bottom: 66px; }
-  .mypage-rail {
-    position: fixed; top: auto; right: 0; bottom: 0; left: 0; width: 100%; height: 66px;
-    flex-direction: row; border-top: 1px solid var(--border); border-right: 0; padding: 6px 12px;
-  }
-  .mypage-rail-logo, .mypage-avatar { display: none; }
-  .mypage-rail-links { width: 100%; flex-direction: row; justify-content: space-around; margin: 0; }
-  .mypage-rail-links a { width: 64px; min-height: 52px; }
   .mypage-menu { position: static; width: 100%; height: auto; border-right: 0; border-bottom: 1px solid var(--border); padding: 18px 14px; }
   .mypage-menu-head { padding-bottom: 14px; }
   .mypage-menu-list { display: flex; overflow-x: auto; }
   .mypage-menu-list button { min-width: 130px; }
   .mypage-menu-list button span, .mypage-logout { display: none; }
   .mypage-content { padding: 24px 14px 36px; }
-  .mypage-form-grid, .plan-choice-grid, .current-plan-summary { grid-template-columns: 1fr; }
   .mypage-card { padding: 20px; }
-  .mypage-card-head, .payment-placeholder, .enterprise-row { align-items: flex-start; flex-direction: column; }
 }

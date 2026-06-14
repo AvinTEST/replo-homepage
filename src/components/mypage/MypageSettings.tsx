@@ -5,6 +5,7 @@ import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import { IntegrationManagement } from "@/components/mypage/IntegrationManagement";
 import { MemberManagement } from "@/components/mypage/MemberManagement";
+import { PortalRail } from "@/components/portal/PortalRail";
 import { selectablePlans } from "@/lib/billing/plans";
 import { createClient } from "@/lib/supabase/client";
 
@@ -139,18 +140,7 @@ export function MypageSettings(props: Props) {
 
   return (
     <div className="mypage-shell">
-      <nav className="mypage-rail" aria-label="주요 메뉴">
-        <Link href="/" className="mypage-rail-logo" aria-label="Replo 홈">R<sup>+</sup></Link>
-        <div className="mypage-rail-links">
-          <Link href={`/dashboard/${props.tenantId}`}><b>01</b><span>대시보드</span></Link>
-          <Link href={`/dashboard/${props.tenantId}/reports`}><b>02</b><span>리포트</span></Link>
-          <Link href={`/dashboard/${props.tenantId}/integrations`}><b>03</b><span>연동</span></Link>
-          <Link href="/mypage" className="active"><b>04</b><span>설정</span></Link>
-        </div>
-        <button type="button" className="mypage-avatar" onClick={() => setActive("profile")}>
-          {profile.brandName.slice(0, 1) || "R"}
-        </button>
-      </nav>
+      <PortalRail tenantId={props.tenantId} active="account" workspaceName={profile.brandName} />
 
       <aside className="mypage-menu">
         <div className="mypage-menu-head">

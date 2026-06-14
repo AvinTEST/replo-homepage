@@ -1,10 +1,8 @@
 "use client";
 
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useMemo, useState, useTransition } from "react";
+import { useMemo, useState } from "react";
+import { PortalShell } from "@/components/portal/PortalShell";
 import { createCsv } from "@/lib/dashboard/csv";
-import { createClient } from "@/lib/supabase/client";
 import type { DashboardResponse, Grain } from "@/types/dashboard";
 
 const number = new Intl.NumberFormat("ko-KR");
@@ -106,16 +104,6 @@ function SectionHead({ title, sub }: { title: string; sub: string }) {
   );
 }
 
-function NavIcon({ type }: { type: "dashboard" | "report" | "integration" | "account" }) {
-  const paths = {
-    dashboard: <><rect x="3" y="3" width="7" height="7" rx="2" /><rect x="14" y="3" width="7" height="7" rx="2" /><rect x="3" y="14" width="7" height="7" rx="2" /><rect x="14" y="14" width="7" height="7" rx="2" /></>,
-    report: <><path d="M5 20V10" /><path d="M12 20V4" /><path d="M19 20v-7" /><path d="M3 20h18" /></>,
-    integration: <><path d="M8 12h8" /><path d="M12 8v8" /><rect x="3" y="3" width="18" height="18" rx="5" /></>,
-    account: <><circle cx="12" cy="8" r="3" /><path d="M5 20c.7-4 3-6 7-6s6.3 2 7 6" /></>,
-  };
-  return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">{paths[type]}</svg>;
-}
-
 export function OperationDashboard({
   tenantId,
   initialData,
@@ -125,7 +113,6 @@ export function OperationDashboard({
   initialData: DashboardResponse;
   canManage: boolean;
 }) {
-  const router = useRouter();
   const [data, setData] = useState(initialData);
   const [grain, setGrain] = useState<Grain>(initialData.range.grain);
   const [start, setStart] = useState(initialData.range.start);
@@ -135,24 +122,31 @@ export function OperationDashboard({
   const [detailOpen, setDetailOpen] = useState(false);
   const [compareMode, setCompareMode] = useState<"line" | "bar">("line");
   const [error, setError] = useState("");
-  const [isPending, startTransition] = useTransition();
+  const [isLoading, setIsLoading] = useState(false);
 
-  const refresh = (overrides?: { channel?: string; task?: string }) => {
+  const fetchDashboard = async (overrides?: { channel?: string; task?: string }) => {
     const nextChannel = overrides?.channel ?? channel;
     const nextTask = overrides?.task ?? task;
     const query = new URLSearchParams({ start, end, grain });
     if (nextChannel) query.set("channel", nextChannel);
     if (nextTask) query.set("task", nextTask);
     setError("");
-    startTransition(async () => {
-      const response = await fetch(`/api/tenants/${tenantId}/dashboard?${query}`);
-      const body = await response.json();
-      if (!response.ok) {
-        setError(body.error ?? "데이터를 불러오지 못했습니다.");
-        return;
-      }
-      setData(body as DashboardResponse);
-    });
+    const response = await fetch(`/api/tenants/${tenantId}/dashboard?${query}`);
+    const body = await response.json();
+    if (!response.ok) {
+      setError(body.error ?? "데이터를 불러오지 못했습니다.");
+      return;
+    }
+    setData(body as DashboardResponse);
+  };
+
+  const refresh = async (overrides?: { channel?: string; task?: string }) => {
+    setIsLoading(true);
+    try {
+      await fetchDashboard(overrides);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const setChannelFilter = (value: string) => {
@@ -165,16 +159,21 @@ export function OperationDashboard({
     setTask("");
     refresh({ channel: "", task: "" });
   };
-  const sync = () =>
-    startTransition(async () => {
+  const sync = async () => {
+    setIsLoading(true);
+    setError("");
+    try {
       const response = await fetch(`/api/tenants/${tenantId}/sync/all`, { method: "POST" });
       if (!response.ok) {
         const body = await response.json();
         setError(body.error ?? "동기화에 실패했습니다.");
         return;
       }
-      refresh();
-    });
+      await fetchDashboard();
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const compare = useMemo(() => {
     const midpoint = Math.ceil(data.charts.trend.length / 2);
@@ -186,50 +185,23 @@ export function OperationDashboard({
   }, [data.charts.trend]);
 
   const usage = Math.min(100, Math.max(0, data.planUsage.usageRate));
-  const signOut = async () => {
-    await createClient().auth.signOut();
-    router.replace("/login");
-    router.refresh();
-  };
-
   return (
-    <div className="ops-dashboard">
-      <nav className="dashboard-rail" aria-label="주요 메뉴">
-        <Link href="/" className="rail-logo" aria-label="Replo 홈">R<sup>+</sup></Link>
-        <div className="rail-menu">
-          <Link href={`/dashboard/${tenantId}`} className="rail-link active" aria-label="대시보드"><NavIcon type="dashboard" /><span>대시보드</span></Link>
-          <Link href={`/dashboard/${tenantId}/reports`} className="rail-link" aria-label="리포트"><NavIcon type="report" /><span>리포트</span></Link>
-          <Link href={`/dashboard/${tenantId}/integrations`} className="rail-link" aria-label="연동 관리"><NavIcon type="integration" /><span>연동</span></Link>
-          <Link href="/mypage" className="rail-link" aria-label="계정 관리"><NavIcon type="account" /><span>계정</span></Link>
-        </div>
-        <button type="button" className="rail-profile" onClick={() => router.push("/mypage")} aria-label="마이페이지">
-          {data.tenant.name.slice(0, 1)}
-        </button>
-      </nav>
-
-      <aside className="dashboard-sidebar">
-        <div className="sidebar-workspace">
-          <span>WORKSPACE</span>
-          <strong>{data.tenant.name}</strong>
-          <small>{data.tenant.planName} 플랜</small>
-        </div>
-        <div className="sidebar-navigation">
-          <p>운영</p>
-          <Link href={`/dashboard/${tenantId}`} className="active">운영 대시보드</Link>
-          <Link href={`/dashboard/${tenantId}/reports`}>운영 리포트</Link>
-          <Link href={`/dashboard/${tenantId}/integrations`}>연동 채널 관리</Link>
-          <Link href="/mypage">워크스페이스 설정</Link>
-        </div>
+    <PortalShell
+      tenantId={tenantId}
+      tenantName={data.tenant.name}
+      planName={data.tenant.planName}
+      active="dashboard"
+      sidebar={
+        <>
         <div className="sidebar-group">
           <h2>데이터 연동</h2>
           <div className="sync-status">
             <i className={data.sync.status} />
-            <span>{isPending ? "데이터 갱신 중..." : data.sync.message}</span>
+            <span>{isLoading ? "데이터 갱신 중..." : data.sync.message}</span>
           </div>
-          <button type="button" className="secondary-button full" onClick={sync} disabled={isPending || !canManage}>
+          <button type="button" className="secondary-button full" onClick={sync} disabled={isLoading || !canManage}>
             새로고침
           </button>
-          <Link href={`/dashboard/${tenantId}/integrations`} className="sidebar-link">연동 관리</Link>
         </div>
         <div className="sidebar-group">
           <h2>기간 필터</h2>
@@ -243,7 +215,7 @@ export function OperationDashboard({
           <input type="date" value={start} onChange={(event) => setStart(event.target.value)} />
           <label>종료일</label>
           <input type="date" value={end} onChange={(event) => setEnd(event.target.value)} />
-          <button type="button" className="primary-button full" onClick={() => refresh()} disabled={isPending}>기간 적용</button>
+          <button type="button" className="primary-button full" onClick={() => refresh()} disabled={isLoading}>기간 적용</button>
         </div>
         <div className="sidebar-group">
           <h2>채널 필터</h2>
@@ -271,10 +243,17 @@ export function OperationDashboard({
             </div>
           ) : null}
         </div>
-        <button type="button" className="sidebar-logout" onClick={signOut}>로그아웃</button>
-      </aside>
-
-      <main className="dashboard-main">
+        </>
+      }
+    >
+        <div
+          className={`dashboard-progress ${isLoading ? "visible" : ""}`}
+          role="progressbar"
+          aria-label="대시보드 데이터 불러오는 중"
+          aria-hidden={!isLoading}
+        >
+          <span />
+        </div>
         <header className="dashboard-page-header">
           <div>
             <p>OPERATIONS</p>
@@ -386,7 +365,6 @@ export function OperationDashboard({
           <div className="table-scroll"><table><thead><tr><th>기준일</th><th>판매채널</th><th>세부업무</th><th>처리 건수</th><th>메모</th></tr></thead><tbody>{data.table.map((row, index) => <tr key={`${row.date}-${row.channel}-${row.task}-${index}`}><td>{row.date}</td><td><span className="channel-tag">{row.channel}</span></td><td>{row.task}</td><td>{number.format(row.count)}</td><td>{row.memo}</td></tr>)}</tbody><tfoot><tr><td colSpan={3}>합계</td><td>{number.format(data.operationKpis.total)}</td><td /></tr></tfoot></table></div>
         </section>
         <footer>{data.tenant.name} 운영팀 전용 · Powered by Replo</footer>
-      </main>
-    </div>
+    </PortalShell>
   );
 }
