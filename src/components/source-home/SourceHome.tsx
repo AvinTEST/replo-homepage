@@ -115,9 +115,11 @@ function LoginModal({
         <button className="home-auth-close" type="button" onClick={onClose} aria-label="로그인 창 닫기">
           <Icon name="x" size={21} />
         </button>
-        <Logo />
-        <h2 id="home-auth-title">고객 운영을 한곳에서 관리하세요.</h2>
-        <p>Google 계정으로 로그인하면 Replo 워크스페이스로 이동합니다.</p>
+        <div className="home-auth-brand">
+          <Logo />
+        </div>
+        <h2 id="home-auth-title">Replo에 로그인</h2>
+        <p className="home-auth-description">Google 계정으로 간편하게 시작하세요.</p>
         {authError ? (
           <p className="home-auth-error" role="alert">
             Google 인증을 완료하지 못했습니다. 다시 시도해 주세요.
@@ -126,7 +128,7 @@ function LoginModal({
         <div className="home-auth-action">
           <GoogleAuthButton label="Google로 계속하기" />
         </div>
-        <small>처음 로그인하는 경우 회사와 브랜드 정보를 등록한 뒤 대시보드를 시작합니다.</small>
+        <small>처음 로그인하면 회사와 브랜드 정보를 등록합니다.</small>
       </div>
     </div>
   );
