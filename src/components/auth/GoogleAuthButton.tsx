@@ -12,17 +12,44 @@ export function GoogleAuthButton({ label }: { label: string }) {
     setLoading(true);
     setMessage("");
 
-    const supabase = createClient();
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: {
-        redirectTo: getAuthCallbackUrl(),
-      },
-    });
+    try {
+      const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+      const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-    if (error) {
-      setLoading(false);
+      if (!supabaseUrl || !supabaseAnonKey) {
+        throw new Error("Missing Supabase browser environment variables");
+      }
+
+      const settingsResponse = await fetch(`${supabaseUrl}/auth/v1/settings`, {
+        headers: { apikey: supabaseAnonKey },
+        cache: "no-store",
+      });
+      const settings = (await settingsResponse.json().catch(() => null)) as {
+        external?: { google?: boolean };
+      } | null;
+
+      if (!settingsResponse.ok || !settings?.external?.google) {
+        setMessage(
+          "Google 로그인 설정이 아직 완료되지 않았습니다. 관리자 설정 후 다시 시도해 주세요.",
+        );
+        return;
+      }
+
+      const supabase = createClient();
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: {
+          redirectTo: getAuthCallbackUrl(),
+        },
+      });
+
+      if (error) {
+        throw error;
+      }
+    } catch {
       setMessage("Google 로그인을 시작하지 못했습니다. 잠시 후 다시 시도해 주세요.");
+    } finally {
+      setLoading(false);
     }
   }
 
