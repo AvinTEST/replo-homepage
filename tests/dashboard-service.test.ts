@@ -6,6 +6,7 @@ import {
 } from "../src/lib/dashboard/billing.ts";
 import { createCsv } from "../src/lib/dashboard/csv.ts";
 import {
+  automaticGrain,
   calendarMonthRange,
   dateKeyInTimeZone,
 } from "../src/lib/dashboard/dates.ts";
@@ -92,6 +93,29 @@ test("real metric fixtures preserve DB call counts and calendar-month billable u
     dashboard.planUsage.detailRows.map(({ channel, count }) => [channel, count]),
     [["쿠팡", 80], ["채널톡", 50]],
   );
+
+  const weeklyDashboard = buildDashboardFromMetricFixtures({
+    tenant: {
+      id: "tenant-fixture",
+      name: "Fixture",
+      planName: "Basic",
+      monthlyPlanLimit: 1000,
+    },
+    grain: "week",
+    start: "2026-06-03",
+    end: "2026-06-09",
+    referenceDate: "2026-06-09",
+    selectedMetrics: [
+      { ...selectedMetrics[0], date_key: "2026-06-03" },
+      ...selectedMetrics,
+    ],
+    monthlyMetrics,
+    sync: { status: "ok", lastSyncAt: null, message: "fixture" },
+  });
+  assert.deepEqual(
+    weeklyDashboard.charts.trend.map(({ label }) => label),
+    ["06.03~06.07", "06.08~06.09"],
+  );
 });
 
 test("billing rules apply is_billable and weight", () => {
@@ -118,6 +142,7 @@ test("billing rules apply is_billable and weight", () => {
     0,
   );
   assert.equal(calculateBillableCount(10, "coupang", "쿠팡", "고객 문의", rules), 0);
+  assert.equal(calculateBillableCount(10, "channel_talk", "채널톡", "채팅", new Map()), 10);
 
   const metrics = buildDailyMetricRows({
     tenantId: "tenant-fixture",
@@ -159,6 +184,9 @@ test("tenant timezone determines date_key", () => {
     calendarMonthRange("Asia/Seoul", new Date("2026-05-20T03:00:00.000Z")),
     { start: "2026-05-01", end: "2026-05-20" },
   );
+  assert.equal(automaticGrain("2026-06-01", "2026-06-30"), "day");
+  assert.equal(automaticGrain("2026-06-01", "2026-07-26"), "week");
+  assert.equal(automaticGrain("2026-01-01", "2026-06-30"), "month");
 });
 
 test("CSV cells neutralize spreadsheet formulas", () => {

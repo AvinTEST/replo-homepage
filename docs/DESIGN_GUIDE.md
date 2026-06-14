@@ -138,6 +138,9 @@ Data-heavy portal routes must always provide visible loading feedback.
 - Use the tenant-facing `Asia/Seoul` date: start at the first day of the current month and end at today.
 - Example: May opens as May 1 through today in May; June opens as June 1 through today in June.
 - Keep explicit user-selected start and end dates when refreshing or filtering.
+- Do not expose a manual day/week/month selector.
+- Select chart aggregation automatically: up to 31 days uses daily points, up to 56 days uses weekly points, and longer ranges use monthly points.
+- Trend chart points must expose the represented date or date range and count through mouse hover and keyboard focus.
 - The reports route may keep its separate long-range reporting period.
 
 ### Portal Implementation Don'ts

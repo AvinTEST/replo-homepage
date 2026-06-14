@@ -25,6 +25,7 @@ export function calculateBillableCount(
   rules: Map<string, BillingTaskRule>,
 ) {
   const rule = rules.get(billingRuleKey(provider, channel, taskType));
+  if (rules.size === 0 && provider === "channel_talk") return count;
   if (!rule?.isBillable) return 0;
   return count * rule.weight;
 }

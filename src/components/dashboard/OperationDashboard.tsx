@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import { PortalShell } from "@/components/portal/PortalShell";
 import { createCsv } from "@/lib/dashboard/csv";
-import type { DashboardResponse, Grain } from "@/types/dashboard";
+import type { DashboardResponse } from "@/types/dashboard";
 
 const number = new Intl.NumberFormat("ko-KR");
 
@@ -21,11 +21,14 @@ function LineChart({
   values,
   labels,
   color = "#5B47E0",
+  valueLabel = "처리 건수",
 }: {
   values: number[];
   labels: string[];
   color?: string;
+  valueLabel?: string;
 }) {
+  const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const width = 640;
   const height = 220;
   const max = Math.max(...values, 1);
@@ -34,6 +37,13 @@ function LineChart({
     y: height - 34 - (value / max) * (height - 58),
   }));
   const path = points.map((point, index) => `${index ? "L" : "M"}${point.x},${point.y}`).join(" ");
+  const activePoint = activeIndex === null ? null : points[activeIndex];
+  const tooltipTransform =
+    activeIndex === 0
+      ? "translate(0, -115%)"
+      : activeIndex === points.length - 1
+        ? "translate(-100%, -115%)"
+        : "translate(-50%, -115%)";
 
   return (
     <div className="chart-svg-wrap">
@@ -51,9 +61,36 @@ function LineChart({
         <path d={`${path} L${points.at(-1)?.x ?? 0},${height - 34} L18,${height - 34} Z`} fill={`${color}12`} />
         <path d={path} fill="none" stroke={color} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
         {points.map((point, index) => (
-          <circle key={`${point.x}-${point.y}`} cx={point.x} cy={point.y} r="3.5" fill="#fff" stroke={color} strokeWidth="2" />
+          <g
+            key={`${point.x}-${point.y}`}
+            tabIndex={0}
+            role="button"
+            aria-label={`${labels[index]}, ${valueLabel} ${number.format(values[index])}건`}
+            onPointerEnter={() => setActiveIndex(index)}
+            onPointerLeave={() => setActiveIndex(null)}
+            onFocus={() => setActiveIndex(index)}
+            onBlur={() => setActiveIndex(null)}
+            onClick={() => setActiveIndex((current) => current === index ? null : index)}
+          >
+            <circle cx={point.x} cy={point.y} r="12" fill="transparent" />
+            <circle cx={point.x} cy={point.y} r={activeIndex === index ? 5 : 3.5} fill="#fff" stroke={color} strokeWidth="2" />
+          </g>
         ))}
       </svg>
+      {activePoint && activeIndex !== null ? (
+        <div
+          className="chart-tooltip"
+          role="status"
+          style={{
+            left: `${(activePoint.x / width) * 100}%`,
+            top: `${(activePoint.y / height) * 100}%`,
+            transform: tooltipTransform,
+          }}
+        >
+          <span>{labels[activeIndex]}</span>
+          <strong>{valueLabel} {number.format(values[activeIndex])}건</strong>
+        </div>
+      ) : null}
       <div className="chart-axis">
         {labels.filter((_, index) => index === 0 || index === labels.length - 1).map((label) => (
           <span key={label}>{label}</span>
@@ -114,7 +151,7 @@ export function OperationDashboard({
   canManage: boolean;
 }) {
   const [data, setData] = useState(initialData);
-  const [grain, setGrain] = useState<Grain>(initialData.range.grain);
+  const [grain, setGrain] = useState(initialData.range.grain);
   const [start, setStart] = useState(initialData.range.start);
   const [end, setEnd] = useState(initialData.range.end);
   const [channel, setChannel] = useState("");
@@ -127,7 +164,7 @@ export function OperationDashboard({
   const fetchDashboard = async (overrides?: { channel?: string; task?: string }) => {
     const nextChannel = overrides?.channel ?? channel;
     const nextTask = overrides?.task ?? task;
-    const query = new URLSearchParams({ start, end, grain });
+    const query = new URLSearchParams({ start, end });
     if (nextChannel) query.set("channel", nextChannel);
     if (nextTask) query.set("task", nextTask);
     setError("");
@@ -137,7 +174,9 @@ export function OperationDashboard({
       setError(body.error ?? "데이터를 불러오지 못했습니다.");
       return;
     }
-    setData(body as DashboardResponse);
+    const nextData = body as DashboardResponse;
+    setData(nextData);
+    setGrain(nextData.range.grain);
   };
 
   const refresh = async (overrides?: { channel?: string; task?: string }) => {
@@ -205,12 +244,10 @@ export function OperationDashboard({
         </div>
         <div className="sidebar-group">
           <h2>기간 필터</h2>
-          <label>보기 기준</label>
-          <select value={grain} onChange={(event) => setGrain(event.target.value as Grain)}>
-            <option value="day">일간</option>
-            <option value="week">주간</option>
-            <option value="month">월간</option>
-          </select>
+          <div className="automatic-grain">
+            <span>자동 집계</span>
+            <strong>{grain === "day" ? "일 단위" : grain === "week" ? "주 단위" : "월 단위"}</strong>
+          </div>
           <label>시작일</label>
           <input type="date" value={start} onChange={(event) => setStart(event.target.value)} />
           <label>종료일</label>
@@ -333,7 +370,7 @@ export function OperationDashboard({
             </div>
             <article className="panel chart-panel">
               <div className="chart-heading"><div><strong>콜 인입 · 응대 · 응대율 추이</strong><small>기간별 전화 응대 현황</small></div><span>혼합</span></div>
-              <LineChart values={data.charts.callTrend.map((item) => item.total)} labels={data.charts.callTrend.map((item) => item.label)} color="#0284c7" />
+              <LineChart values={data.charts.callTrend.map((item) => item.total)} labels={data.charts.callTrend.map((item) => item.label)} color="#0284c7" valueLabel="총 콜 인입" />
             </article>
           </div>
         </section>

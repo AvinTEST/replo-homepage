@@ -51,6 +51,17 @@ function grainKey(dateValue: string, grain: Grain) {
   return dateValue;
 }
 
+function trendLabel(key: string, grain: Grain, rangeStart: string, rangeEnd: string) {
+  if (grain === "day") return key.slice(5).replace("-", ".");
+  if (grain === "month") return key.replace("-", ".");
+  const start = new Date(`${key}T00:00:00Z`);
+  const end = new Date(start);
+  end.setUTCDate(end.getUTCDate() + 6);
+  const cappedStart = key < rangeStart ? rangeStart : key;
+  const cappedEnd = isoDate(end) > rangeEnd ? rangeEnd : isoDate(end);
+  return `${cappedStart.slice(5).replace("-", ".")}~${cappedEnd.slice(5).replace("-", ".")}`;
+}
+
 function businessDaysRemaining(referenceDate: string) {
   const [year, month, day] = referenceDate.split("-").map(Number);
   const cursor = new Date(Date.UTC(year, month - 1, day));
@@ -116,7 +127,11 @@ export function aggregateDashboardMetrics(input: {
   const sortedTasks = Array.from(taskTotals.entries()).sort((a, b) => b[1] - a[1]);
   const trend = Array.from(dateTotals.entries())
     .sort(([a], [b]) => a.localeCompare(b))
-    .map(([key, count]) => ({ key, label: key, count }));
+    .map(([key, count]) => ({
+      key,
+      label: trendLabel(key, input.grain, input.start, input.end),
+      count,
+    }));
   const latest = trend.at(-1);
   const previous = trend.at(-2);
   const diff = (latest?.count ?? 0) - (previous?.count ?? 0);

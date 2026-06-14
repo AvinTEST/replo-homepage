@@ -21,6 +21,15 @@ export function calendarMonthRange(timeZone = "Asia/Seoul", now = new Date()) {
   return { start: `${end.slice(0, 7)}-01`, end };
 }
 
+export function automaticGrain(start: string, end: string): Grain {
+  const startDate = new Date(`${start}T00:00:00Z`);
+  const endDate = new Date(`${end}T00:00:00Z`);
+  const days = Math.floor((endDate.getTime() - startDate.getTime()) / 86400000) + 1;
+  if (days <= 31) return "day";
+  if (days <= 56) return "week";
+  return "month";
+}
+
 export function defaultRange(grain: Grain) {
   const end = new Date();
   const start = new Date(end);

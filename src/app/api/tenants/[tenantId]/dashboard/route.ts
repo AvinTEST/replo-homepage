@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { calendarMonthRange, validDate } from "@/lib/dashboard/dates";
+import { automaticGrain, calendarMonthRange, validDate } from "@/lib/dashboard/dates";
 import { loadDashboard } from "@/lib/dashboard/service";
 import { getTenantAccess } from "@/lib/tenants/auth";
-import type { Grain } from "@/types/dashboard";
 
 export const dynamic = "force-dynamic";
 
@@ -13,9 +12,6 @@ export async function GET(
   const access = await getTenantAccess(params.tenantId);
   if (!access) return NextResponse.json({ error: "접근 권한이 없습니다." }, { status: 403 });
 
-  const grainValue = request.nextUrl.searchParams.get("grain");
-  const grain: Grain =
-    grainValue === "week" || grainValue === "month" ? grainValue : "day";
   const fallback = calendarMonthRange("Asia/Seoul");
   const start = validDate(request.nextUrl.searchParams.get("start")) ?? fallback.start;
   const end = validDate(request.nextUrl.searchParams.get("end")) ?? fallback.end;
@@ -26,7 +22,7 @@ export async function GET(
   try {
     const data = await loadDashboard({
       tenantId: params.tenantId,
-      grain,
+      grain: automaticGrain(start, end),
       start,
       end,
       channel: request.nextUrl.searchParams.get("channel") || undefined,
