@@ -7,13 +7,13 @@ export async function GET(request: Request) {
   const code = searchParams.get("code");
 
   if (!code) {
-    return NextResponse.redirect(`${origin}/login?error=auth_failed`);
+    return NextResponse.redirect(`${origin}/?login=1&error=auth_failed`);
   }
 
   const supabase = await createClient();
   const { error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
   if (exchangeError) {
-    return NextResponse.redirect(`${origin}/login?error=auth_failed`);
+    return NextResponse.redirect(`${origin}/?login=1&error=auth_failed`);
   }
 
   const {
@@ -21,7 +21,7 @@ export async function GET(request: Request) {
     error: userError,
   } = await supabase.auth.getUser();
   if (userError || !user) {
-    return NextResponse.redirect(`${origin}/login?error=auth_failed`);
+    return NextResponse.redirect(`${origin}/?login=1&error=auth_failed`);
   }
 
   try {
@@ -32,6 +32,6 @@ export async function GET(request: Request) {
       "Failed to initialize authenticated user:",
       error instanceof Error ? error.message : "unknown error",
     );
-    return NextResponse.redirect(`${origin}/login?error=auth_failed`);
+    return NextResponse.redirect(`${origin}/?login=1&error=auth_failed`);
   }
 }

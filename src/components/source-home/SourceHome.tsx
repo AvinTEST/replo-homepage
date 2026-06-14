@@ -1,7 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { GoogleAuthButton } from "../auth/GoogleAuthButton";
 import { homeCopy } from "../../content/homeCopy";
+import { createClient } from "../../lib/supabase/client";
 
 const PATHS: Record<string, string> = {
   arrowRight: "M5 12h14M13 5l7 7-7 7",
@@ -73,8 +76,76 @@ function ButtonLink({
   );
 }
 
-function MarketingNav({ showPortalLogin }: { showPortalLogin: boolean }) {
+function LoginModal({
+  authError,
+  open,
+  onClose,
+}: {
+  authError: boolean;
+  open: boolean;
+  onClose: () => void;
+}) {
+  useEffect(() => {
+    if (!open) return;
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [onClose, open]);
+
+  if (!open) return null;
+
+  return (
+    <div className="home-auth-modal" role="presentation" onMouseDown={onClose}>
+      <div
+        aria-labelledby="home-auth-title"
+        aria-modal="true"
+        className="home-auth-dialog"
+        role="dialog"
+        onMouseDown={(event) => event.stopPropagation()}
+      >
+        <button className="home-auth-close" type="button" onClick={onClose} aria-label="로그인 창 닫기">
+          <Icon name="x" size={21} />
+        </button>
+        <Logo />
+        <h2 id="home-auth-title">고객 운영을 한곳에서 관리하세요.</h2>
+        <p>Google 계정으로 로그인하면 Replo 워크스페이스로 이동합니다.</p>
+        {authError ? (
+          <p className="home-auth-error" role="alert">
+            Google 인증을 완료하지 못했습니다. 다시 시도해 주세요.
+          </p>
+        ) : null}
+        <div className="home-auth-action">
+          <GoogleAuthButton label="Google로 계속하기" />
+        </div>
+        <small>처음 로그인하는 경우 회사와 브랜드 정보를 등록한 뒤 대시보드를 시작합니다.</small>
+      </div>
+    </div>
+  );
+}
+
+function MarketingNav({
+  authenticated,
+  onLogin,
+  onLogout,
+  showPortalLogin,
+}: {
+  authenticated: boolean;
+  onLogin: () => void;
+  onLogout: () => void;
+  showPortalLogin: boolean;
+}) {
   const [menu, setMenu] = useState(false);
+  const showAuthControls = showPortalLogin || authenticated;
+
   return (
     <header className="mnav">
       <div className="wrap mnav-in">
@@ -87,12 +158,14 @@ function MarketingNav({ showPortalLogin }: { showPortalLogin: boolean }) {
           ))}
         </nav>
         <div className="mnav-cta">
-          {showPortalLogin ? (
-            <ButtonLink href="/login" variant="ghost" size="sm">
-              로그인
-            </ButtonLink>
+          {showAuthControls ? (
+            <button className="btn btn-ghost btn-sm" type="button" onClick={authenticated ? onLogout : onLogin}>
+              {authenticated ? "로그아웃" : "로그인"}
+            </button>
           ) : null}
-          <ButtonLink size="sm">{homeCopy.navigation.cta}</ButtonLink>
+          <ButtonLink href={authenticated ? "/dashboard" : "/contact"} size="sm">
+            {authenticated ? "대시보드 바로가기" : homeCopy.navigation.cta}
+          </ButtonLink>
           <button className="mnav-burger" type="button" onClick={() => setMenu(true)} aria-label="메뉴 열기">
             <Icon name="menu" size={26} />
           </button>
@@ -110,12 +183,21 @@ function MarketingNav({ showPortalLogin }: { showPortalLogin: boolean }) {
             <a key={id} href={`#${id}`} onClick={() => setMenu(false)}>{label}</a>
           ))}
           <div className="col gap-10" style={{ marginTop: 18 }}>
-            {showPortalLogin ? (
-              <ButtonLink href="/login" variant="ghost">
-                로그인
-              </ButtonLink>
+            {showAuthControls ? (
+              <button
+                className="btn btn-ghost"
+                type="button"
+                onClick={() => {
+                  setMenu(false);
+                  authenticated ? onLogout() : onLogin();
+                }}
+              >
+                {authenticated ? "로그아웃" : "로그인"}
+              </button>
             ) : null}
-            <ButtonLink>{homeCopy.navigation.cta}</ButtonLink>
+            <ButtonLink href={authenticated ? "/dashboard" : "/contact"}>
+              {authenticated ? "대시보드 바로가기" : homeCopy.navigation.cta}
+            </ButtonLink>
           </div>
         </div>
       </div>
@@ -639,11 +721,36 @@ function Footer() {
   );
 }
 
-export function SourceHome({ showPortalLogin = false }: { showPortalLogin?: boolean }) {
+export function SourceHome({
+  authError = false,
+  initialAuthenticated = false,
+  initialLoginOpen = false,
+  showPortalLogin = false,
+}: {
+  authError?: boolean;
+  initialAuthenticated?: boolean;
+  initialLoginOpen?: boolean;
+  showPortalLogin?: boolean;
+}) {
+  const router = useRouter();
+  const [authenticated, setAuthenticated] = useState(initialAuthenticated);
+  const [loginOpen, setLoginOpen] = useState(initialLoginOpen && !initialAuthenticated);
+
+  async function handleLogout() {
+    await createClient().auth.signOut();
+    setAuthenticated(false);
+    router.refresh();
+  }
+
   return (
     <div className="replo-source-home">
       <div className="mkt">
-        <MarketingNav showPortalLogin={showPortalLogin} />
+        <MarketingNav
+          authenticated={authenticated}
+          onLogin={() => setLoginOpen(true)}
+          onLogout={handleLogout}
+          showPortalLogin={showPortalLogin}
+        />
         <Hero />
         <ChecklistSection />
         <CauseSection />
@@ -660,6 +767,7 @@ export function SourceHome({ showPortalLogin = false }: { showPortalLogin?: bool
         <CtaSection />
         <Footer />
       </div>
+      <LoginModal authError={authError} open={loginOpen} onClose={() => setLoginOpen(false)} />
     </div>
   );
 }
