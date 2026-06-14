@@ -65,6 +65,81 @@ Do not change the original hero copy or nav labels without explicit instruction.
 ## Auth And Customer Portal Rules
 The customer mypage at `/mypage` and operations dashboard at `/dashboard` should remain protected by Supabase Auth. Public pages such as `/contact` must not require login. Customer portal UI should stay calm, compact, and operational rather than decorative.
 
+## Customer Portal Layout System
+The authenticated customer portal uses one shared navigation system. Do not recreate the rail, workspace sidebar, navigation icons, active states, profile shortcut, or logout control inside individual pages.
+
+### Shared Components
+
+- `src/components/portal/PortalRail.tsx`
+  - The single source of truth for the primary portal navigation.
+  - Contains dashboard, reports, integrations, and account links.
+  - Owns the navigation icons, labels, active state, profile shortcut, and mobile bottom navigation.
+- `src/components/portal/PortalShell.tsx`
+  - The required shell for dashboard, report, integration, and integration-detail pages.
+  - Owns `PortalRail`, the workspace name and plan sidebar, secondary navigation, logout, and the main content region.
+  - Use its `sidebar` prop only for page-specific controls such as filters, sync status, or actions.
+- `src/app/dashboard/[tenantId]/loading.tsx`
+  - The shared route-loading UI for the dashboard subtree.
+  - Keep its rail, sidebar, cards, and progress treatment visually aligned with `PortalShell`.
+
+### Required Page Structure
+
+All routes under `/dashboard/[tenantId]`, including reports and integration detail pages, must render their content inside `PortalShell`.
+
+```tsx
+<PortalShell
+  tenantId={tenantId}
+  tenantName={tenant.name}
+  planName={tenant.planName}
+  active="reports"
+>
+  {/* Page content only */}
+</PortalShell>
+```
+
+Pass exactly one active section:
+
+- `dashboard`: operations dashboard
+- `reports`: reports and report detail pages
+- `integrations`: integrations and connector detail pages
+- `account`: mypage and workspace settings
+
+The mypage can keep its settings-specific secondary menu, but its primary navigation must use `PortalRail`. Do not create a separate mypage rail.
+
+### Portal Layout Rules
+
+- Desktop uses a three-column layout: primary rail, workspace sidebar, main content.
+- The primary rail remains visible on dashboard, reports, integrations, connector details, and mypage.
+- The workspace sidebar must not disappear on report or integration routes.
+- Desktop navigation uses the shared icon-and-label treatment. Do not replace it with numbered navigation.
+- Mobile converts the shared primary rail into a fixed bottom navigation.
+- At widths of `640px` and below, reserve bottom padding for the fixed navigation and verify that `document.documentElement.scrollWidth` does not exceed the viewport width.
+- Page-specific controls belong in `PortalShell.sidebar`; primary navigation does not.
+- Portal colors, spacing, cards, and typography should continue using the existing rules in `src/app/dashboard/dashboard.css` and `src/components/portal/PortalRail.module.css`.
+
+### Portal Loading Rules
+
+Data-heavy portal routes must always provide visible loading feedback.
+
+- Route transitions in the dashboard subtree use `src/app/dashboard/[tenantId]/loading.tsx`.
+- Client-side refetch, filtering, and synchronization use the thin `.dashboard-progress` progress bar at the top of the main content.
+- Keep the progress bar visible for the full request lifecycle, including error responses, and clear it in `finally`.
+- Disable the action that started the request while it is running to prevent duplicate requests.
+- Use `role="progressbar"` with a Korean `aria-label`.
+- Loading skeletons should preserve the normal rail, sidebar, card, and panel geometry to avoid layout jumps.
+- Do not replace portal loading feedback with a blank screen, an isolated spinner, or text-only loading.
+
+### Portal Implementation Don'ts
+
+Do not:
+
+- Add page-local copies of `PortalRail`, `PortalShell`, `NavIcon`, workspace navigation, or logout logic.
+- Add new `.dashboard-rail`, `.mypage-rail`, numbered rail, or equivalent duplicate rail styles.
+- Render reports, integrations, or connector details as standalone cards without the shared portal shell.
+- Hide the primary navigation on integration pages.
+- Introduce a second set of active-state colors or navigation breakpoints.
+- Add a new portal route without checking desktop and `390px` mobile layouts.
+
 ## Accessibility Basics
 Use semantic labels for form fields. Preserve keyboard access for buttons and links. Maintain high contrast and visible focus states. Tap targets should be comfortable on mobile.
 
@@ -79,6 +154,8 @@ Do:
 - Keep forms compact and easy to complete.
 - Keep Korean copy clear and practical.
 - Verify mobile layouts for horizontal overflow.
+- Reuse `PortalShell` and `PortalRail` for authenticated portal screens.
+- Add route and request loading feedback to data-heavy portal screens.
 
 Don't:
 
@@ -88,3 +165,4 @@ Don't:
 - Make login the main public CTA.
 - Introduce unrelated colors, decorative animations, or a new visual system.
 - Ask for card number, CVC, expiration date, billing password, or payment credentials.
+- Rebuild portal navigation or workspace layout inside individual pages.
