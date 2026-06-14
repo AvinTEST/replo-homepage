@@ -13,10 +13,6 @@ export default function DashboardLoading() {
           <div className="loading-line wide" />
           <div className="loading-line short" />
         </div>
-        <div className="sidebar-navigation">
-          <p>운영</p>
-          {Array.from({ length: 4 }, (_, index) => <div className="loading-nav" key={index} />)}
-        </div>
       </aside>
       <main className="dashboard-main">
         <div className="dashboard-progress visible" role="progressbar" aria-label="운영 데이터 불러오는 중">

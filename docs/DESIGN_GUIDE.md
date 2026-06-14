@@ -76,7 +76,7 @@ The authenticated customer portal uses one shared navigation system. Do not recr
   - Owns the navigation icons, labels, active state, profile shortcut, and mobile bottom navigation.
 - `src/components/portal/PortalShell.tsx`
   - The required shell for dashboard, report, integration, and integration-detail pages.
-  - Owns `PortalRail`, the workspace name and plan sidebar, secondary navigation, logout, and the main content region.
+  - Owns `PortalRail`, the workspace name and plan sidebar, logout, and the main content region.
   - Use its `sidebar` prop only for page-specific controls such as filters, sync status, or actions.
 - `src/app/dashboard/[tenantId]/loading.tsx`
   - The shared route-loading UI for the dashboard subtree.
@@ -104,13 +104,16 @@ Pass exactly one active section:
 - `integrations`: integrations and connector detail pages
 - `account`: mypage and workspace settings
 
-The mypage can keep its settings-specific secondary menu, but its primary navigation must use `PortalRail`. Do not create a separate mypage rail.
+The mypage keeps its settings-specific secondary menu, including workspace settings. Its primary navigation must still use `PortalRail`. Do not create a separate mypage rail.
 
 ### Portal Layout Rules
 
 - Desktop uses a three-column layout: primary rail, workspace sidebar, main content.
 - The primary rail remains visible on dashboard, reports, integrations, connector details, and mypage.
 - The workspace sidebar must not disappear on report or integration routes.
+- The primary rail is the only global page navigation. Do not repeat dashboard, reports, integrations, or account links in the workspace sidebar.
+- The workspace sidebar shows workspace identity and page-specific controls only.
+- `워크스페이스 설정` and its settings menu are exposed only on the account route at `/mypage`.
 - Desktop navigation uses the shared icon-and-label treatment. Do not replace it with numbered navigation.
 - Mobile converts the shared primary rail into a fixed bottom navigation.
 - At widths of `640px` and below, reserve bottom padding for the fixed navigation and verify that `document.documentElement.scrollWidth` does not exceed the viewport width.
@@ -135,6 +138,8 @@ Do not:
 
 - Add page-local copies of `PortalRail`, `PortalShell`, `NavIcon`, workspace navigation, or logout logic.
 - Add new `.dashboard-rail`, `.mypage-rail`, numbered rail, or equivalent duplicate rail styles.
+- Duplicate the primary rail links inside the workspace sidebar.
+- Show `워크스페이스 설정` outside the account route.
 - Render reports, integrations, or connector details as standalone cards without the shared portal shell.
 - Hide the primary navigation on integration pages.
 - Introduce a second set of active-state colors or navigation breakpoints.
