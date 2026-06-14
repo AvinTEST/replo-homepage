@@ -31,13 +31,18 @@ function LineChart({
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const width = 640;
   const height = 220;
+  const chartTop = 24;
+  const chartBottom = height - 34;
   const max = Math.max(...values, 1);
   const points = values.map((value, index) => ({
     x: values.length === 1 ? width / 2 : (index / Math.max(1, values.length - 1)) * (width - 36) + 18,
-    y: height - 34 - (value / max) * (height - 58),
+    y: chartBottom - (value / max) * (chartBottom - chartTop),
   }));
   const path = points.map((point, index) => `${index ? "L" : "M"}${point.x},${point.y}`).join(" ");
   const activePoint = activeIndex === null ? null : points[activeIndex];
+  const labelStep = Math.max(1, Math.ceil(labels.length / 9));
+  const shouldShowLabel = (index: number) =>
+    index === 0 || index === labels.length - 1 || index % labelStep === 0;
   const tooltipTransform =
     activeIndex === 0
       ? "translate(0, -115%)"
@@ -53,12 +58,22 @@ function LineChart({
             key={ratio}
             x1="18"
             x2={width - 18}
-            y1={height - 34 - ratio * (height - 58)}
-            y2={height - 34 - ratio * (height - 58)}
+            y1={chartBottom - ratio * (chartBottom - chartTop)}
+            y2={chartBottom - ratio * (chartBottom - chartTop)}
             stroke="#e8ebf1"
           />
         ))}
-        <path d={`${path} L${points.at(-1)?.x ?? 0},${height - 34} L18,${height - 34} Z`} fill={`${color}12`} />
+        {points.map((point, index) => (
+          <line
+            key={`guide-${labels[index]}-${point.x}`}
+            className={activeIndex === index ? "chart-guide active" : "chart-guide"}
+            x1={point.x}
+            x2={point.x}
+            y1={chartTop}
+            y2={chartBottom}
+          />
+        ))}
+        <path d={`${path} L${points.at(-1)?.x ?? 0},${chartBottom} L18,${chartBottom} Z`} fill={`${color}12`} />
         <path d={path} fill="none" stroke={color} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
         {points.map((point, index) => (
           <g
@@ -76,6 +91,17 @@ function LineChart({
             <circle cx={point.x} cy={point.y} r={activeIndex === index ? 5 : 3.5} fill="#fff" stroke={color} strokeWidth="2" />
           </g>
         ))}
+        {points.map((point, index) => shouldShowLabel(index) ? (
+          <text
+            key={`label-${labels[index]}-${point.x}`}
+            className="chart-date-label"
+            x={point.x}
+            y={height - 8}
+            textAnchor={index === 0 ? "start" : index === points.length - 1 ? "end" : "middle"}
+          >
+            {labels[index]}
+          </text>
+        ) : null)}
       </svg>
       {activePoint && activeIndex !== null ? (
         <div
@@ -91,11 +117,6 @@ function LineChart({
           <strong>{valueLabel} {number.format(values[activeIndex])}건</strong>
         </div>
       ) : null}
-      <div className="chart-axis">
-        {labels.filter((_, index) => index === 0 || index === labels.length - 1).map((label) => (
-          <span key={label}>{label}</span>
-        ))}
-      </div>
     </div>
   );
 }
