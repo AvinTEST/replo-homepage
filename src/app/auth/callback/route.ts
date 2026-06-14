@@ -3,19 +3,29 @@ import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import { syncProfileAndLegacyMembership } from "@/lib/customers/access";
 
-type PendingCookie = {
+type CookieToSet = {
   name: string;
   value: string;
   options: CookieOptions;
 };
 
-function redirectWithCookies(url: string, pendingCookies: PendingCookie[]) {
+function redirectWithCookies(
+  url: string,
+  cookiesToSet: CookieToSet[],
+  responseHeaders: Record<string, string>,
+) {
   const response = NextResponse.redirect(url, 303);
 
-  pendingCookies.forEach(({ name, value, options }) => {
+  cookiesToSet.forEach(({ name, value, options }) => {
     response.cookies.set(name, value, options);
   });
-  response.headers.set("Cache-Control", "private, no-store");
+  Object.entries(responseHeaders).forEach(([name, value]) => {
+    response.headers.set(name, value);
+  });
+  response.headers.set(
+    "Cache-Control",
+    "private, no-cache, no-store, must-revalidate, max-age=0",
+  );
 
   return response;
 }
@@ -29,7 +39,8 @@ export async function GET(request: Request) {
   }
 
   const cookieStore = await cookies();
-  const pendingCookies: PendingCookie[] = [];
+  const cookiesToSet: CookieToSet[] = [];
+  const responseHeaders: Record<string, string> = {};
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
@@ -39,18 +50,21 @@ export async function GET(request: Request) {
 
   const supabase = createServerClient(supabaseUrl, supabaseAnonKey, {
     cookies: {
-      get(name: string) {
-        return cookieStore.get(name)?.value;
+      getAll() {
+        return cookieStore.getAll();
       },
-      set(name: string, value: string, options: CookieOptions) {
-        pendingCookies.push({ name, value, options });
-      },
-      remove(name: string, options: CookieOptions) {
-        pendingCookies.push({
-          name,
-          value: "",
-          options: { ...options, maxAge: 0 },
+      setAll(nextCookies, headers) {
+        nextCookies.forEach((cookie) => {
+          const existingIndex = cookiesToSet.findIndex(
+            ({ name }) => name === cookie.name,
+          );
+          if (existingIndex >= 0) {
+            cookiesToSet[existingIndex] = cookie;
+          } else {
+            cookiesToSet.push(cookie);
+          }
         });
+        Object.assign(responseHeaders, headers);
       },
     },
   });
@@ -61,7 +75,8 @@ export async function GET(request: Request) {
   if (exchangeError || !session?.user) {
     return redirectWithCookies(
       `${origin}/?login=1&error=auth_failed`,
-      pendingCookies,
+      cookiesToSet,
+      responseHeaders,
     );
   }
 
@@ -71,7 +86,8 @@ export async function GET(request: Request) {
     const customerId = await syncProfileAndLegacyMembership(user);
     return redirectWithCookies(
       `${origin}${customerId ? "/dashboard" : "/onboarding"}`,
-      pendingCookies,
+      cookiesToSet,
+      responseHeaders,
     );
   } catch (error) {
     console.error(
@@ -91,7 +107,8 @@ export async function GET(request: Request) {
 
     return redirectWithCookies(
       `${origin}${membership?.customer_id ? "/dashboard" : "/onboarding"}`,
-      pendingCookies,
+      cookiesToSet,
+      responseHeaders,
     );
   }
 }

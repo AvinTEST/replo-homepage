@@ -1,6 +1,5 @@
 import { cookies } from "next/headers";
 import { createServerClient } from "@supabase/ssr";
-import type { CookieOptions } from "@supabase/ssr";
 
 /**
  * Creates a Supabase client for use on the server.
@@ -21,19 +20,14 @@ export async function createClient() {
 
   return createServerClient(supabaseUrl, supabaseAnonKey, {
     cookies: {
-      get(name: string) {
-        return cookieStore.get(name)?.value;
+      getAll() {
+        return cookieStore.getAll();
       },
-      set(name: string, value: string, options: CookieOptions) {
+      setAll(cookiesToSet) {
         try {
-          cookieStore.set(name, value, options);
-        } catch {
-          // When running in environments where cookies can't be set (e.g. static generation)
-        }
-      },
-      remove(name: string, options: CookieOptions) {
-        try {
-          cookieStore.set(name, "", { ...options, maxAge: 0 });
+          cookiesToSet.forEach(({ name, value, options }) => {
+            cookieStore.set(name, value, options);
+          });
         } catch {
           // When running in environments where cookies can't be set (e.g. static generation)
         }
