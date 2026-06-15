@@ -602,18 +602,41 @@ function FeatureMatrix() {
 
 function LandingPricing() {
   const [showMatrix, setShowMatrix] = useState(false);
-  const partnerPlan = homeCopy.pricing.partnerPlan;
+  const [yearly, setYearly] = useState(false);
+  const pricing = homeCopy.pricing;
+  const partnerPlan = pricing.partnerPlan;
   const partnerCtaHref = `/contact?plan=${partnerPlan.id}&variant=${partnerPlan.variant}&partner=${partnerPlan.partnerChannel}`;
   const formatPrice = (price: number) => `₩${price.toLocaleString("ko-KR")}`;
+  const unit = yearly ? pricing.yearlyUnit : pricing.monthlyUnit;
+  // 연결제: 일반 플랜은 11개월치(1개월 무료), 카페24 스타터는 10개월치(2개월 무료) 노출
+  const partnerDisplayPrice = yearly ? partnerPlan.price * 10 : partnerPlan.price;
 
   return (
     <section className="sec-tight" style={{ background: "var(--bg)" }} id="pricing-sec">
       <div className="deco"><div className="deco-grid mask-top" /></div>
       <div className="wrap">
-        <div className="sec-head sec-center" style={{ marginBottom: 52 }}>
-          <span className="eyebrow-pill">{homeCopy.pricing.eyebrow}</span>
-          <h2 className="t-h1">{homeCopy.pricing.title}</h2>
-          <p className="t-lead" style={{ marginTop: 16 }}>{homeCopy.pricing.description}</p>
+        <div className="sec-head sec-center" style={{ marginBottom: 36 }}>
+          <span className="eyebrow-pill">{pricing.eyebrow}</span>
+          <h2 className="t-h1">{pricing.title}</h2>
+          <p className="t-lead" style={{ marginTop: 16 }}>{pricing.description}</p>
+        </div>
+        <div className="billing-toggle" role="group" aria-label="결제 주기">
+          <button
+            type="button"
+            className={`billing-opt${yearly ? "" : " active"}`}
+            aria-pressed={!yearly}
+            onClick={() => setYearly(false)}
+          >
+            {pricing.billingMonthly}
+          </button>
+          <button
+            type="button"
+            className={`billing-opt${yearly ? " active" : ""}`}
+            aria-pressed={yearly}
+            onClick={() => setYearly(true)}
+          >
+            {pricing.billingYearly}
+          </button>
         </div>
         <article
           className="partner-tier"
@@ -628,39 +651,48 @@ function LandingPricing() {
             </span>
           </div>
           <div className="partner-tier-copy">
-            <div className="tier-name-en">{partnerPlan.badge} PARTNER</div>
+            <div className="tier-name-en">{partnerPlan.tierEn}</div>
             <div className="tier-name">{partnerPlan.name}</div>
-            <p>{partnerPlan.description}</p>
             <div className="partner-tier-meta">
               <span className="tier-vol">{partnerPlan.volume}</span>
               <span className="tier-vol">{partnerPlan.scope}</span>
             </div>
           </div>
-          <div className="partner-tier-price">
-            <del>{formatPrice(partnerPlan.originalPrice)}</del>
-            <strong>
-              {formatPrice(partnerPlan.price)}
-              <small>{homeCopy.pricing.monthlyUnit}</small>
-            </strong>
+          <div className="partner-tier-action">
+            {yearly ? <span className="tier-free-badge">{pricing.partnerFreeBadge}</span> : null}
+            <div className="partner-tier-price">
+              <del>
+                {yearly ? null : <span className="price-lowest">{pricing.partnerLowestLabel} </span>}
+                {formatPrice(yearly ? partnerPlan.price * 12 : partnerPlan.originalPrice)}
+              </del>
+              <strong>
+                {formatPrice(partnerDisplayPrice)}
+                <small>{unit}</small>
+              </strong>
+            </div>
+            <ButtonLink href={partnerCtaHref} size="sm" className="partner-tier-cta">
+              {partnerPlan.cta}
+            </ButtonLink>
           </div>
-          <ButtonLink href={partnerCtaHref} size="sm" className="partner-tier-cta">
-            {partnerPlan.cta}
-          </ButtonLink>
         </article>
         <div className="pricing5">
-          {homeCopy.pricing.plans.map(({ en, ko, price, volume, best, description, features }) => (
-            <div className={`tier${best ? " best" : ""}`} key={en}>
-              {best ? <span className="tier-badge">{homeCopy.pricing.recommended}</span> : null}
+          {pricing.plans.map(({ en, ko, price, priceLabel, volume, description, features }) => (
+            <div className="tier" key={en}>
+              {yearly ? <span className="tier-free-badge tier-free-badge--top">{pricing.planFreeBadge}</span> : null}
               <div className="tier-name-en">{en}</div>
               <div className="tier-name">{ko}</div>
-              <div className="tier-price">{price}{price.startsWith("₩") ? <small>{homeCopy.pricing.monthlyUnit}</small> : null}</div>
+              <div className="tier-price">
+                {price === null
+                  ? priceLabel
+                  : <>{formatPrice(yearly ? price * 11 : price)}<small>{unit}</small></>}
+              </div>
               <span className="tier-vol">{volume}</span>
               <p style={{ fontSize: 12.5, color: "var(--ink-400)", lineHeight: 1.55, margin: "14px 0 0", wordBreak: "keep-all", minHeight: 54 }}>{description}</p>
               <ul className="tier-feats">
                 {features.map((feature) => <li key={feature}><Icon name="check" size={15} stroke={2.3} />{feature}</li>)}
               </ul>
-              <ButtonLink size="sm" variant={best ? "primary" : "ghost"} className="btn-block tier-cta">
-                {en === "Enterprise" ? homeCopy.pricing.enterpriseCta : homeCopy.pricing.standardCta}
+              <ButtonLink size="sm" variant="ghost" className="btn-block tier-cta">
+                {en === "Enterprise" ? pricing.enterpriseCta : pricing.standardCta}
               </ButtonLink>
             </div>
           ))}
