@@ -1593,6 +1593,101 @@
   grid-template-columns: repeat(5, 1fr);
 }
 
+.replo-source-home .partner-tier {
+  align-items: center;
+  background: linear-gradient(135deg, var(--surface), var(--violet-tint));
+  border: 1.5px solid var(--violet-300);
+  border-radius: var(--r-xl);
+  box-shadow: var(--sh-md);
+  display: grid;
+  gap: 28px;
+  grid-template-columns: 170px minmax(0, 1fr) auto 190px;
+  margin-bottom: 24px;
+  padding: 26px 28px;
+}
+
+.replo-source-home .partner-tier-brand {
+  align-items: flex-start;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.replo-source-home .partner-tier-logo {
+  align-items: center;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  display: inline-flex;
+  min-height: 42px;
+  padding: 10px 13px;
+}
+
+.replo-source-home .partner-tier-logo img {
+  display: block;
+  height: 20px;
+  max-width: 112px;
+  width: 100%;
+}
+
+.replo-source-home .partner-tier-label {
+  background: var(--violet-600);
+  border-radius: var(--r-pill);
+  color: #fff;
+  display: inline-flex;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: .03em;
+  padding: 5px 10px;
+}
+
+.replo-source-home .partner-tier-copy .tier-name {
+  margin-bottom: 8px;
+}
+
+.replo-source-home .partner-tier-copy p {
+  color: var(--ink-700);
+  font-size: 14px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.replo-source-home .partner-tier-copy .tier-vol {
+  margin-top: 10px;
+}
+
+.replo-source-home .partner-tier-price {
+  align-items: flex-start;
+  display: flex;
+  flex-direction: column;
+  min-width: 180px;
+}
+
+.replo-source-home .partner-tier-price del {
+  color: var(--ink-400);
+  font-size: 14px;
+  margin-bottom: 7px;
+}
+
+.replo-source-home .partner-tier-price strong {
+  color: var(--violet-700);
+  font-size: 28px;
+  font-weight: 900;
+  letter-spacing: -.025em;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.replo-source-home .partner-tier-price small {
+  color: var(--ink-400);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.replo-source-home .partner-tier-cta {
+  width: 100%;
+}
+
 .replo-source-home .tier {
   background: var(--surface);
   border: 1px solid var(--line);
@@ -1978,6 +2073,12 @@
 @media (max-width: 1080px) {
   .replo-source-home .pricing5 { grid-template-columns: repeat(3, 1fr); }
   .replo-source-home .proc-row { grid-template-columns: repeat(3, 1fr); }
+  .replo-source-home .partner-tier {
+    grid-template-columns: 150px minmax(0, 1fr) auto;
+  }
+  .replo-source-home .partner-tier-cta {
+    grid-column: 1 / -1;
+  }
   .replo-source-home .expertise-grid {
     gap: 18px;
   }
@@ -2022,6 +2123,13 @@
   }
   .replo-source-home .pricing5 {
     grid-template-columns: 1fr 1fr;
+  }
+  .replo-source-home .partner-tier {
+    gap: 20px;
+    grid-template-columns: 140px minmax(0, 1fr);
+  }
+  .replo-source-home .partner-tier-price {
+    grid-column: 2;
   }
 }
 
@@ -2102,6 +2210,15 @@
   .replo-source-home .proc-row,
   .replo-source-home .pricing5 {
     grid-template-columns: 1fr;
+  }
+  .replo-source-home .partner-tier {
+    gap: 18px;
+    grid-template-columns: 1fr;
+    padding: 24px 22px;
+  }
+  .replo-source-home .partner-tier-price,
+  .replo-source-home .partner-tier-cta {
+    grid-column: auto;
   }
   .replo-source-home .hero-pitch {
     padding: 72px 0 86px;
