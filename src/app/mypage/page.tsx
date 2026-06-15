@@ -14,14 +14,11 @@ const roleLabels: Record<string, string> = {
 };
 
 export default async function MyPage() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user?.email) redirect("/login");
-
   const access = await getCurrentCustomerAccess();
   if (!access) redirect("/onboarding");
+  const supabase = await createClient();
+  const loginEmail = access.user.email;
+  if (!loginEmail) redirect("/login");
 
   const [subscriptionResult, paymentMethodResult, brandResult, tenantResult] =
     await Promise.all([
@@ -61,7 +58,7 @@ export default async function MyPage() {
     <MypageSettings
       tenantId={access.tenantId}
       canManage={access.membership.role === "owner" || access.membership.role === "admin"}
-      loginEmail={user.email}
+      loginEmail={loginEmail}
       roleLabel={roleLabels[access.membership.role] ?? access.membership.role}
       customer={{
         companyName: customer.company_name,

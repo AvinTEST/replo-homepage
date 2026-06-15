@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { automaticGrain, calendarMonthRange, validDate } from "@/lib/dashboard/dates";
+import { calendarMonthRange, validDate } from "@/lib/dashboard/dates";
 import { loadDashboard } from "@/lib/dashboard/service";
 import { getTenantAccess } from "@/lib/tenants/auth";
 
@@ -22,7 +22,7 @@ export async function GET(
   try {
     const data = await loadDashboard({
       tenantId: params.tenantId,
-      grain: automaticGrain(start, end),
+      grain: "day",
       start,
       end,
       channel: request.nextUrl.searchParams.get("channel") || undefined,

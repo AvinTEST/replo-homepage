@@ -1,19 +1,15 @@
-import { notFound, redirect } from "next/navigation";
+import { redirect } from "next/navigation";
 import { PortalShell } from "@/components/portal/PortalShell";
 import { defaultRange } from "@/lib/dashboard/dates";
 import { loadDashboard } from "@/lib/dashboard/service";
-import { createClient } from "@/lib/supabase/server";
 import { getTenantAccess } from "@/lib/tenants/auth";
 
 export const dynamic = "force-dynamic";
 
 export default async function ReportsPage({ params }: { params: { tenantId: string } }) {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) redirect(`/login?next=/dashboard/${params.tenantId}/reports`);
-  if (!(await getTenantAccess(params.tenantId))) notFound();
+  if (!(await getTenantAccess(params.tenantId))) {
+    redirect(`/login?next=/dashboard/${params.tenantId}/reports`);
+  }
   const range = defaultRange("month");
   const data = await loadDashboard({
     tenantId: params.tenantId,

@@ -1,10 +1,9 @@
 import Link from "next/link";
-import { notFound, redirect } from "next/navigation";
+import { redirect } from "next/navigation";
 import { ChannelTalkCredentialForm } from "@/components/dashboard/ChannelTalkCredentialForm";
 import { PortalShell } from "@/components/portal/PortalShell";
 import { loadPortalTenant } from "@/lib/dashboard/service";
 import { listIntegrations } from "@/lib/integrations/service";
-import { createClient } from "@/lib/supabase/server";
 import { canManageIntegrations, getTenantAccess } from "@/lib/tenants/auth";
 
 export const dynamic = "force-dynamic";
@@ -14,13 +13,10 @@ export default async function ChannelTalkIntegrationPage({
 }: {
   params: { tenantId: string };
 }) {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) redirect(`/login?next=/dashboard/${params.tenantId}/integrations/channel-talk`);
   const access = await getTenantAccess(params.tenantId);
-  if (!access) notFound();
+  if (!access) {
+    redirect(`/login?next=/dashboard/${params.tenantId}/integrations/channel-talk`);
+  }
 
   const [integrations, tenant] = await Promise.all([
     listIntegrations(params.tenantId),

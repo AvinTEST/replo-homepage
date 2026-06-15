@@ -57,65 +57,75 @@ export async function PATCH(request: Request) {
 
   const admin = createAdminClient();
   const now = new Date().toISOString();
-  const { error: customerError } = await admin
-    .from("customers")
-    .update({
-      company_name: companyName,
-      representative_name: representativeName,
-      contact_name: contactName || representativeName,
-      email,
-      phone: phone || null,
-      website_url: websiteUrl || null,
-      business_number: businessNumber || null,
-      billing_email: billingEmail || email,
-      updated_at: now,
-    })
-    .eq("id", access.customer.id);
+  const [customerResult, tenantResult, brandLookup] = await Promise.all([
+    admin
+      .from("customers")
+      .update({
+        company_name: companyName,
+        representative_name: representativeName,
+        contact_name: contactName || representativeName,
+        email,
+        phone: phone || null,
+        website_url: websiteUrl || null,
+        business_number: businessNumber || null,
+        billing_email: billingEmail || email,
+        updated_at: now,
+      })
+      .eq("id", access.customer.id),
+    admin
+      .from("tenants")
+      .update({
+        company_name: companyName,
+        display_name: brandName,
+        updated_at: now,
+      })
+      .eq("id", access.tenantId),
+    admin
+      .from("brands")
+      .select("id")
+      .eq("customer_id", access.customer.id)
+      .order("created_at", { ascending: true })
+      .limit(1)
+      .maybeSingle(),
+  ]);
+  const customerError = customerResult.error;
   if (customerError) {
     return NextResponse.json({ error: "고객 정보를 저장하지 못했습니다." }, { status: 500 });
   }
 
-  const { error: tenantError } = await admin
-    .from("tenants")
-    .update({
-      company_name: companyName,
-      display_name: brandName,
-      updated_at: now,
-    })
-    .eq("id", access.tenantId);
+  const tenantError = tenantResult.error;
   if (tenantError) {
     return NextResponse.json({ error: "워크스페이스 정보를 저장하지 못했습니다." }, { status: 500 });
   }
 
-  const { data: brand } = await admin
-    .from("brands")
-    .select("id")
-    .eq("customer_id", access.customer.id)
-    .order("created_at", { ascending: true })
-    .limit(1)
-    .maybeSingle();
-  const brandResult = brand
-    ? await admin
+  if (brandLookup.error) {
+    return NextResponse.json({ error: "브랜드 정보를 확인하지 못했습니다." }, { status: 500 });
+  }
+  const brand = brandLookup.data;
+  const brandRequest = brand
+    ? admin
         .from("brands")
         .update({ name: brandName, website_url: websiteUrl || null, updated_at: now })
         .eq("id", brand.id)
-    : await admin.from("brands").insert({
+    : admin.from("brands").insert({
         customer_id: access.customer.id,
         name: brandName,
         website_url: websiteUrl || null,
       });
+  const [brandResult] = await Promise.all([
+    brandRequest,
+    admin.from("audit_logs").insert({
+      customer_id: access.customer.id,
+      actor_user_id: access.user.id,
+      action: "customer.profile_updated",
+      target_type: "customer",
+      target_id: access.customer.id,
+      metadata: { company_name: companyName, brand_name: brandName },
+    }),
+  ]);
   if (brandResult.error) {
     return NextResponse.json({ error: "브랜드 정보를 저장하지 못했습니다." }, { status: 500 });
   }
-
-  await admin.from("audit_logs").insert({
-    customer_id: access.customer.id,
-    actor_user_id: access.user.id,
-    action: "customer.profile_updated",
-    target_type: "customer",
-    target_id: access.customer.id,
-    metadata: { company_name: companyName, brand_name: brandName },
-  });
 
   return NextResponse.json({ ok: true, message: "고객 정보를 저장했습니다." });
 }

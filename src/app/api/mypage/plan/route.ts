@@ -41,31 +41,33 @@ export async function PATCH(request: Request) {
     return NextResponse.json({ error: "플랜을 저장하지 못했습니다." }, { status: 500 });
   }
 
-  const { error: tenantError } = await admin
-    .from("tenants")
-    .update({
-      plan_name: plan.id,
-      monthly_plan_limit: plan.includedTickets,
-      updated_at: new Date().toISOString(),
-    })
-    .eq("id", access.tenantId);
+  const now = new Date().toISOString();
+  const [tenantResult] = await Promise.all([
+    admin
+      .from("tenants")
+      .update({
+        plan_name: plan.id,
+        monthly_plan_limit: plan.includedTickets,
+        updated_at: now,
+      })
+      .eq("id", access.tenantId),
+    admin
+      .from("customers")
+      .update({ status: "active", updated_at: now })
+      .eq("id", access.customer.id),
+    admin.from("audit_logs").insert({
+      customer_id: access.customer.id,
+      actor_user_id: access.user.id,
+      action: "subscription.plan_updated",
+      target_type: "subscription",
+      target_id: subscription?.id ?? null,
+      metadata: { previous_plan: subscription?.plan_name ?? null, plan: plan.id },
+    }),
+  ]);
+  const tenantError = tenantResult.error;
   if (tenantError) {
     return NextResponse.json({ error: "대시보드 플랜 정보를 갱신하지 못했습니다." }, { status: 500 });
   }
-
-  await admin
-    .from("customers")
-    .update({ status: "active", updated_at: new Date().toISOString() })
-    .eq("id", access.customer.id);
-
-  await admin.from("audit_logs").insert({
-    customer_id: access.customer.id,
-    actor_user_id: access.user.id,
-    action: "subscription.plan_updated",
-    target_type: "subscription",
-    target_id: subscription?.id ?? null,
-    metadata: { previous_plan: subscription?.plan_name ?? null, plan: plan.id },
-  });
 
   return NextResponse.json({
     ok: true,

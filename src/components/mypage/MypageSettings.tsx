@@ -83,6 +83,7 @@ export function MypageSettings(props: Props) {
   const [active, setActive] = useState<Section>("profile");
   const [profile, setProfile] = useState(props.customer);
   const [selectedPlan, setSelectedPlan] = useState(props.subscription?.planName ?? "Basic");
+  const [subscription, setSubscription] = useState(props.subscription);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
@@ -100,20 +101,22 @@ export function MypageSettings(props: Props) {
     setSaving(true);
     setMessage("");
     setError("");
-    const response = await fetch("/api/mypage/customer", {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(profile),
-    });
-    const result = (await response.json().catch(() => ({}))) as {
-      message?: string;
-      error?: string;
-    };
-    setSaving(false);
-    if (!response.ok) setError(result.error || "고객 정보를 저장하지 못했습니다.");
-    else {
-      setMessage(result.message || "고객 정보를 저장했습니다.");
-      router.refresh();
+    try {
+      const response = await fetch("/api/mypage/customer", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(profile),
+      });
+      const result = (await response.json().catch(() => ({}))) as {
+        message?: string;
+        error?: string;
+      };
+      if (!response.ok) setError(result.error || "고객 정보를 저장하지 못했습니다.");
+      else setMessage(result.message || "고객 정보를 저장했습니다.");
+    } catch {
+      setError("네트워크 연결을 확인해 주세요.");
+    } finally {
+      setSaving(false);
     }
   }
 
@@ -121,20 +124,37 @@ export function MypageSettings(props: Props) {
     setPlanSaving(true);
     setMessage("");
     setError("");
-    const response = await fetch("/api/mypage/plan", {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ planId: selectedPlan }),
-    });
-    const result = (await response.json().catch(() => ({}))) as {
-      message?: string;
-      error?: string;
-    };
-    setPlanSaving(false);
-    if (!response.ok) setError(result.error || "플랜을 저장하지 못했습니다.");
-    else {
-      setMessage(result.message || "플랜을 저장했습니다.");
-      router.refresh();
+    try {
+      const response = await fetch("/api/mypage/plan", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ planId: selectedPlan }),
+      });
+      const result = (await response.json().catch(() => ({}))) as {
+        message?: string;
+        error?: string;
+        plan?: {
+          id: string;
+          monthlyFee: number;
+          includedTickets: number;
+        };
+      };
+      if (!response.ok) setError(result.error || "플랜을 저장하지 못했습니다.");
+      else {
+        setMessage(result.message || "플랜을 저장했습니다.");
+        if (result.plan) {
+          setSubscription((current) => ({
+            planName: result.plan!.id,
+            monthlyFee: result.plan!.monthlyFee,
+            includedTickets: result.plan!.includedTickets,
+            nextBillingDate: current?.nextBillingDate ?? "",
+          }));
+        }
+      }
+    } catch {
+      setError("네트워크 연결을 확인해 주세요.");
+    } finally {
+      setPlanSaving(false);
     }
   }
 
@@ -224,7 +244,7 @@ export function MypageSettings(props: Props) {
                 <h2>플랜 등록</h2>
                 <p>선택한 플랜은 대시보드 사용량 기준에도 즉시 반영됩니다.</p>
               </div>
-              <span>{props.subscription?.planName ?? "미등록"}</span>
+              <span>{subscription?.planName ?? "미등록"}</span>
             </div>
             <div className="plan-choice-grid">
               {selectablePlans.map((plan) => (
@@ -248,10 +268,10 @@ export function MypageSettings(props: Props) {
               <Link href="/contact">문의하기</Link>
             </div>
             <div className="current-plan-summary">
-              <div><span>현재 플랜</span><strong>{props.subscription?.planName ?? "미등록"}</strong></div>
-              <div><span>월 이용료</span><strong>{props.subscription ? won(props.subscription.monthlyFee) : "-"}</strong></div>
-              <div><span>포함 문의량</span><strong>{props.subscription ? `${props.subscription.includedTickets.toLocaleString("ko-KR")}건` : "-"}</strong></div>
-              <div><span>다음 결제일</span><strong>{props.subscription?.nextBillingDate || "미정"}</strong></div>
+              <div><span>현재 플랜</span><strong>{subscription?.planName ?? "미등록"}</strong></div>
+              <div><span>월 이용료</span><strong>{subscription ? won(subscription.monthlyFee) : "-"}</strong></div>
+              <div><span>포함 문의량</span><strong>{subscription ? `${subscription.includedTickets.toLocaleString("ko-KR")}건` : "-"}</strong></div>
+              <div><span>다음 결제일</span><strong>{subscription?.nextBillingDate || "미정"}</strong></div>
             </div>
             <div className="mypage-form-actions">
               <button type="button" disabled={!props.canManage || planSaving} onClick={savePlan}>

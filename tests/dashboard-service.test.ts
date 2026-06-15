@@ -5,6 +5,7 @@ import {
   calculateBillableCount,
 } from "../src/lib/dashboard/billing.ts";
 import { channelTalkProcessedAt } from "../src/lib/connectors/channelTalkDates.ts";
+import { buildResponsiveChartSeries } from "../src/lib/dashboard/chartSeries.ts";
 import { createCsv } from "../src/lib/dashboard/csv.ts";
 import {
   automaticGrain,
@@ -201,6 +202,29 @@ test("ChannelTalk processed date uses closedAt and excludes unresolved chats", (
   );
   assert.equal(channelTalkProcessedAt({ state: "opened", closedAt: 1780877260093 }), null);
   assert.equal(channelTalkProcessedAt({ state: "closed" }), null);
+});
+
+test("chart grain follows available width and preserves empty dates", () => {
+  const daily = buildResponsiveChartSeries(
+    [
+      { key: "2026-06-01", value: 3 },
+      { key: "2026-06-03", value: 4 },
+    ],
+    "2026-06-01",
+    "2026-06-03",
+    3,
+  );
+  assert.equal(daily.grain, "day");
+  assert.deepEqual(daily.points.map(({ value }) => value), [3, 0, 4]);
+
+  const weekly = buildResponsiveChartSeries(
+    [{ key: "2026-06-08", value: 12 }],
+    "2026-06-01",
+    "2026-06-30",
+    8,
+  );
+  assert.equal(weekly.grain, "week");
+  assert.equal(weekly.points.reduce((sum, point) => sum + point.value, 0), 12);
 });
 
 test("CSV cells neutralize spreadsheet formulas", () => {

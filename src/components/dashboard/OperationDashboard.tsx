@@ -1,9 +1,10 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { PortalShell } from "@/components/portal/PortalShell";
+import { buildResponsiveChartSeries } from "@/lib/dashboard/chartSeries";
 import { createCsv } from "@/lib/dashboard/csv";
-import type { DashboardResponse } from "@/types/dashboard";
+import type { DashboardResponse, Grain } from "@/types/dashboard";
 
 const number = new Intl.NumberFormat("ko-KR");
 
@@ -18,19 +19,43 @@ function downloadCsv(filename: string, rows: Array<Array<string | number>>) {
 }
 
 function LineChart({
-  values,
-  labels,
+  items,
+  start,
+  end,
   color = "#5B47E0",
   valueLabel = "처리 건수",
+  onGrainChange,
 }: {
-  values: number[];
-  labels: string[];
+  items: Array<{ key: string; value: number }>;
+  start: string;
+  end: string;
   color?: string;
   valueLabel?: string;
+  onGrainChange?: (grain: Grain) => void;
 }) {
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
-  const width = 640;
-  const height = 220;
+  const wrapRef = useRef<HTMLDivElement>(null);
+  const [width, setWidth] = useState(640);
+  useEffect(() => {
+    const element = wrapRef.current;
+    if (!element) return;
+    const updateWidth = () => setWidth(Math.max(280, Math.round(element.clientWidth)));
+    updateWidth();
+    const observer = new ResizeObserver(updateWidth);
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, []);
+  const maxPoints = Math.max(2, Math.floor((width - 36) / 28) + 1);
+  const series = useMemo(
+    () => buildResponsiveChartSeries(items, start, end, maxPoints),
+    [end, items, maxPoints, start],
+  );
+  useEffect(() => {
+    onGrainChange?.(series.grain);
+  }, [onGrainChange, series.grain]);
+  const values = series.points.map((point) => point.value);
+  const labels = series.points.map((point) => point.label);
+  const height = Math.max(160, Math.min(220, Math.round(width * 0.3)));
   const chartTop = 24;
   const chartBottom = height - 34;
   const max = Math.max(...values, 1);
@@ -40,7 +65,8 @@ function LineChart({
   }));
   const path = points.map((point, index) => `${index ? "L" : "M"}${point.x},${point.y}`).join(" ");
   const activePoint = activeIndex === null ? null : points[activeIndex];
-  const labelStep = Math.max(1, Math.ceil(labels.length / 9));
+  const labelCapacity = Math.max(2, Math.floor(width / 88));
+  const labelStep = Math.max(1, Math.ceil(labels.length / labelCapacity));
   const shouldShowLabel = (index: number) =>
     index === 0 || index === labels.length - 1 || index % labelStep === 0;
   const tooltipTransform =
@@ -51,7 +77,12 @@ function LineChart({
         : "translate(-50%, -115%)";
 
   return (
-    <div className="chart-svg-wrap">
+    <div
+      ref={wrapRef}
+      className="chart-svg-wrap"
+      style={{ height }}
+      data-grain={series.grain}
+    >
       <svg viewBox={`0 0 ${width} ${height}`} role="img" aria-label="처리 건수 추이">
         {[0.25, 0.5, 0.75, 1].map((ratio) => (
           <line
@@ -172,7 +203,7 @@ export function OperationDashboard({
   canManage: boolean;
 }) {
   const [data, setData] = useState(initialData);
-  const [grain, setGrain] = useState(initialData.range.grain);
+  const [grain, setGrain] = useState<Grain>(initialData.range.grain);
   const [start, setStart] = useState(initialData.range.start);
   const [end, setEnd] = useState(initialData.range.end);
   const [channel, setChannel] = useState("");
@@ -391,7 +422,13 @@ export function OperationDashboard({
             </div>
             <article className="panel chart-panel">
               <div className="chart-heading"><div><strong>콜 인입 · 응대 · 응대율 추이</strong><small>기간별 전화 응대 현황</small></div><span>혼합</span></div>
-              <LineChart values={data.charts.callTrend.map((item) => item.total)} labels={data.charts.callTrend.map((item) => item.label)} color="#0284c7" valueLabel="총 콜 인입" />
+              <LineChart
+                items={data.charts.callTrend.map((item) => ({ key: item.key, value: item.total }))}
+                start={data.range.start}
+                end={data.range.end}
+                color="#0284c7"
+                valueLabel="총 콜 인입"
+              />
             </article>
           </div>
         </section>
@@ -399,7 +436,7 @@ export function OperationDashboard({
         <section>
           <SectionHead title="처리 추이" sub={`${grain === "day" ? "일간" : grain === "week" ? "주간" : "월간"} 집계`} />
           <div className="charts-grid">
-            <article className="panel chart-panel wide"><div className="chart-heading"><div><strong>처리 건수 추이</strong><small>전체 처리 건수 변화</small></div><span>라인</span></div><LineChart values={data.charts.trend.map((item) => item.count)} labels={data.charts.trend.map((item) => item.label)} /></article>
+            <article className="panel chart-panel wide"><div className="chart-heading"><div><strong>처리 건수 추이</strong><small>영역에 맞춰 일·주·월 단위로 자동 표시</small></div><span>라인</span></div><LineChart items={data.charts.trend.map((item) => ({ key: item.key, value: item.count }))} start={data.range.start} end={data.range.end} onGrainChange={setGrain} /></article>
             <article className="panel chart-panel"><div className="chart-heading"><div><strong>채널별 처리 건수</strong><small>클릭하면 필터 적용</small></div><span>바</span></div><BarChart rows={data.charts.byChannel} labelKey="channel" onSelect={setChannelFilter} /></article>
             <article className="panel chart-panel"><div className="chart-heading"><div><strong>세부업무별 처리 건수</strong><small>상위 10개</small></div><span>바</span></div><BarChart rows={data.charts.byTask} labelKey="task" onSelect={(value) => { setTask(value); refresh({ task: value }); }} /></article>
           </div>
@@ -414,7 +451,7 @@ export function OperationDashboard({
               <div className="blue"><span>기간 B</span><strong>{number.format(compare.totalB)}</strong><small>뒤 구간 합계</small></div>
               <div className="amber"><span>증감 (B - A)</span><strong>{compare.diff > 0 ? "+" : ""}{number.format(compare.diff)}</strong><small>{compare.totalA ? `${((compare.diff / compare.totalA) * 100).toFixed(1)}%` : "비교 불가"}</small></div>
             </div>
-            {compareMode === "line" ? <LineChart values={[...compare.a, ...compare.b].map((item) => item.count)} labels={[...compare.a, ...compare.b].map((item) => item.label)} /> : <BarChart rows={[{ period: "기간 A", count: compare.totalA }, { period: "기간 B", count: compare.totalB }]} labelKey="period" />}
+            {compareMode === "line" ? <LineChart items={[...compare.a, ...compare.b].map((item) => ({ key: item.key, value: item.count }))} start={data.range.start} end={data.range.end} /> : <BarChart rows={[{ period: "기간 A", count: compare.totalA }, { period: "기간 B", count: compare.totalB }]} labelKey="period" />}
           </article>
         </section>
 

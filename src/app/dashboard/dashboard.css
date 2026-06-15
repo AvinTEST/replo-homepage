@@ -107,8 +107,8 @@
 .chart-heading strong { display: block; font-size: 13px; }
 .chart-heading small, .panel-toolbar small { display: block; margin-top: 3px; color: var(--muted); font-size: 11px; }
 .chart-heading > span { border: 1px solid #d9d1ff; border-radius: 6px; background: var(--purple-soft); color: var(--purple); padding: 3px 8px; font-size: 10px; font-weight: 700; }
-.chart-svg-wrap { position: relative; width: 100%; min-height: 220px; }
-.chart-svg-wrap svg { display: block; width: 100%; height: 220px; overflow: visible; }
+.chart-svg-wrap { position: relative; width: 100%; min-height: 160px; max-height: 220px; }
+.chart-svg-wrap svg { display: block; width: 100%; height: 100%; overflow: visible; }
 .chart-guide { stroke: #e5e7eb; stroke-width: 1; stroke-dasharray: 3 4; }
 .chart-guide.active { stroke: #8b7ae9; stroke-width: 1.5; stroke-dasharray: none; }
 .chart-date-label { fill: #64748b; font-size: 9px; font-weight: 600; }
@@ -227,8 +227,7 @@
   .dashboard-section-head span { min-width: 40px; }
   .plan-grid, .kpi-grid, .call-kpis, .compare-summary, .integration-grid, .report-summary-grid, .loading-card-grid { grid-template-columns: 1fr; }
   .panel-toolbar { align-items: flex-start; flex-direction: column; }
-  .chart-svg-wrap { min-height: 190px; }
-  .chart-svg-wrap svg { height: 190px; }
+  .chart-svg-wrap { min-height: 160px; }
   .portal-loading-rail {
     position: fixed; top: auto; right: 0; bottom: 0; left: 0; z-index: 50;
     width: 100%; height: 66px; flex-direction: row; border-top: 1px solid var(--border);

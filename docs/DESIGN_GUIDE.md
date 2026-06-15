@@ -139,7 +139,8 @@ Data-heavy portal routes must always provide visible loading feedback.
 - Example: May opens as May 1 through today in May; June opens as June 1 through today in June.
 - Keep explicit user-selected start and end dates when refreshing or filtering.
 - Do not expose a manual day/week/month selector.
-- Select chart aggregation automatically: up to 31 days uses daily points, up to 56 days uses weekly points, and longer ranges use monthly points.
+- Keep dashboard source data daily, then select day, week, or month chart aggregation from both the selected date range and the rendered chart width. Resize changes must update chart density without another API request.
+- Chart height must stay proportional to its rendered width, between 160px and 220px, so narrow cards do not reserve oversized empty chart areas.
 - Trend chart points must expose the represented date or date range and count through mouse hover and keyboard focus.
 - Trend charts show a vertical guide for every data point and date labels at an automatically reduced interval; always keep the first and last date visible.
 - ChannelTalk 처리 건수 and plan usage use `closedAt` in the tenant timezone. Open or snoozed chats are not counted as completed work.
