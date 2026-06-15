@@ -1767,6 +1767,47 @@
   font-weight: 600;
 }
 
+/* 연결제 정가/할인 표기 */
+.replo-source-home .tier-price-yearly {
+  align-items: flex-start;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.replo-source-home .tier-price .price-list,
+.replo-source-home .partner-tier-price .price-list {
+  color: var(--ink-400);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.replo-source-home .tier-price .price-now {
+  color: var(--ink-900);
+  font-size: 25px;
+  font-weight: 900;
+  letter-spacing: -.02em;
+  line-height: 1;
+}
+
+.replo-source-home .price-off {
+  background: #fdecec;
+  border: 1px solid #f7c8c8;
+  border-radius: var(--r-pill);
+  color: #d92d20;
+  display: inline-flex;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: .01em;
+  padding: 4px 10px;
+  white-space: nowrap;
+}
+
+.replo-source-home .partner-tier-price .price-off {
+  font-size: 13px;
+  margin-top: 8px;
+}
+
 .replo-source-home .partner-tier {
   align-items: center;
   background:

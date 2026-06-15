@@ -608,8 +608,11 @@ function LandingPricing() {
   const partnerCtaHref = `/contact?plan=${partnerPlan.id}&variant=${partnerPlan.variant}&partner=${partnerPlan.partnerChannel}`;
   const formatPrice = (price: number) => `₩${price.toLocaleString("ko-KR")}`;
   const unit = yearly ? pricing.yearlyUnit : pricing.monthlyUnit;
-  // 연결제: 일반 플랜은 11개월치(1개월 무료), 카페24 스타터는 10개월치(2개월 무료) 노출
-  const partnerDisplayPrice = yearly ? partnerPlan.price * 10 : partnerPlan.price;
+  // 연결제: 전체 플랜 2개월 무료 → 12개월 정가 대비 10개월치 결제
+  const PAID_MONTHS = 10;
+  const yearlyPrice = (monthly: number) => monthly * PAID_MONTHS;
+  const listPrice = (monthly: number) => monthly * 12;
+  const discountPct = Math.round((1 - PAID_MONTHS / 12) * 100);
 
   return (
     <section className="sec-tight" style={{ background: "var(--bg)" }} id="pricing-sec">
@@ -661,14 +664,27 @@ function LandingPricing() {
           <div className="partner-tier-action">
             {yearly ? <span className="tier-free-badge">{pricing.partnerFreeBadge}</span> : null}
             <div className="partner-tier-price">
-              <del>
-                {yearly ? null : <span className="price-lowest">{pricing.partnerLowestLabel} </span>}
-                {formatPrice(yearly ? partnerPlan.price * 12 : partnerPlan.originalPrice)}
-              </del>
-              <strong>
-                {formatPrice(partnerDisplayPrice)}
-                <small>{unit}</small>
-              </strong>
+              {yearly ? (
+                <>
+                  <del className="price-list">{pricing.listLabel} {formatPrice(listPrice(partnerPlan.price))}</del>
+                  <strong>
+                    {formatPrice(yearlyPrice(partnerPlan.price))}
+                    <small>{unit}</small>
+                  </strong>
+                  <span className="price-off">{discountPct}{pricing.discountUnit}</span>
+                </>
+              ) : (
+                <>
+                  <del>
+                    <span className="price-lowest">{pricing.partnerLowestLabel} </span>
+                    {formatPrice(partnerPlan.originalPrice)}
+                  </del>
+                  <strong>
+                    {formatPrice(partnerPlan.price)}
+                    <small>{unit}</small>
+                  </strong>
+                </>
+              )}
             </div>
             <ButtonLink href={partnerCtaHref} size="sm" className="partner-tier-cta">
               {partnerPlan.cta}
@@ -682,9 +698,17 @@ function LandingPricing() {
               <div className="tier-name-en">{en}</div>
               <div className="tier-name">{ko}</div>
               <div className="tier-price">
-                {price === null
-                  ? priceLabel
-                  : <>{formatPrice(yearly ? price * 11 : price)}<small>{unit}</small></>}
+                {price === null ? (
+                  priceLabel
+                ) : yearly ? (
+                  <span className="tier-price-yearly">
+                    <del className="price-list">{pricing.listLabel} {formatPrice(listPrice(price))}</del>
+                    <span className="price-now">{formatPrice(yearlyPrice(price))}<small>{unit}</small></span>
+                    <span className="price-off">{discountPct}{pricing.discountUnit}</span>
+                  </span>
+                ) : (
+                  <>{formatPrice(price)}<small>{unit}</small></>
+                )}
               </div>
               <span className="tier-vol">{volume}</span>
               <p style={{ fontSize: 12.5, color: "var(--ink-400)", lineHeight: 1.55, margin: "14px 0 0", wordBreak: "keep-all", minHeight: 54 }}>{description}</p>
