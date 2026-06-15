@@ -631,7 +631,10 @@ function LandingPricing() {
             <div className="tier-name-en">{partnerPlan.badge} PARTNER</div>
             <div className="tier-name">{partnerPlan.name}</div>
             <p>{partnerPlan.description}</p>
-            <span className="tier-vol">{partnerPlan.scope}</span>
+            <div className="partner-tier-meta">
+              <span className="tier-vol">{partnerPlan.volume}</span>
+              <span className="tier-vol">{partnerPlan.scope}</span>
+            </div>
           </div>
           <div className="partner-tier-price">
             <del>{formatPrice(partnerPlan.originalPrice)}</del>
