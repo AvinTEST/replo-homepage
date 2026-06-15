@@ -65,6 +65,22 @@ export async function syncChannelTalk(
   try {
     const connector = channelTalkConnectorFromIntegration(integration);
     const events = await connector.fetchEvents({ from, to });
+    const { data: removedOpenEvents, error: removeOpenError } = await admin
+      .from("operation_events")
+      .delete()
+      .eq("tenant_id", tenantId)
+      .eq("integration_id", integration.id)
+      .neq("status", "closed")
+      .select("date_key");
+    if (removeOpenError) throw removeOpenError;
+
+    const { data: previousEvents, error: previousEventsError } = await admin
+      .from("operation_events")
+      .select("date_key")
+      .eq("tenant_id", tenantId)
+      .eq("integration_id", integration.id);
+    if (previousEventsError) throw previousEventsError;
+
     const payload = events.map((event) => ({
       tenant_id: tenantId,
       integration_id: integration.id,
@@ -94,7 +110,11 @@ export async function syncChannelTalk(
       if (error) throw error;
     }
 
-    const dateKeys = Array.from(new Set(payload.map((item) => item.date_key)));
+    const dateKeys = Array.from(new Set([
+      ...(removedOpenEvents ?? []).map((item) => item.date_key as string),
+      ...(previousEvents ?? []).map((item) => item.date_key as string),
+      ...payload.map((item) => item.date_key),
+    ]));
     for (const dateKey of dateKeys) {
       const { data: dayEvents, error } = await admin
         .from("operation_events")
@@ -110,6 +130,13 @@ export async function syncChannelTalk(
         billingRules,
         updatedAt: new Date().toISOString(),
       });
+      const { error: clearMetricError } = await admin
+        .from("daily_operation_metrics")
+        .delete()
+        .eq("tenant_id", tenantId)
+        .eq("date_key", dateKey)
+        .eq("provider", "channel_talk");
+      if (clearMetricError) throw clearMetricError;
       if (metrics.length) {
         const { error: metricError } = await admin
           .from("daily_operation_metrics")

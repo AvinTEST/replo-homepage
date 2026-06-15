@@ -1,4 +1,5 @@
 import "server-only";
+import { channelTalkProcessedAt } from "@/lib/connectors/channelTalkDates";
 import { ConnectorError } from "@/lib/connectors/errors";
 import type {
   Connector,
@@ -24,15 +25,6 @@ type UserChat = Record<string, unknown> & {
 
 const API_BASE = "https://api.channel.io";
 const MAX_PAGES_PER_STATE = 1000;
-
-function timestamp(value: number | string | undefined) {
-  if (typeof value === "number") return new Date(value).toISOString();
-  if (typeof value === "string") {
-    const parsed = new Date(value);
-    if (!Number.isNaN(parsed.getTime())) return parsed.toISOString();
-  }
-  return null;
-}
 
 function redactPayload(chat: UserChat) {
   return {
@@ -94,7 +86,7 @@ export class ChannelTalkConnector implements Connector {
   async fetchEvents(range: SyncRange) {
     const events = new Map<string, NormalizedOperationEvent>();
 
-    for (const state of ["opened", "snoozed", "closed"]) {
+    for (const state of ["closed"]) {
       let since: string | undefined;
       const seenCursors = new Set<string>();
 
@@ -112,12 +104,13 @@ export class ChannelTalkConnector implements Connector {
           next?: string | null;
         }>(`/open/v5/user-chats?${params.toString()}`);
         const chats = body.userChats ?? body.chats ?? [];
-        let oldestTimestamp: string | null = null;
 
         for (const chat of chats) {
-          const occurredAt = timestamp(chat.openedAt ?? chat.createdAt);
+          const occurredAt = channelTalkProcessedAt({
+            state: chat.state ?? state,
+            closedAt: chat.closedAt,
+          });
           if (!occurredAt || !chat.id) continue;
-          if (!oldestTimestamp || occurredAt < oldestTimestamp) oldestTimestamp = occurredAt;
           if (occurredAt < range.from || occurredAt > range.to) continue;
           const medium = String(chat.contactMediumType ?? "").toLowerCase();
           const isCall = medium.includes("phone") || medium.includes("call");
@@ -142,8 +135,7 @@ export class ChannelTalkConnector implements Connector {
         if (
           chats.length === 0 ||
           !next ||
-          seenCursors.has(next) ||
-          (oldestTimestamp !== null && oldestTimestamp < range.from)
+          seenCursors.has(next)
         ) {
           break;
         }

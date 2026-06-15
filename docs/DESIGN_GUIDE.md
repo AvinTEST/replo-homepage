@@ -142,6 +142,7 @@ Data-heavy portal routes must always provide visible loading feedback.
 - Select chart aggregation automatically: up to 31 days uses daily points, up to 56 days uses weekly points, and longer ranges use monthly points.
 - Trend chart points must expose the represented date or date range and count through mouse hover and keyboard focus.
 - Trend charts show a vertical guide for every data point and date labels at an automatically reduced interval; always keep the first and last date visible.
+- ChannelTalk 처리 건수 and plan usage use `closedAt` in the tenant timezone. Open or snoozed chats are not counted as completed work.
 - The reports route may keep its separate long-range reporting period.
 
 ### Portal Implementation Don'ts

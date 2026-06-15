@@ -4,6 +4,7 @@ import {
   buildBillingRuleMap,
   calculateBillableCount,
 } from "../src/lib/dashboard/billing.ts";
+import { channelTalkProcessedAt } from "../src/lib/connectors/channelTalkDates.ts";
 import { createCsv } from "../src/lib/dashboard/csv.ts";
 import {
   automaticGrain,
@@ -187,6 +188,19 @@ test("tenant timezone determines date_key", () => {
   assert.equal(automaticGrain("2026-06-01", "2026-06-30"), "day");
   assert.equal(automaticGrain("2026-06-01", "2026-07-26"), "week");
   assert.equal(automaticGrain("2026-01-01", "2026-06-30"), "month");
+});
+
+test("ChannelTalk processed date uses closedAt and excludes unresolved chats", () => {
+  assert.equal(
+    channelTalkProcessedAt({ state: "closed", closedAt: 1780877260093 }),
+    "2026-06-08T00:07:40.093Z",
+  );
+  assert.equal(
+    channelTalkProcessedAt({ state: "closed", closedAt: "1780877260093" }),
+    "2026-06-08T00:07:40.093Z",
+  );
+  assert.equal(channelTalkProcessedAt({ state: "opened", closedAt: 1780877260093 }), null);
+  assert.equal(channelTalkProcessedAt({ state: "closed" }), null);
 });
 
 test("CSV cells neutralize spreadsheet formulas", () => {
