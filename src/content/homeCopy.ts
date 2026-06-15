@@ -270,10 +270,10 @@ export const homeCopy = {
       price: 99000,
       description: "카페24 전용 요금제",
       scope: "게시판 문의 전용",
-      volume: "월 상담 50건",
       cta: "제휴가로 시작하기",
     },
     plans: [
+      { en: "Starter", ko: "스타터", price: "₩99,000", volume: "월 상담 50건", best: false, description: "운영 초기 브랜드가 채팅·게시판 문의를 가볍게 맡겨보는 시작 플랜", features: ["채팅·게시판 응대", "AI 응대 · 반복 문의 자동화", "FAQ 구축 · 상담 스크립트", "월간 운영 리포트"] },
       { en: "Lite", ko: "라이트", price: "₩490,000", volume: "월 상담 200건", best: false, description: "문의량이 증가하는 브랜드를 위한 기본 운영·분석 플랜", features: ["채팅·게시판·이메일 응대", "운영 인사이트 분석", "데일리 현황 알림", "월간 운영 리포트"] },
       { en: "Basic", ko: "베이직", price: "₩990,000", volume: "월 상담 500건", best: true, description: "전화·채팅·게시판·이메일을 함께 운영하며 품질을 안정화하는 성장 브랜드용", features: ["콜·채팅·게시판·이메일", "응대 가이드 제공", "교환·환불·클레임 운영", "격주 운영 리포트"] },
       { en: "Pro", ko: "프로", price: "₩1,790,000", volume: "월 상담 1,000건", best: false, description: "다채널 운영과 CS 정책 설계까지 필요한 브랜드에 적합", features: ["모든 채널 운영", "실시간 운영 대시보드", "CS 정책 설계 지원", "주간 리포트"] },
@@ -282,11 +282,11 @@ export const homeCopy = {
     matrix: {
       featureLabel: "기능",
       bestIndex: 2,
-      columns: ["스타터(카페24)", "라이트", "베이직", "프로", "엔터프라이즈"],
+      columns: ["스타터", "라이트", "베이직", "프로", "엔터프라이즈"],
       rows: [
         { label: "월 구독료", kind: "strong", cells: ["₩99,000", "₩490,000", "₩990,000", "₩1,790,000", "별도 협의"] },
         { label: "월 상담 제공량", kind: "strong", cells: ["50건", "200건", "500건", "1,000건", "2,000건+"] },
-        { label: "상담 채널", kind: "text", cells: ["게시판", "채팅·게시판·이메일", "콜·채팅·게시판·이메일", "모든 채널", "모든 채널 + 맞춤"] },
+        { label: "상담 채널", kind: "text", cells: ["채팅·게시판", "채팅·게시판·이메일", "콜·채팅·게시판·이메일", "모든 채널", "모든 채널 + 맞춤"] },
         { label: "AI 응대 지원", kind: "check", cells: [true, true, true, true, true] },
         { label: "반복 문의 자동화", kind: "check", cells: [true, true, true, true, true] },
         { label: "데일리 현황 알림", kind: "check", cells: [true, true, true, true, true] },
