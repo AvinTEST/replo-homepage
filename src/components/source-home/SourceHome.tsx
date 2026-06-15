@@ -531,7 +531,7 @@ function LandingPricing() {
             <span className="partner-tier-logo">
               <img alt="CAFE24" height="20" src="/cafe24.svg" width="112" />
             </span>
-            <span className="partner-tier-label">{partnerPlan.partnerBadge}</span>
+            <span className="partner-tier-label">제휴 특가</span>
           </div>
           <div className="partner-tier-copy">
             <div className="tier-name-en">{partnerPlan.badge} PARTNER</div>
