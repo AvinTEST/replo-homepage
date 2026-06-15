@@ -9,6 +9,10 @@ import {
   channelTalkMissedCallAt,
   channelTalkProcessedAt,
 } from "../src/lib/connectors/channelTalkDates.ts";
+import {
+  channelTalkCallDirection,
+  channelTalkCallStatus,
+} from "../src/lib/connectors/channelTalkCalls.ts";
 import { buildResponsiveChartSeries } from "../src/lib/dashboard/chartSeries.ts";
 import { createCsv } from "../src/lib/dashboard/csv.ts";
 import {
@@ -223,6 +227,18 @@ test("ChannelTalk calls use openedAt and only missed state counts as missed", ()
     "2026-06-08T00:07:40.093Z",
   );
   assert.equal(channelTalkMissedCallAt({ state: "closed", openedAt: 1780877260093 }), null);
+  assert.equal(
+    channelTalkCallDirection({ state: "closed", firstAskedAt: 1780877260093 }),
+    "inbound",
+  );
+  assert.equal(channelTalkCallDirection({ state: "closed" }), "outbound");
+  assert.equal(channelTalkCallDirection({ state: "missed" }), "inbound");
+  assert.equal(channelTalkCallStatus({ state: "closed" }), "closed");
+  assert.equal(
+    channelTalkCallStatus({ state: "closed", missedReason: "ringTimeOver" }),
+    "missed",
+  );
+  assert.equal(channelTalkCallStatus({ state: "missed" }), "missed");
 
   const metrics = buildDailyMetricRows({
     tenantId: "tenant-fixture",

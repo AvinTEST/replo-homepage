@@ -1,9 +1,12 @@
 import "server-only";
 import {
   channelTalkCallAt,
-  channelTalkMissedCallAt,
   channelTalkProcessedAt,
 } from "@/lib/connectors/channelTalkDates";
+import {
+  channelTalkCallDirection,
+  channelTalkCallStatus,
+} from "@/lib/connectors/channelTalkCalls";
 import { ConnectorError } from "@/lib/connectors/errors";
 import type {
   Connector,
@@ -22,6 +25,8 @@ type UserChat = Record<string, unknown> & {
   createdAt?: number | string;
   openedAt?: number | string;
   closedAt?: number | string;
+  firstAskedAt?: number | string;
+  missedReason?: string;
   contactMediumType?: string;
   userId?: string;
   assigneeId?: string;
@@ -37,6 +42,8 @@ function redactPayload(chat: UserChat) {
     createdAt: chat.createdAt,
     openedAt: chat.openedAt,
     closedAt: chat.closedAt,
+    firstAskedAt: chat.firstAskedAt,
+    missedReason: chat.missedReason,
     contactMediumType: chat.contactMediumType,
   };
 }
@@ -122,26 +129,30 @@ export class ChannelTalkConnector implements Connector {
             : channelTalkProcessedAt({ state: chatState, closedAt: chat.closedAt });
           if (!occurredAt || !chat.id) continue;
           if (occurredAt < range.from || occurredAt > range.to) continue;
+          const callDirection = isCall
+            ? channelTalkCallDirection(chat)
+            : "inbound";
+          const callStatus = isCall
+            ? channelTalkCallStatus(chat)
+            : "closed";
 
           events.set(chat.id, {
             provider: this.provider,
             externalId: chat.id,
             occurredAt,
             channel: "채널톡",
-            taskType: isCall ? "전화 - 인바운드" : "채팅",
-            direction: "inbound",
-            status:
-              isCall && channelTalkMissedCallAt({
-                state: chatState,
-                openedAt: chat.openedAt,
-                createdAt: chat.createdAt,
-              })
-                ? "missed"
-                : "closed",
+            taskType: isCall
+              ? `전화 - ${callDirection === "inbound" ? "인바운드" : "아웃바운드"}`
+              : "채팅",
+            direction: callDirection,
+            status: callStatus,
             count: 1,
             customerExternalId: chat.userId,
             assigneeName: chat.assigneeId,
-            metadata: { contactMediumType: chat.contactMediumType },
+            metadata: {
+              contactMediumType: chat.contactMediumType,
+              missedReason: chat.missedReason,
+            },
             rawPayload: redactPayload(chat),
           });
         }

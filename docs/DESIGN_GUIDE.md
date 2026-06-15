@@ -144,7 +144,8 @@ Data-heavy portal routes must always provide visible loading feedback.
 - Trend chart points must expose the represented date or date range and count through mouse hover and keyboard focus.
 - Trend charts show a vertical guide for every data point and date labels at an automatically reduced interval; always keep the first and last date visible.
 - ChannelTalk chat 처리 건수 and plan usage use `closedAt` in the tenant timezone. Open or snoozed chats are not counted as completed work.
-- ChannelTalk phone records include only `closed` and `missed` states and use `openedAt` in the tenant timezone. `closed` counts as answered and billable; `missed` counts only toward missed-call metrics.
+- ChannelTalk phone records include only `closed` and `missed` states and use `openedAt` in the tenant timezone.
+- Phone records with `firstAskedAt` are inbound; closed phone records without it are outbound. `missed` state or a non-empty `missedReason` counts as missed inbound work.
 - The reports route may keep its separate long-range reporting period.
 
 ### Portal Implementation Don'ts
