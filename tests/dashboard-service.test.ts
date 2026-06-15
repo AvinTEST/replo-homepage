@@ -13,7 +13,10 @@ import {
   channelTalkCallDirection,
   channelTalkCallStatus,
 } from "../src/lib/connectors/channelTalkCalls.ts";
-import { buildResponsiveChartSeries } from "../src/lib/dashboard/chartSeries.ts";
+import {
+  buildResponsiveCallChartSeries,
+  buildResponsiveChartSeries,
+} from "../src/lib/dashboard/chartSeries.ts";
 import { createCsv } from "../src/lib/dashboard/csv.ts";
 import {
   automaticGrain,
@@ -264,10 +267,75 @@ test("ChannelTalk calls use openedAt and only missed state counts as missed", ()
       },
     ],
   });
-  assert.equal(metrics[0].total_count, 7);
+  assert.equal(metrics[0].total_count, 10);
   assert.equal(metrics[0].answered_count, 7);
   assert.equal(metrics[0].missed_count, 3);
   assert.equal(metrics[0].billable_count, 7);
+});
+
+test("inbound call totals include missed calls without billing them", () => {
+  const metrics = buildDailyMetricRows({
+    tenantId: "tenant-fixture",
+    dateKey: "2026-06-08",
+    updatedAt: "2026-06-08T00:00:00.000Z",
+    billingRules: new Map(),
+    events: [
+      {
+        provider: "channel_talk",
+        channel: "채널톡",
+        task_type: "전화 - 인바운드",
+        direction: "inbound",
+        status: "closed",
+        count: 220,
+      },
+      {
+        provider: "channel_talk",
+        channel: "채널톡",
+        task_type: "전화 - 인바운드",
+        direction: "inbound",
+        status: "missed",
+        count: 88,
+      },
+    ],
+  });
+
+  assert.equal(metrics[0].total_count, 308);
+  assert.equal(metrics[0].answered_count, 220);
+  assert.equal(metrics[0].missed_count, 88);
+  assert.equal(metrics[0].billable_count, 220);
+
+  const dashboard = buildDashboardFromMetricFixtures({
+    tenant: {
+      id: "tenant-fixture",
+      name: "Fixture",
+      planName: "Basic",
+      monthlyPlanLimit: 1000,
+    },
+    grain: "day",
+    start: "2026-06-08",
+    end: "2026-06-08",
+    referenceDate: "2026-06-08",
+    selectedMetrics: [{
+      date_key: "2026-06-08",
+      provider: "channel_talk",
+      channel: "채널톡",
+      task_type: "전화 - 인바운드",
+      total_count: 220,
+      answered_count: 220,
+      missed_count: 88,
+      billable_count: 220,
+    }],
+    monthlyMetrics: [],
+    sync: { status: "ok", lastSyncAt: null, message: "fixture" },
+  });
+
+  assert.equal(dashboard.operationKpis.total, 308);
+  assert.deepEqual(dashboard.callKpis, {
+    totalCalls: 308,
+    answeredCalls: 220,
+    missedCalls: 88,
+    answerRate: 220 / 308 * 100,
+  });
 });
 
 test("chart grain follows available width and preserves empty dates", () => {
@@ -291,6 +359,20 @@ test("chart grain follows available width and preserves empty dates", () => {
   );
   assert.equal(weekly.grain, "week");
   assert.equal(weekly.points.reduce((sum, point) => sum + point.value, 0), 12);
+
+  const calls = buildResponsiveCallChartSeries(
+    [
+      { key: "2026-06-01", total: 10, answered: 7 },
+      { key: "2026-06-03", total: 20, answered: 10 },
+    ],
+    "2026-06-01",
+    "2026-06-03",
+    3,
+  );
+  assert.deepEqual(
+    calls.points.map(({ total, answered, rate }) => [total, answered, rate]),
+    [[10, 7, 70], [0, 0, 0], [20, 10, 50]],
+  );
 });
 
 test("CSV cells neutralize spreadsheet formulas", () => {

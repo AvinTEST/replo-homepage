@@ -2,7 +2,10 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { PortalShell } from "@/components/portal/PortalShell";
-import { buildResponsiveChartSeries } from "@/lib/dashboard/chartSeries";
+import {
+  buildResponsiveCallChartSeries,
+  buildResponsiveChartSeries,
+} from "@/lib/dashboard/chartSeries";
 import { createCsv } from "@/lib/dashboard/csv";
 import type { DashboardResponse, Grain } from "@/types/dashboard";
 
@@ -179,6 +182,171 @@ function BarChart({
           <strong>{number.format(Number(row.count))}</strong>
         </button>
       ))}
+    </div>
+  );
+}
+
+function CallMixedChart({
+  items,
+  start,
+  end,
+}: {
+  items: Array<{ key: string; total: number; answered: number }>;
+  start: string;
+  end: string;
+}) {
+  const [activeIndex, setActiveIndex] = useState<number | null>(null);
+  const wrapRef = useRef<HTMLDivElement>(null);
+  const [width, setWidth] = useState(640);
+  useEffect(() => {
+    const element = wrapRef.current;
+    if (!element) return;
+    const updateWidth = () => setWidth(Math.max(280, Math.round(element.clientWidth)));
+    updateWidth();
+    const observer = new ResizeObserver(updateWidth);
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, []);
+  const maxPoints = Math.max(2, Math.floor((width - 36) / 36));
+  const series = useMemo(
+    () => buildResponsiveCallChartSeries(items, start, end, maxPoints),
+    [end, items, maxPoints, start],
+  );
+  const height = Math.max(160, Math.min(220, Math.round(width * 0.3)));
+  const chartTop = 24;
+  const chartBottom = height - 34;
+  const chartHeight = chartBottom - chartTop;
+  const maxCount = Math.max(...series.points.map((point) => point.total + point.answered), 1);
+  const slotWidth = (width - 36) / Math.max(series.points.length, 1);
+  const barWidth = Math.max(8, Math.min(28, slotWidth * 0.58));
+  const labelCapacity = Math.max(2, Math.floor(width / 88));
+  const labelStep = Math.max(1, Math.ceil(series.points.length / labelCapacity));
+  const shouldShowLabel = (index: number) =>
+    index === 0 || index === series.points.length - 1 || index % labelStep === 0;
+  const points = series.points.map((point, index) => ({
+    x: 18 + slotWidth * index + slotWidth / 2,
+    y: chartBottom - (point.rate / 100) * chartHeight,
+  }));
+  const ratePath = points
+    .map((point, index) => `${index ? "L" : "M"}${point.x},${point.y}`)
+    .join(" ");
+  const activePoint = activeIndex === null ? null : points[activeIndex];
+  const activeValue = activeIndex === null ? null : series.points[activeIndex];
+  const tooltipTransform =
+    activeIndex === 0
+      ? "translate(0, -110%)"
+      : activeIndex === points.length - 1
+        ? "translate(-100%, -110%)"
+        : "translate(-50%, -110%)";
+
+  return (
+    <div ref={wrapRef} className="chart-svg-wrap call-mixed-chart" style={{ height }}>
+      <div className="call-chart-legend" aria-hidden="true">
+        <span className="inbound">인입 건</span>
+        <span className="answered">응대 건</span>
+        <span className="rate">응대율</span>
+      </div>
+      <svg viewBox={`0 0 ${width} ${height}`} role="img" aria-label="콜 인입, 응대, 응대율 추이">
+        {[0.25, 0.5, 0.75, 1].map((ratio) => (
+          <line
+            key={ratio}
+            x1="18"
+            x2={width - 18}
+            y1={chartBottom - ratio * chartHeight}
+            y2={chartBottom - ratio * chartHeight}
+            stroke="#e8ebf1"
+          />
+        ))}
+        {series.points.map((point, index) => {
+          const x = points[index].x - barWidth / 2;
+          const inboundHeight = (point.total / maxCount) * chartHeight;
+          const answeredHeight = (point.answered / maxCount) * chartHeight;
+          return (
+            <g key={`bars-${point.key}`}>
+              <rect
+                x={x}
+                y={chartBottom - inboundHeight}
+                width={barWidth}
+                height={inboundHeight}
+                rx="3"
+                fill="#c7d2fe"
+              />
+              <rect
+                x={x}
+                y={chartBottom - inboundHeight - answeredHeight}
+                width={barWidth}
+                height={answeredHeight}
+                rx="3"
+                fill="#5b47e0"
+              />
+            </g>
+          );
+        })}
+        <path
+          d={ratePath}
+          fill="none"
+          stroke="#0284c7"
+          strokeWidth="2.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+        {points.map((point, index) => (
+          <g
+            key={`call-point-${series.points[index].key}`}
+            tabIndex={0}
+            role="button"
+            aria-label={`${series.points[index].label}, 인입 ${number.format(series.points[index].total)}건, 응대 ${number.format(series.points[index].answered)}건, 응대율 ${series.points[index].rate.toFixed(1)}%`}
+            onPointerEnter={() => setActiveIndex(index)}
+            onPointerLeave={() => setActiveIndex(null)}
+            onFocus={() => setActiveIndex(index)}
+            onBlur={() => setActiveIndex(null)}
+            onClick={() => setActiveIndex((current) => current === index ? null : index)}
+          >
+            <rect
+              x={point.x - slotWidth / 2}
+              y={chartTop}
+              width={slotWidth}
+              height={chartHeight}
+              fill="transparent"
+            />
+            <circle
+              cx={point.x}
+              cy={point.y}
+              r={activeIndex === index ? 5 : 3.5}
+              fill="#fff"
+              stroke="#0284c7"
+              strokeWidth="2"
+            />
+          </g>
+        ))}
+        {series.points.map((point, index) => shouldShowLabel(index) ? (
+          <text
+            key={`call-label-${point.key}`}
+            className="chart-date-label"
+            x={points[index].x}
+            y={height - 8}
+            textAnchor={index === 0 ? "start" : index === series.points.length - 1 ? "end" : "middle"}
+          >
+            {point.label}
+          </text>
+        ) : null)}
+      </svg>
+      {activePoint && activeValue ? (
+        <div
+          className="chart-tooltip"
+          role="status"
+          style={{
+            left: `${(activePoint.x / width) * 100}%`,
+            top: `${(activePoint.y / height) * 100}%`,
+            transform: tooltipTransform,
+          }}
+        >
+          <span>{activeValue.label}</span>
+          <strong>인입 {number.format(activeValue.total)}건</strong>
+          <strong>응대 {number.format(activeValue.answered)}건</strong>
+          <strong>응대율 {activeValue.rate.toFixed(1)}%</strong>
+        </div>
+      ) : null}
     </div>
   );
 }
@@ -422,12 +590,14 @@ export function OperationDashboard({
             </div>
             <article className="panel chart-panel">
               <div className="chart-heading"><div><strong>콜 인입 · 응대 · 응대율 추이</strong><small>기간별 전화 응대 현황</small></div><span>혼합</span></div>
-              <LineChart
-                items={data.charts.callTrend.map((item) => ({ key: item.key, value: item.total }))}
+              <CallMixedChart
+                items={data.charts.callTrend.map((item) => ({
+                  key: item.key,
+                  total: item.total,
+                  answered: item.answered,
+                }))}
                 start={data.range.start}
                 end={data.range.end}
-                color="#0284c7"
-                valueLabel="총 콜 인입"
               />
             </article>
           </div>

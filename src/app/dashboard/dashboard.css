@@ -121,6 +121,20 @@
 }
 .chart-tooltip span { display: block; color: #cbd5e1; font-size: 10px; }
 .chart-tooltip strong { display: block; margin-top: 3px; font-size: 11px; }
+.call-mixed-chart { padding-top: 22px; }
+.call-chart-legend {
+  position: absolute; top: 0; right: 0; z-index: 2;
+  display: flex; align-items: center; gap: 10px;
+  color: var(--muted); font-size: 9px; font-weight: 700;
+}
+.call-chart-legend span { display: inline-flex; align-items: center; gap: 4px; }
+.call-chart-legend span::before {
+  width: 8px; height: 8px; border-radius: 2px; background: #c7d2fe; content: "";
+}
+.call-chart-legend .answered::before { background: var(--purple); }
+.call-chart-legend .rate::before {
+  width: 11px; height: 2px; border-radius: 99px; background: #0284c7;
+}
 .automatic-grain {
   display: flex; align-items: center; justify-content: space-between; gap: 10px;
   margin-bottom: 10px; border: 1px solid var(--border); border-radius: 8px;

@@ -228,17 +228,27 @@ export function aggregateDashboardMetrics(input: {
 }
 
 export function mapMetricRows(rows: SupabaseMetricRow[]): DashboardMetricRow[] {
-  return rows.map((metric) => ({
-    date: metric.date_key,
-    provider: metric.provider,
-    channel: metric.channel,
-    task: metric.task_type,
-    count: Number(metric.total_count),
-    answeredCount: Number(metric.answered_count),
-    missedCount: Number(metric.missed_count),
-    billableCount: Number(metric.billable_count),
-    memo: "",
-  }));
+  return rows.map((metric) => {
+    const answeredCount = Number(metric.answered_count);
+    const missedCount = Number(metric.missed_count);
+    const storedCount = Number(metric.total_count);
+    const count =
+      metric.task_type === "전화 - 인바운드"
+        ? Math.max(storedCount, answeredCount + missedCount)
+        : storedCount;
+
+    return {
+      date: metric.date_key,
+      provider: metric.provider,
+      channel: metric.channel,
+      task: metric.task_type,
+      count,
+      answeredCount,
+      missedCount,
+      billableCount: Number(metric.billable_count),
+      memo: "",
+    };
+  });
 }
 
 export function buildDashboardFromMetricFixtures(input: {

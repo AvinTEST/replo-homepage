@@ -47,10 +47,10 @@ export function buildDailyMetricRows(input: {
     const count = Number(event.count);
     const isMissedCall =
       event.task_type === "전화 - 인바운드" && event.status === "missed";
+    current.total += count;
+    if (event.direction === "inbound") current.inbound += count;
+    if (event.direction === "outbound") current.outbound += count;
     if (!isMissedCall) {
-      current.total += count;
-      if (event.direction === "inbound") current.inbound += count;
-      if (event.direction === "outbound") current.outbound += count;
       current.billable += calculateBillableCount(
         count,
         event.provider,
