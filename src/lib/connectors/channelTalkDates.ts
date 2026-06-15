@@ -19,8 +19,14 @@ export function channelTalkProcessedAt(chat: ChannelTalkDateFields) {
   return chat.state === "closed" ? timestamp(chat.closedAt) : null;
 }
 
+export function channelTalkCallAt(chat: ChannelTalkDateFields) {
+  return chat.state === "closed" || chat.state === "missed"
+    ? timestamp(chat.openedAt ?? chat.createdAt)
+    : null;
+}
+
 export function channelTalkMissedCallAt(chat: ChannelTalkDateFields) {
-  return chat.state === "opened" || chat.state === "snoozed"
+  return chat.state === "missed"
     ? timestamp(chat.openedAt ?? chat.createdAt)
     : null;
 }

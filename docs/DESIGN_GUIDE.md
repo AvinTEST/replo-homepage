@@ -143,8 +143,8 @@ Data-heavy portal routes must always provide visible loading feedback.
 - Chart height must stay proportional to its rendered width, between 160px and 220px, so narrow cards do not reserve oversized empty chart areas.
 - Trend chart points must expose the represented date or date range and count through mouse hover and keyboard focus.
 - Trend charts show a vertical guide for every data point and date labels at an automatically reduced interval; always keep the first and last date visible.
-- ChannelTalk 처리 건수 and plan usage use `closedAt` in the tenant timezone. Open or snoozed chats are not counted as completed work.
-- ChannelTalk open or snoozed phone records use `openedAt` for missed-call metrics only. They must not increase processed totals or plan usage.
+- ChannelTalk chat 처리 건수 and plan usage use `closedAt` in the tenant timezone. Open or snoozed chats are not counted as completed work.
+- ChannelTalk phone records include only `closed` and `missed` states and use `openedAt` in the tenant timezone. `closed` counts as answered and billable; `missed` counts only toward missed-call metrics.
 - The reports route may keep its separate long-range reporting period.
 
 ### Portal Implementation Don'ts

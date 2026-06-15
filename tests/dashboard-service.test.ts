@@ -5,6 +5,7 @@ import {
   calculateBillableCount,
 } from "../src/lib/dashboard/billing.ts";
 import {
+  channelTalkCallAt,
   channelTalkMissedCallAt,
   channelTalkProcessedAt,
 } from "../src/lib/connectors/channelTalkDates.ts";
@@ -207,9 +208,18 @@ test("ChannelTalk processed date uses closedAt and excludes unresolved chats", (
   assert.equal(channelTalkProcessedAt({ state: "closed" }), null);
 });
 
-test("ChannelTalk missed calls use openedAt without counting as processed work", () => {
+test("ChannelTalk calls use openedAt and only missed state counts as missed", () => {
   assert.equal(
-    channelTalkMissedCallAt({ state: "opened", openedAt: 1780877260093 }),
+    channelTalkCallAt({ state: "closed", openedAt: 1780877260093 }),
+    "2026-06-08T00:07:40.093Z",
+  );
+  assert.equal(
+    channelTalkCallAt({ state: "missed", openedAt: 1780877260093 }),
+    "2026-06-08T00:07:40.093Z",
+  );
+  assert.equal(channelTalkCallAt({ state: "opened", openedAt: 1780877260093 }), null);
+  assert.equal(
+    channelTalkMissedCallAt({ state: "missed", openedAt: 1780877260093 }),
     "2026-06-08T00:07:40.093Z",
   );
   assert.equal(channelTalkMissedCallAt({ state: "closed", openedAt: 1780877260093 }), null);

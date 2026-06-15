@@ -1,5 +1,6 @@
 import "server-only";
 import {
+  channelTalkCallAt,
   channelTalkMissedCallAt,
   channelTalkProcessedAt,
 } from "@/lib/connectors/channelTalkDates";
@@ -89,7 +90,7 @@ export class ChannelTalkConnector implements Connector {
   async fetchEvents(range: SyncRange) {
     const events = new Map<string, NormalizedOperationEvent>();
 
-    for (const state of ["opened", "snoozed", "closed"]) {
+    for (const state of ["missed", "closed"]) {
       let since: string | undefined;
       const seenCursors = new Set<string>();
 
@@ -112,16 +113,13 @@ export class ChannelTalkConnector implements Connector {
           const medium = String(chat.contactMediumType ?? "").toLowerCase();
           const isCall = medium.includes("phone") || medium.includes("call");
           const chatState = chat.state ?? state;
-          const occurredAt =
-            chatState === "closed"
-              ? channelTalkProcessedAt({ state: chatState, closedAt: chat.closedAt })
-              : isCall
-                ? channelTalkMissedCallAt({
-                    state: chatState,
-                    openedAt: chat.openedAt,
-                    createdAt: chat.createdAt,
-                  })
-                : null;
+          const occurredAt = isCall
+            ? channelTalkCallAt({
+                state: chatState,
+                openedAt: chat.openedAt,
+                createdAt: chat.createdAt,
+              })
+            : channelTalkProcessedAt({ state: chatState, closedAt: chat.closedAt });
           if (!occurredAt || !chat.id) continue;
           if (occurredAt < range.from || occurredAt > range.to) continue;
 
@@ -132,7 +130,14 @@ export class ChannelTalkConnector implements Connector {
             channel: "채널톡",
             taskType: isCall ? "전화 - 인바운드" : "채팅",
             direction: "inbound",
-            status: chatState === "closed" ? "closed" : "missed",
+            status:
+              isCall && channelTalkMissedCallAt({
+                state: chatState,
+                openedAt: chat.openedAt,
+                createdAt: chat.createdAt,
+              })
+                ? "missed"
+                : "closed",
             count: 1,
             customerExternalId: chat.userId,
             assigneeName: chat.assigneeId,
