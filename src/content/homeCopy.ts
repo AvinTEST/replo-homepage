@@ -271,7 +271,7 @@ export const homeCopy = {
       price: 99000,
       description: "카페24 Pro 전용 요금제",
       scope: "게시판 문의 전용",
-      volume: "월 상담 50건",
+      volume: "월 문의 50건 이하",
       cta: "제휴가로 시작하기",
     },
     plans: [

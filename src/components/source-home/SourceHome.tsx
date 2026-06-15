@@ -621,11 +621,11 @@ function LandingPricing() {
           data-plan-id={partnerPlan.id}
           data-plan-variant={partnerPlan.variant}
         >
+          <span className="partner-tier-label">{partnerPlan.partnerBadge}</span>
           <div className="partner-tier-brand">
             <span className="partner-tier-logo">
               <img alt="CAFE24" height="20" src="/cafe24.svg" width="112" />
             </span>
-            <span className="partner-tier-label">{partnerPlan.partnerBadge}</span>
           </div>
           <div className="partner-tier-copy">
             <div className="tier-name-en">{partnerPlan.badge} PARTNER</div>

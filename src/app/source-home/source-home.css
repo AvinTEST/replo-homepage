@@ -1710,16 +1710,17 @@
 .replo-source-home .partner-tier {
   align-items: center;
   background:
-    radial-gradient(circle at 88% 10%, rgba(120, 100, 255, .18), transparent 32%),
+    radial-gradient(circle at 88% 10%, rgba(120, 100, 255, .25), transparent 34%),
     linear-gradient(135deg, #fff 0%, var(--violet-50) 100%);
-  border: 2px solid var(--violet-500);
+  border: 2px solid var(--violet-600);
   border-radius: var(--r-xl);
-  box-shadow: 0 18px 44px rgba(91, 71, 224, .16);
+  box-shadow: 0 24px 60px rgba(91, 71, 224, .24);
   display: grid;
   gap: 28px;
   grid-template-columns: 170px minmax(0, 1fr) auto 190px;
   margin-bottom: 24px;
-  padding: 26px 28px;
+  padding: 32px 28px 28px;
+  position: relative;
 }
 
 .replo-source-home .partner-tier-brand {
@@ -1747,14 +1748,21 @@
 }
 
 .replo-source-home .partner-tier-label {
-  background: var(--violet-600);
+  background: var(--ink-900);
   border-radius: var(--r-pill);
+  box-shadow: 0 8px 20px rgba(24, 20, 51, .22);
   color: #fff;
   display: inline-flex;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 800;
-  letter-spacing: .03em;
-  padding: 6px 12px;
+  left: 50%;
+  letter-spacing: .05em;
+  padding: 6px 16px;
+  position: absolute;
+  top: -14px;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  z-index: 1;
 }
 
 .replo-source-home .partner-tier-copy .tier-name {
@@ -1781,9 +1789,13 @@
 
 .replo-source-home .partner-tier-price {
   align-items: flex-start;
+  background: rgba(255, 255, 255, .88);
+  border: 1px solid var(--violet-100);
+  border-radius: 14px;
   display: flex;
   flex-direction: column;
   min-width: 180px;
+  padding: 16px 18px;
 }
 
 .replo-source-home .partner-tier-price del {
@@ -1794,7 +1806,7 @@
 
 .replo-source-home .partner-tier-price strong {
   color: var(--violet-700);
-  font-size: 28px;
+  font-size: 30px;
   font-weight: 900;
   letter-spacing: -.025em;
   line-height: 1;
