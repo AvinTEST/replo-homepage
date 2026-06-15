@@ -12,11 +12,14 @@ export async function POST(request: Request) {
 
   try {
     const admin = requireAdminClient();
-    const { data, error } = await admin
+    const integrationId = new URL(request.url).searchParams.get("integrationId");
+    let query = admin
       .from("channel_integrations")
       .select("id, tenant_id")
       .eq("provider", "channel_talk")
       .eq("status", "connected");
+    if (integrationId) query = query.eq("id", integrationId);
+    const { data, error } = await query;
     if (error) throw error;
     const targets = validSyncTargets(data ?? []);
     const results = [];
