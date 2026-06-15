@@ -508,9 +508,6 @@ function FeatureMatrix() {
 
 function LandingPricing() {
   const [showMatrix, setShowMatrix] = useState(false);
-  const partnerPlan = homeCopy.pricing.partnerPlan;
-  const partnerCtaHref = `/contact?plan=${partnerPlan.id}&variant=${partnerPlan.variant}&partner=${partnerPlan.partnerChannel}`;
-  const formatPrice = (price: number) => `₩${price.toLocaleString("ko-KR")}`;
 
   return (
     <section className="sec-tight" style={{ background: "var(--bg)" }} id="pricing-sec">
@@ -521,35 +518,6 @@ function LandingPricing() {
           <h2 className="t-h1">{homeCopy.pricing.title}</h2>
           <p className="t-lead" style={{ marginTop: 16 }}>{homeCopy.pricing.description}</p>
         </div>
-        <article
-          className="partner-tier"
-          data-partner-channel={partnerPlan.partnerChannel}
-          data-plan-id={partnerPlan.id}
-          data-plan-variant={partnerPlan.variant}
-        >
-          <div className="partner-tier-brand">
-            <span className="partner-tier-logo">
-              <img alt="CAFE24" height="20" src="/cafe24.svg" width="112" />
-            </span>
-            <span className="partner-tier-label">제휴 특가</span>
-          </div>
-          <div className="partner-tier-copy">
-            <div className="tier-name-en">{partnerPlan.badge} PARTNER</div>
-            <div className="tier-name">{partnerPlan.name}</div>
-            <p>{partnerPlan.description}</p>
-            <span className="tier-vol">{partnerPlan.scope}</span>
-          </div>
-          <div className="partner-tier-price">
-            <del>{formatPrice(partnerPlan.originalPrice)}</del>
-            <strong>
-              {formatPrice(partnerPlan.price)}
-              <small>{homeCopy.pricing.monthlyUnit}</small>
-            </strong>
-          </div>
-          <ButtonLink href={partnerCtaHref} size="sm" className="partner-tier-cta">
-            {partnerPlan.cta}
-          </ButtonLink>
-        </article>
         <div className="pricing5">
           {homeCopy.pricing.plans.map(({ en, ko, price, volume, best, description, features }) => (
             <div className={`tier${best ? " best" : ""}`} key={en}>

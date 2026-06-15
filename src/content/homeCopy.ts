@@ -260,18 +260,6 @@ export const homeCopy = {
     detailOpen: "플랜별 기능 전체 비교",
     detailClose: "기능 비교표 접기",
     note: "모든 금액은 부가세 별도 · 초과 상담은 건당 과금됩니다.",
-    partnerPlan: {
-      id: "starter",
-      variant: "cafe24_partner",
-      partnerChannel: "cafe24",
-      badge: "CAFE24",
-      name: "Starter",
-      originalPrice: 590000,
-      price: 99000,
-      description: "카페24 전용 요금제",
-      scope: "게시판 문의 전용",
-      cta: "제휴가로 시작하기",
-    },
     plans: [
       { en: "Starter", ko: "스타터", price: "₩99,000", volume: "월 상담 50건", best: false, description: "운영 초기 브랜드가 채팅·게시판 문의를 가볍게 맡겨보는 시작 플랜", features: ["채팅·게시판 응대", "AI 응대 · 반복 문의 자동화", "FAQ 구축 · 상담 스크립트", "월간 운영 리포트"] },
       { en: "Lite", ko: "라이트", price: "₩490,000", volume: "월 상담 200건", best: false, description: "문의량이 증가하는 브랜드를 위한 기본 운영·분석 플랜", features: ["채팅·게시판·이메일 응대", "운영 인사이트 분석", "데일리 현황 알림", "월간 운영 리포트"] },
