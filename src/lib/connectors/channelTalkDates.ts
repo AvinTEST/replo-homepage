@@ -1,14 +1,26 @@
 type ChannelTalkDateFields = {
   state?: string;
+  createdAt?: number | string;
+  openedAt?: number | string;
   closedAt?: number | string;
 };
 
-export function channelTalkProcessedAt(chat: ChannelTalkDateFields) {
-  if (chat.state !== "closed" || chat.closedAt === undefined) return null;
-  const value =
-    typeof chat.closedAt === "string" && /^\d+$/.test(chat.closedAt)
-      ? Number(chat.closedAt)
-      : chat.closedAt;
-  const parsed = new Date(value);
+function timestamp(value: number | string | undefined) {
+  if (value === undefined) return null;
+  const normalized =
+    typeof value === "string" && /^\d+$/.test(value)
+      ? Number(value)
+      : value;
+  const parsed = new Date(normalized);
   return Number.isNaN(parsed.getTime()) ? null : parsed.toISOString();
+}
+
+export function channelTalkProcessedAt(chat: ChannelTalkDateFields) {
+  return chat.state === "closed" ? timestamp(chat.closedAt) : null;
+}
+
+export function channelTalkMissedCallAt(chat: ChannelTalkDateFields) {
+  return chat.state === "opened" || chat.state === "snoozed"
+    ? timestamp(chat.openedAt ?? chat.createdAt)
+    : null;
 }

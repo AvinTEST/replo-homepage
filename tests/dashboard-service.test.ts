@@ -4,7 +4,10 @@ import {
   buildBillingRuleMap,
   calculateBillableCount,
 } from "../src/lib/dashboard/billing.ts";
-import { channelTalkProcessedAt } from "../src/lib/connectors/channelTalkDates.ts";
+import {
+  channelTalkMissedCallAt,
+  channelTalkProcessedAt,
+} from "../src/lib/connectors/channelTalkDates.ts";
 import { buildResponsiveChartSeries } from "../src/lib/dashboard/chartSeries.ts";
 import { createCsv } from "../src/lib/dashboard/csv.ts";
 import {
@@ -202,6 +205,43 @@ test("ChannelTalk processed date uses closedAt and excludes unresolved chats", (
   );
   assert.equal(channelTalkProcessedAt({ state: "opened", closedAt: 1780877260093 }), null);
   assert.equal(channelTalkProcessedAt({ state: "closed" }), null);
+});
+
+test("ChannelTalk missed calls use openedAt without counting as processed work", () => {
+  assert.equal(
+    channelTalkMissedCallAt({ state: "opened", openedAt: 1780877260093 }),
+    "2026-06-08T00:07:40.093Z",
+  );
+  assert.equal(channelTalkMissedCallAt({ state: "closed", openedAt: 1780877260093 }), null);
+
+  const metrics = buildDailyMetricRows({
+    tenantId: "tenant-fixture",
+    dateKey: "2026-06-08",
+    updatedAt: "2026-06-08T00:00:00.000Z",
+    billingRules: new Map(),
+    events: [
+      {
+        provider: "channel_talk",
+        channel: "채널톡",
+        task_type: "전화 - 인바운드",
+        direction: "inbound",
+        status: "closed",
+        count: 7,
+      },
+      {
+        provider: "channel_talk",
+        channel: "채널톡",
+        task_type: "전화 - 인바운드",
+        direction: "inbound",
+        status: "missed",
+        count: 3,
+      },
+    ],
+  });
+  assert.equal(metrics[0].total_count, 7);
+  assert.equal(metrics[0].answered_count, 7);
+  assert.equal(metrics[0].missed_count, 3);
+  assert.equal(metrics[0].billable_count, 7);
 });
 
 test("chart grain follows available width and preserves empty dates", () => {

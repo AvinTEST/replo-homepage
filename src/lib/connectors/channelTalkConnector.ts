@@ -1,5 +1,8 @@
 import "server-only";
-import { channelTalkProcessedAt } from "@/lib/connectors/channelTalkDates";
+import {
+  channelTalkMissedCallAt,
+  channelTalkProcessedAt,
+} from "@/lib/connectors/channelTalkDates";
 import { ConnectorError } from "@/lib/connectors/errors";
 import type {
   Connector,
@@ -86,7 +89,7 @@ export class ChannelTalkConnector implements Connector {
   async fetchEvents(range: SyncRange) {
     const events = new Map<string, NormalizedOperationEvent>();
 
-    for (const state of ["closed"]) {
+    for (const state of ["opened", "snoozed", "closed"]) {
       let since: string | undefined;
       const seenCursors = new Set<string>();
 
@@ -106,14 +109,21 @@ export class ChannelTalkConnector implements Connector {
         const chats = body.userChats ?? body.chats ?? [];
 
         for (const chat of chats) {
-          const occurredAt = channelTalkProcessedAt({
-            state: chat.state ?? state,
-            closedAt: chat.closedAt,
-          });
-          if (!occurredAt || !chat.id) continue;
-          if (occurredAt < range.from || occurredAt > range.to) continue;
           const medium = String(chat.contactMediumType ?? "").toLowerCase();
           const isCall = medium.includes("phone") || medium.includes("call");
+          const chatState = chat.state ?? state;
+          const occurredAt =
+            chatState === "closed"
+              ? channelTalkProcessedAt({ state: chatState, closedAt: chat.closedAt })
+              : isCall
+                ? channelTalkMissedCallAt({
+                    state: chatState,
+                    openedAt: chat.openedAt,
+                    createdAt: chat.createdAt,
+                  })
+                : null;
+          if (!occurredAt || !chat.id) continue;
+          if (occurredAt < range.from || occurredAt > range.to) continue;
 
           events.set(chat.id, {
             provider: this.provider,
@@ -122,7 +132,7 @@ export class ChannelTalkConnector implements Connector {
             channel: "채널톡",
             taskType: isCall ? "전화 - 인바운드" : "채팅",
             direction: "inbound",
-            status: chat.state,
+            status: chatState === "closed" ? "closed" : "missed",
             count: 1,
             customerExternalId: chat.userId,
             assigneeName: chat.assigneeId,
