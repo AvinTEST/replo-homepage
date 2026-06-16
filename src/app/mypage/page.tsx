@@ -14,10 +14,15 @@ const roleLabels: Record<string, string> = {
 };
 
 export default async function MyPage() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
+
   const access = await getCurrentCustomerAccess();
   if (!access) redirect("/onboarding");
-  const supabase = await createClient();
-  const loginEmail = access.user.email;
+  const loginEmail = user.email;
   if (!loginEmail) redirect("/login");
 
   const [subscriptionResult, paymentMethodResult, brandResult, tenantResult] =

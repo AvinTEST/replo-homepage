@@ -148,31 +148,43 @@ function MarketingNav({
   const [menu, setMenu] = useState(false);
   const showAuthControls = showPortalLogin || authenticated;
 
+  useEffect(() => {
+    if (!menu) return;
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [menu]);
+
   return (
-    <header className="mnav">
-      <div className="wrap mnav-in">
-        <a href="#top" aria-label="Replo source home">
-          <Logo />
-        </a>
-        <nav className="mnav-links" aria-label="주요 메뉴">
-          {homeCopy.navigation.links.map(({ id, label }) => (
-            <a key={id} href={`#${id}`}>{label}</a>
-          ))}
-        </nav>
-        <div className="mnav-cta">
-          {showAuthControls ? (
-            <button className="btn btn-ghost btn-sm" type="button" onClick={authenticated ? onLogout : onLogin}>
-              {authenticated ? "로그아웃" : "로그인"}
+    <>
+      <header className="mnav">
+        <div className="wrap mnav-in">
+          <a href="#top" aria-label="Replo source home">
+            <Logo />
+          </a>
+          <nav className="mnav-links" aria-label="주요 메뉴">
+            {homeCopy.navigation.links.map(({ id, label }) => (
+              <a key={id} href={`#${id}`}>{label}</a>
+            ))}
+          </nav>
+          <div className="mnav-cta">
+            {showAuthControls ? (
+              <button className="btn btn-ghost btn-sm" type="button" onClick={authenticated ? onLogout : onLogin}>
+                {authenticated ? "로그아웃" : "로그인"}
+              </button>
+            ) : null}
+            <ButtonLink href={authenticated ? "/dashboard" : "/contact"} size="sm">
+              {authenticated ? "대시보드 바로가기" : homeCopy.navigation.cta}
+            </ButtonLink>
+            <button className="mnav-burger" type="button" onClick={() => setMenu(true)} aria-label="메뉴 열기">
+              <Icon name="menu" size={26} />
             </button>
-          ) : null}
-          <ButtonLink href={authenticated ? "/dashboard" : "/contact"} size="sm">
-            {authenticated ? "대시보드 바로가기" : homeCopy.navigation.cta}
-          </ButtonLink>
-          <button className="mnav-burger" type="button" onClick={() => setMenu(true)} aria-label="메뉴 열기">
-            <Icon name="menu" size={26} />
-          </button>
+          </div>
         </div>
-      </div>
+      </header>
       <div className={`msheet${menu ? " show" : ""}`} onClick={() => setMenu(false)}>
         <div className="msheet-panel" onClick={(event) => event.stopPropagation()}>
           <div className="row between" style={{ marginBottom: 8 }}>
@@ -203,7 +215,7 @@ function MarketingNav({
           </div>
         </div>
       </div>
-    </header>
+    </>
   );
 }
 

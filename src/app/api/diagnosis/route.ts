@@ -216,7 +216,10 @@ export async function POST(request: Request) {
     };
 
     if (!webhookUrl) {
-      return NextResponse.json({ ok: true, webhookStatus: "skipped" });
+      return NextResponse.json({
+        ok: true,
+        webhookStatus: "skipped",
+      });
     }
 
     const webhookPayload = {
