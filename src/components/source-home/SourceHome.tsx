@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { homeCopy } from "../../content/homeCopy";
 
 const PATHS: Record<string, string> = {
@@ -75,24 +75,37 @@ function ButtonLink({
 
 function MarketingNav() {
   const [menu, setMenu] = useState(false);
+
+  useEffect(() => {
+    if (!menu) return;
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [menu]);
+
   return (
-    <header className="mnav">
-      <div className="wrap mnav-in">
-        <a href="#top" aria-label="Replo source home">
-          <Logo />
-        </a>
-        <nav className="mnav-links" aria-label="주요 메뉴">
-          {homeCopy.navigation.links.map(({ id, label }) => (
-            <a key={id} href={`#${id}`}>{label}</a>
-          ))}
-        </nav>
-        <div className="mnav-cta">
-          <ButtonLink size="sm">{homeCopy.navigation.cta}</ButtonLink>
-          <button className="mnav-burger" type="button" onClick={() => setMenu(true)} aria-label="메뉴 열기">
-            <Icon name="menu" size={26} />
-          </button>
+    <>
+      <header className="mnav">
+        <div className="wrap mnav-in">
+          <a href="#top" aria-label="Replo source home">
+            <Logo />
+          </a>
+          <nav className="mnav-links" aria-label="주요 메뉴">
+            {homeCopy.navigation.links.map(({ id, label }) => (
+              <a key={id} href={`#${id}`}>{label}</a>
+            ))}
+          </nav>
+          <div className="mnav-cta">
+            <ButtonLink size="sm">{homeCopy.navigation.cta}</ButtonLink>
+            <button className="mnav-burger" type="button" onClick={() => setMenu(true)} aria-label="메뉴 열기">
+              <Icon name="menu" size={26} />
+            </button>
+          </div>
         </div>
-      </div>
+      </header>
       <div className={`msheet${menu ? " show" : ""}`} onClick={() => setMenu(false)}>
         <div className="msheet-panel" onClick={(event) => event.stopPropagation()}>
           <div className="row between" style={{ marginBottom: 8 }}>
@@ -109,7 +122,7 @@ function MarketingNav() {
           </div>
         </div>
       </div>
-    </header>
+    </>
   );
 }
 

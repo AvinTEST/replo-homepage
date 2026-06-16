@@ -112,7 +112,7 @@ export default function ContactPage() {
         return;
       }
 
-      window.location.assign("/contatct/success");
+      window.location.assign("/contact/success");
     } catch {
       setError("네트워크 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.");
     } finally {
