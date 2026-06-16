@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { GoogleAuthButton } from "../auth/GoogleAuthButton";
 import { homeCopy } from "../../content/homeCopy";
 import { createClient } from "../../lib/supabase/client";
+import { shouldShowPortalLogin } from "../../lib/deployment/host";
 
 const PATHS: Record<string, string> = {
   arrowRight: "M5 12h14M13 5l7 7-7 7",
@@ -136,11 +137,13 @@ function LoginModal({
 
 function MarketingNav({
   authenticated,
+  authReady,
   onLogin,
   onLogout,
   showPortalLogin,
 }: {
   authenticated: boolean;
+  authReady: boolean;
   onLogin: () => void;
   onLogout: () => void;
   showPortalLogin: boolean;
@@ -171,7 +174,9 @@ function MarketingNav({
             ))}
           </nav>
           <div className="mnav-cta">
-            {showAuthControls ? (
+            {!authReady ? (
+              <span className="mnav-auth-skeleton" aria-label="로그인 상태 확인 중" role="status" />
+            ) : showAuthControls ? (
               <button className="btn btn-ghost btn-sm" type="button" onClick={authenticated ? onLogout : onLogin}>
                 {authenticated ? "로그아웃" : "로그인"}
               </button>
@@ -197,7 +202,7 @@ function MarketingNav({
             <a key={id} href={`#${id}`} onClick={() => setMenu(false)}>{label}</a>
           ))}
           <div className="col gap-10" style={{ marginTop: 18 }}>
-            {showAuthControls ? (
+            {authReady && showAuthControls ? (
               <button
                 className="btn btn-ghost"
                 type="button"
@@ -826,20 +831,43 @@ function Footer() {
   );
 }
 
-export function SourceHome({
-  authError = false,
-  initialAuthenticated = false,
-  initialLoginOpen = false,
-  showPortalLogin = false,
-}: {
-  authError?: boolean;
-  initialAuthenticated?: boolean;
-  initialLoginOpen?: boolean;
-  showPortalLogin?: boolean;
-}) {
+export function SourceHome() {
   const router = useRouter();
-  const [authenticated, setAuthenticated] = useState(initialAuthenticated);
-  const [loginOpen, setLoginOpen] = useState(initialLoginOpen && !initialAuthenticated);
+  // Auth, host, and login deep-links are resolved client-side so the page can
+  // be served as static HTML. `authReady` gates the nav auth control until the
+  // session is known, avoiding a login/logout button flash.
+  const [authReady, setAuthReady] = useState(false);
+  const [authenticated, setAuthenticated] = useState(false);
+  const [showPortalLogin, setShowPortalLogin] = useState(false);
+  const [authError, setAuthError] = useState(false);
+  const [loginOpen, setLoginOpen] = useState(false);
+
+  useEffect(() => {
+    setShowPortalLogin(shouldShowPortalLogin(window.location.hostname));
+
+    const params = new URLSearchParams(window.location.search);
+    const wantLogin = params.get("login") === "1";
+    if (params.get("error") === "auth_failed") setAuthError(true);
+
+    const supabase = createClient();
+    let active = true;
+    // getSession reads the session from the cookie/storage without a network
+    // round-trip, so it resolves almost instantly on the client.
+    supabase.auth.getSession().then(({ data }) => {
+      if (!active) return;
+      const isAuthed = Boolean(data.session);
+      setAuthenticated(isAuthed);
+      if (wantLogin && !isAuthed) setLoginOpen(true);
+      setAuthReady(true);
+    });
+    const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
+      setAuthenticated(Boolean(session));
+    });
+    return () => {
+      active = false;
+      sub.subscription.unsubscribe();
+    };
+  }, []);
 
   async function handleLogout() {
     await createClient().auth.signOut();
@@ -852,6 +880,7 @@ export function SourceHome({
       <div className="mkt">
         <MarketingNav
           authenticated={authenticated}
+          authReady={authReady}
           onLogin={() => setLoginOpen(true)}
           onLogout={handleLogout}
           showPortalLogin={showPortalLogin}
