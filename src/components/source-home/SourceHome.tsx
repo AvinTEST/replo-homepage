@@ -99,7 +99,8 @@ function MarketingNav() {
             ))}
           </nav>
           <div className="mnav-cta">
-            <ButtonLink size="sm">{homeCopy.navigation.cta}</ButtonLink>
+            <ButtonLink className="mnav-desktop-cta" size="sm">{homeCopy.navigation.cta}</ButtonLink>
+            <ButtonLink className="mnav-mobile-login" href="/login" size="sm">로그인</ButtonLink>
             <button className="mnav-burger" type="button" onClick={() => setMenu(true)} aria-label="메뉴 열기">
               <Icon name="menu" size={26} />
             </button>
@@ -117,7 +118,8 @@ function MarketingNav() {
           {homeCopy.navigation.links.map(({ id, label }) => (
             <a key={id} href={`#${id}`} onClick={() => setMenu(false)}>{label}</a>
           ))}
-          <div className="col gap-10" style={{ marginTop: 18 }}>
+          <div className="msheet-actions">
+            <ButtonLink href="/login" variant="ghost">로그인</ButtonLink>
             <ButtonLink>{homeCopy.navigation.cta}</ButtonLink>
           </div>
         </div>

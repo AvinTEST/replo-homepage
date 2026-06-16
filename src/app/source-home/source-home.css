@@ -252,6 +252,10 @@
   display: none;
 }
 
+.replo-source-home .mnav-mobile-login {
+  display: none;
+}
+
 .replo-source-home .msheet {
   background: #fff;
   display: none;
@@ -287,7 +291,26 @@
   padding: 14px 6px;
 }
 
+.replo-source-home .msheet-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.replo-source-home .msheet-actions .btn {
+  border-bottom: 0;
+  padding: 0 18px;
+  width: 100%;
+}
+
+.replo-source-home .msheet-actions .btn-primary {
+  color: #fff;
+}
+
 @media (max-width: 900px) {
+  .replo-source-home .mnav-desktop-cta { display: none; }
+  .replo-source-home .mnav-mobile-login { display: inline-flex; }
   .replo-source-home .mnav-links { display: none; }
   .replo-source-home .mnav-burger { display: inline-flex; }
 }
