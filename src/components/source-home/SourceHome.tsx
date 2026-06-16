@@ -99,6 +99,7 @@ function MarketingNav() {
             ))}
           </nav>
           <div className="mnav-cta">
+            <ButtonLink className="mnav-desktop-login" href="/login" variant="ghost" size="sm">로그인</ButtonLink>
             <ButtonLink className="mnav-desktop-cta" size="sm">{homeCopy.navigation.cta}</ButtonLink>
             <ButtonLink className="mnav-mobile-login" href="/login" size="sm">로그인</ButtonLink>
             <button className="mnav-burger" type="button" onClick={() => setMenu(true)} aria-label="메뉴 열기">

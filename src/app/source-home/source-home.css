@@ -309,6 +309,7 @@
 }
 
 @media (max-width: 900px) {
+  .replo-source-home .mnav-desktop-login { display: none; }
   .replo-source-home .mnav-desktop-cta { display: none; }
   .replo-source-home .mnav-mobile-login { display: inline-flex; }
   .replo-source-home .mnav-links { display: none; }
