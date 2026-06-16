@@ -33,6 +33,40 @@ DIAGNOSIS_WEBHOOK_SECRET=
 
 `SUPABASE_SERVICE_ROLE_KEY`, Redis token, webhook secret에는 `NEXT_PUBLIC_` 접두사를 붙이지 않습니다.
 
+## Meta(Facebook) 추적 환경변수
+
+Facebook Pixel과 Meta Conversions API 연동을 사용하려면 Vercel에 아래 값을 설정합니다.
+
+```env
+# 클라이언트 Pixel (공개). 비어 있으면 Pixel이 로드되지 않고 no-op 처리됩니다.
+NEXT_PUBLIC_FACEBOOK_PIXEL_ID=
+
+# 서버 전용 Conversions API. NEXT_PUBLIC_ 접두사를 붙이지 않습니다.
+# META_PIXEL_ID는 보통 NEXT_PUBLIC_FACEBOOK_PIXEL_ID와 동일한 숫자 id입니다.
+META_PIXEL_ID=
+META_ACCESS_TOKEN=
+# 선택: Events Manager의 Test Events로 이벤트를 미러링할 때 사용합니다.
+META_TEST_EVENT_CODE=
+```
+
+- `META_PIXEL_ID` 또는 `META_ACCESS_TOKEN`이 없으면 `/api/meta/conversions`는 사용자
+  플로우를 막지 않고 안전하게 no-op 합니다.
+- `META_ACCESS_TOKEN`은 서버에서만 읽으며 브라우저 번들에 포함되지 않습니다.
+
+### 추적 이벤트
+
+| 시점 | Pixel | CAPI | content_name |
+| --- | --- | --- | --- |
+| 페이지 진입/라우트 변경 | `PageView` | (Pixel만) | — |
+| 상담/문의 CTA 클릭 | `Lead` | `Lead` | `consultation_cta` |
+| 문의 제출 완료(`/contact`) | `Lead` | `Lead` | `inquiry_submit` |
+| 회원가입 완료 (이 브랜치 미사용) | `CompleteRegistration` | `CompleteRegistration` | `signup` |
+| 온보딩 완료 (이 브랜치 미사용) | `trackCustom complete_onboarding` | `complete_onboarding` | `onboarding` |
+
+Pixel과 CAPI는 동일한 `event_id`로 전송되어 Meta에서 중복 제거됩니다.
+`Purchase`, `InitiateCheckout`, `AddPaymentInfo`, `Subscribe`, `StartTrial`,
+`AddToCart` 이벤트는 절대 발생시키지 않으며, 서버 route가 whitelist로 차단합니다.
+
 ## Supabase
 
 [`supabase.sql`](./supabase.sql)을 SQL Editor에서 실행하여 `diagnosis_responses` 테이블을 준비합니다.

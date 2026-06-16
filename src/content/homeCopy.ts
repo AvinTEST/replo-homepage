@@ -255,7 +255,7 @@ export const homeCopy = {
     description: "월 상담 건수 기준의 단순한 요금제. 약정 없이 시작하고 언제든 변경할 수 있습니다.",
     recommended: "Recommended",
     monthlyUnit: " / 월",
-    standardCta: "이 플랜으로 시작",
+    standardCta: "도입 상담 신청",
     enterpriseCta: "영업팀 문의",
     detailOpen: "플랜별 기능 전체 비교",
     detailClose: "기능 비교표 접기",

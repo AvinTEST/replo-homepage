@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useState } from "react";
+import { trackInquirySubmit } from "@/lib/meta/track";
 
 const businessTypeOptions = [
   "자사몰을 직접 운영해요",
@@ -89,7 +90,7 @@ export default function ContactPage() {
 
     const websiteUrl = normalizeWebsiteUrl(form.websiteUrl);
     if (!websiteUrl) {
-      setError("홈페이지 주소 형식을 확인해 주세요.");
+      setError("홈페이지 주소를 입력해 주세요. 예: https://replo.kr");
       return;
     }
 
@@ -111,6 +112,10 @@ export default function ContactPage() {
         setError(result.error ?? "운영 진단 신청 중 오류가 발생했습니다.");
         return;
       }
+
+      // 문의 제출 완료: Pixel + CAPI Lead 이벤트(content_name: inquiry_submit).
+      // 식별자(email/phone)는 서버에서 sha256 해시 후 user_data에 포함됩니다.
+      trackInquirySubmit({ email: form.workEmail, phone: form.phone });
 
       window.location.assign("/contatct/success");
     } catch {

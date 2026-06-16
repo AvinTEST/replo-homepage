@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { homeCopy } from "../../content/homeCopy";
+import { trackConsultationCta } from "@/lib/meta/track";
 
 const PATHS: Record<string, string> = {
   arrowRight: "M5 12h14M13 5l7 7-7 7",
@@ -57,6 +58,7 @@ function ButtonLink({
   size,
   className = "",
   iconRight,
+  trackLocation,
 }: {
   children: React.ReactNode;
   href?: string;
@@ -64,9 +66,19 @@ function ButtonLink({
   size?: "lg" | "sm";
   className?: string;
   iconRight?: string;
+  trackLocation?: string;
 }) {
+  const handleClick = trackLocation
+    ? () => {
+        trackConsultationCta(trackLocation);
+      }
+    : undefined;
   return (
-    <a className={["btn", `btn-${variant}`, size === "lg" ? "btn-lg" : size === "sm" ? "btn-sm" : "", className].filter(Boolean).join(" ")} href={href}>
+    <a
+      className={["btn", `btn-${variant}`, size === "lg" ? "btn-lg" : size === "sm" ? "btn-sm" : "", className].filter(Boolean).join(" ")}
+      href={href}
+      onClick={handleClick}
+    >
       {children}
       {iconRight ? <Icon name={iconRight} size={size === "sm" ? 16 : 18} /> : null}
     </a>
@@ -87,7 +99,7 @@ function MarketingNav() {
           ))}
         </nav>
         <div className="mnav-cta">
-          <ButtonLink size="sm">{homeCopy.navigation.cta}</ButtonLink>
+          <ButtonLink size="sm" trackLocation="nav">{homeCopy.navigation.cta}</ButtonLink>
           <button className="mnav-burger" type="button" onClick={() => setMenu(true)} aria-label="메뉴 열기">
             <Icon name="menu" size={26} />
           </button>
@@ -105,7 +117,7 @@ function MarketingNav() {
             <a key={id} href={`#${id}`} onClick={() => setMenu(false)}>{label}</a>
           ))}
           <div className="col gap-10" style={{ marginTop: 18 }}>
-            <ButtonLink>{homeCopy.navigation.cta}</ButtonLink>
+            <ButtonLink trackLocation="mobile_nav">{homeCopy.navigation.cta}</ButtonLink>
           </div>
         </div>
       </div>
@@ -129,7 +141,7 @@ function Hero() {
           </h1>
           <p className="t-lead lead">{homeCopy.hero.description[0]}<br />{homeCopy.hero.description[1]}</p>
           <div className="cta-row">
-            <ButtonLink size="lg">{homeCopy.hero.primaryCta}</ButtonLink>
+            <ButtonLink size="lg" trackLocation="hero">{homeCopy.hero.primaryCta}</ButtonLink>
             <ButtonLink href="#solution-sec" size="lg" variant="ghost">{homeCopy.hero.secondaryCta}</ButtonLink>
           </div>
         </div>
@@ -530,7 +542,7 @@ function LandingPricing() {
               <ul className="tier-feats">
                 {features.map((feature) => <li key={feature}><Icon name="check" size={15} stroke={2.3} />{feature}</li>)}
               </ul>
-              <ButtonLink size="sm" variant={best ? "primary" : "ghost"} className="btn-block tier-cta">
+              <ButtonLink size="sm" variant={best ? "primary" : "ghost"} className="btn-block tier-cta" trackLocation={`pricing_${en.toLowerCase()}`}>
                 {en === "Enterprise" ? homeCopy.pricing.enterpriseCta : homeCopy.pricing.standardCta}
               </ButtonLink>
             </div>
@@ -586,8 +598,8 @@ function CtaSection() {
             <h2 className="t-h1" style={{ color: "#fff" }}>{homeCopy.finalCta.title[0]}<br />{homeCopy.finalCta.title[1]}</h2>
             <p style={{ fontSize: 17, lineHeight: 1.7, marginTop: 16 }}>{homeCopy.finalCta.description[0]}<br />{homeCopy.finalCta.description[1]}</p>
             <div className="cta-row">
-              <ButtonLink size="lg" className="source-cta-white">{homeCopy.finalCta.button}</ButtonLink>
-              <ButtonLink size="lg" className="source-cta-outline">{homeCopy.finalCta.secondaryButton}</ButtonLink>
+              <ButtonLink size="lg" className="source-cta-white" trackLocation="final_primary">{homeCopy.finalCta.button}</ButtonLink>
+              <ButtonLink size="lg" className="source-cta-outline" trackLocation="final_secondary">{homeCopy.finalCta.secondaryButton}</ButtonLink>
             </div>
             <div className="cta-hint">{homeCopy.finalCta.hint}</div>
           </div>

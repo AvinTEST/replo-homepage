@@ -2,6 +2,7 @@ import "../styles/globals.css";
 import "./source-home/source-home.css";
 import Script from "next/script";
 import type { ReactNode } from "react";
+import { MetaPixel } from "@/components/meta/MetaPixel";
 
 const siteTitle = "리플로 Replo | CS 운영 대행 · 고객센터 자동화 · CX 운영 설계";
 const siteDescription =
@@ -43,30 +44,8 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="ko">
       <body>
-        <noscript>
-          <img
-            alt=""
-            height="1"
-            src="https://www.facebook.com/tr?id=1656182135616169&ev=PageView&noscript=1"
-            style={{ display: "none" }}
-            width="1"
-          />
-        </noscript>
         {children}
-        <Script id="replo-meta-pixel" strategy="afterInteractive">
-          {`
-            !function(f,b,e,v,n,t,s)
-            {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-            n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-            if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-            n.queue=[];t=b.createElement(e);t.async=!0;
-            t.src=v;s=b.getElementsByTagName(e)[0];
-            s.parentNode.insertBefore(t,s)}(window, document,'script',
-            'https://connect.facebook.net/en_US/fbevents.js');
-            fbq('init', '1656182135616169');
-            fbq('track', 'PageView');
-          `}
-        </Script>
+        <MetaPixel />
         <Script id="replo-channelio" strategy="afterInteractive">
           {`
             (function() {
