@@ -1,5 +1,6 @@
 import "../styles/globals.css";
 import "./source-home/source-home.css";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import Script from "next/script";
 import type { ReactNode } from "react";
 import { MetaPixel } from "@/components/meta/MetaPixel";
@@ -45,6 +46,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     <html lang="ko">
       <body>
         {children}
+        <SpeedInsights />
         <MetaPixel />
         <Script id="replo-channelio" strategy="afterInteractive">
           {`
