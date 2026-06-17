@@ -1,15 +1,12 @@
 import { redirect } from "next/navigation";
 import { getCurrentCustomerAccess } from "@/lib/customers/access";
-import { createClient } from "@/lib/supabase/server";
+import { getSessionClaims } from "@/lib/supabase/claims";
 
 export const dynamic = "force-dynamic";
 
 export default async function DashboardPage() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) redirect("/login");
+  const claims = await getSessionClaims();
+  if (!claims) redirect("/login");
 
   const access = await getCurrentCustomerAccess();
   if (!access) redirect("/onboarding");

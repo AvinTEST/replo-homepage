@@ -1,4 +1,5 @@
 import "server-only";
+import { getSessionClaims } from "@/lib/supabase/claims";
 import { createClient } from "@/lib/supabase/server";
 
 export type TenantAccess = {
@@ -8,22 +9,20 @@ export type TenantAccess = {
 };
 
 export async function getTenantAccess(tenantId: string): Promise<TenantAccess | null> {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return null;
+  const claims = await getSessionClaims();
+  if (!claims) return null;
 
+  const supabase = await createClient();
   const { data } = await supabase
     .from("tenant_users")
     .select("tenant_id, role")
     .eq("tenant_id", tenantId)
-    .eq("user_id", user.id)
+    .eq("user_id", claims.userId)
     .maybeSingle();
 
   if (!data) return null;
   return {
-    userId: user.id,
+    userId: claims.userId,
     tenantId: data.tenant_id as string,
     role: data.role as TenantAccess["role"],
   };

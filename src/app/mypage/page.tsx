@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { MypageSettings } from "@/components/mypage/MypageSettings";
 import { getCurrentCustomerAccess } from "@/lib/customers/access";
+import { getSessionClaims } from "@/lib/supabase/claims";
 import { createClient } from "@/lib/supabase/server";
 import "./mypage.css";
 
@@ -14,16 +15,15 @@ const roleLabels: Record<string, string> = {
 };
 
 export default async function MyPage() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) redirect("/login");
+  const claims = await getSessionClaims();
+  if (!claims) redirect("/login");
 
   const access = await getCurrentCustomerAccess();
   if (!access) redirect("/onboarding");
-  const loginEmail = user.email;
+  const loginEmail = claims.email;
   if (!loginEmail) redirect("/login");
+
+  const supabase = await createClient();
 
   const [brandResult, tenantResult] =
     await Promise.all([

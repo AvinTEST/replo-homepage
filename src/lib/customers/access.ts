@@ -1,12 +1,13 @@
 import "server-only";
 import type { User } from "@supabase/supabase-js";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { getSessionClaims } from "@/lib/supabase/claims";
 import { createClient } from "@/lib/supabase/server";
 
 export type CustomerRole = "owner" | "admin" | "editor" | "viewer";
 
 export type CustomerAccess = {
-  user: User;
+  user: { id: string; email: string | null };
   tenantId: string;
   membership: {
     id: string;
@@ -122,16 +123,14 @@ export async function syncProfileAndLegacyMembership(user: User) {
 }
 
 export async function getCurrentCustomerAccess(): Promise<CustomerAccess | null> {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return null;
+  const claims = await getSessionClaims();
+  if (!claims) return null;
 
+  const supabase = await createClient();
   const { data: membership, error: membershipError } = await supabase
     .from("customer_members")
     .select("id, customer_id, role, status")
-    .eq("user_id", user.id)
+    .eq("user_id", claims.userId)
     .eq("status", "active")
     .order("created_at", { ascending: true })
     .limit(1)
@@ -148,7 +147,7 @@ export async function getCurrentCustomerAccess(): Promise<CustomerAccess | null>
   if (customerError || !customer?.tenant_id) return null;
 
   return {
-    user,
+    user: { id: claims.userId, email: claims.email },
     tenantId: customer.tenant_id as string,
     membership: membership as CustomerAccess["membership"],
     customer: customer as CustomerAccess["customer"],
