@@ -114,6 +114,8 @@ function OnboardingContent() {
             const isWebsiteUrl = field === "websiteUrl";
             const isPhone = field === "phone";
             const isRepName = field === "representativeName";
+            const isCompany = field === "companyName";
+            const isEmail = field === "billingEmail";
             return (
             <label key={String(field)}>
               {label}
@@ -123,15 +125,19 @@ function OnboardingContent() {
                 autoComplete={String(autoComplete)}
                 inputMode={isPhone ? "numeric" : undefined}
                 placeholder={
-                  isBrandName
-                    ? "예: 밍구네 발바닥"
-                    : isWebsiteUrl
-                      ? "예: https://mingu.kr"
-                      : isPhone
-                        ? "예: 010-1234-5678"
-                        : isRepName
-                          ? "예) 홍길동"
-                          : undefined
+                  isCompany
+                    ? "예: 주식회사 아빈코퍼레이션"
+                    : isBrandName
+                      ? "예: 밍구네 발바닥"
+                      : isWebsiteUrl
+                        ? "예: https://mingu.kr"
+                        : isPhone
+                          ? "예: 010-1234-5678"
+                          : isRepName
+                            ? "예) 홍길동"
+                            : isEmail
+                              ? "예: replo@replo.kr"
+                              : undefined
                 }
                 value={form[field as keyof OnboardingForm]}
                 onChange={(event) =>
