@@ -7,7 +7,7 @@ import { trackMetaEvent } from "@/lib/meta/client";
 type OnboardingForm = {
   companyName: string;
   representativeName: string;
-  businessNumber: string;
+  phone: string;
   billingEmail: string;
   brandName: string;
   websiteUrl: string;
@@ -16,7 +16,7 @@ type OnboardingForm = {
 const initialForm: OnboardingForm = {
   companyName: "",
   representativeName: "",
-  businessNumber: "",
+  phone: "",
   billingEmail: "",
   brandName: "",
   websiteUrl: "",
@@ -98,18 +98,19 @@ function OnboardingContent() {
           {[
             ["companyName", "회사명", "organization", true],
             ["representativeName", "대표 담당자", "name", true],
-            ["businessNumber", "사업자등록번호", "off", false],
+            ["phone", "휴대폰번호", "tel", false],
             ["billingEmail", "연락 이메일", "email", false],
             ["brandName", "주요 운영 브랜드명", "organization", true],
             ["websiteUrl", "브랜드 홈페이지 URL", "url", false],
           ].map(([field, label, autoComplete, required]) => {
             const isBrandName = field === "brandName";
             const isWebsiteUrl = field === "websiteUrl";
+            const isPhone = field === "phone";
             return (
             <label key={String(field)}>
               {label}
               <input
-                type={field === "billingEmail" ? "email" : isWebsiteUrl ? "text" : "text"}
+                type={field === "billingEmail" ? "email" : isPhone ? "tel" : "text"}
                 required={Boolean(required)}
                 autoComplete={String(autoComplete)}
                 placeholder={
@@ -117,7 +118,9 @@ function OnboardingContent() {
                     ? "예: 밍구네 발바닥"
                     : isWebsiteUrl
                       ? "예: https://mingu.kr"
-                      : undefined
+                      : isPhone
+                        ? "예: 010-1234-5678"
+                        : undefined
                 }
                 value={form[field as keyof OnboardingForm]}
                 onChange={(event) =>

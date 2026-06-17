@@ -1097,3 +1097,212 @@
     flex-direction: column;
   }
 }
+
+/* Google 로그인 버튼 기본 스타일 (모달/온보딩/인증 페이지 공통)
+   Tailwind preflight가 button의 border/background를 초기화하므로
+   base 스타일을 명시한다. 모달 안에서는 source-home.css가 일부 값을 덮어쓴다. */
+.google-auth-button {
+  width: 100%;
+  height: 50px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  border: 1px solid #d8dde3;
+  border-radius: 12px;
+  background: #fff;
+  color: #1b2347;
+  font: inherit;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
+}
+
+.google-auth-button svg {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+.google-auth-button:hover:not(:disabled) {
+  border-color: #5b47e0;
+  background: #f7f6ff;
+}
+
+.google-auth-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+
+/* 온보딩 페이지 (워크스페이스 설정) */
+.onboarding-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 56px 24px;
+  background:
+    linear-gradient(#e7e9f1 1px, transparent 1px),
+    linear-gradient(90deg, #e7e9f1 1px, transparent 1px),
+    radial-gradient(circle at 18% 8%, rgba(120, 100, 255, 0.18), transparent 32%),
+    radial-gradient(circle at 82% 4%, rgba(91, 71, 224, 0.1), transparent 28%),
+    #fbfbfe;
+  background-size: 48px 48px, 48px 48px, auto, auto, auto;
+  color: #2c3357;
+  font-family: Pretendard, -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo",
+    system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+.onboarding-card {
+  width: 100%;
+  max-width: 560px;
+  display: grid;
+  gap: 6px;
+  border: 1px solid #e7e9f1;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.94);
+  padding: 36px 34px;
+  box-shadow: 0 18px 50px rgba(20, 18, 60, 0.12), 0 6px 16px rgba(20, 18, 60, 0.06);
+  backdrop-filter: saturate(160%) blur(18px);
+}
+
+.onboarding-logo {
+  display: inline-flex;
+  align-items: flex-start;
+  color: #0e1430;
+  font-size: 24px;
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  line-height: 1;
+}
+
+.onboarding-logo sup {
+  color: #5b47e0;
+  font-size: 0.62em;
+}
+
+.onboarding-step {
+  display: inline-flex;
+  margin: 18px 0 0;
+  color: #5b47e0;
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.06em;
+}
+
+.onboarding-card h1 {
+  margin: 10px 0 0;
+  color: #0e1430;
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  line-height: 1.24;
+  word-break: keep-all;
+}
+
+.onboarding-description {
+  margin: 9px 0 0;
+  color: #5a627e;
+  font-size: 15px;
+  line-height: 1.65;
+  word-break: keep-all;
+}
+
+.onboarding-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  margin: 26px 0 0;
+}
+
+.onboarding-card label {
+  display: grid;
+  gap: 7px;
+  color: #1b2347;
+  font-size: 13.5px;
+  font-weight: 700;
+}
+
+.onboarding-card input {
+  width: 100%;
+  height: 50px;
+  border: 1px solid #e7e9f1;
+  border-radius: 12px;
+  background: #fff;
+  padding: 0 14px;
+  color: #0e1430;
+  font: inherit;
+  font-size: 15px;
+  font-weight: 500;
+  box-shadow: 0 1px 1px rgba(16, 22, 48, 0.03);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.onboarding-card input:focus {
+  outline: none;
+  border-color: #5b47e0;
+  box-shadow: 0 0 0 3px #e9e6ff;
+}
+
+.onboarding-card label small {
+  color: #868da6;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+.onboarding-error {
+  margin: 20px 0 0;
+  border-radius: 12px;
+  background: #fef2f2;
+  padding: 11px 13px;
+  color: #b42318;
+  font-size: 13.5px;
+  font-weight: 700;
+}
+
+.onboarding-submit {
+  width: 100%;
+  height: 52px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin: 26px 0 0;
+  border: 0;
+  border-radius: 14px;
+  background: #5b47e0;
+  color: #fff;
+  font: inherit;
+  font-size: 15.5px;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 10px 24px rgba(91, 71, 224, 0.22);
+  transition: background 0.15s ease, transform 0.15s ease, opacity 0.15s ease;
+}
+
+.onboarding-submit:hover:not(:disabled) {
+  background: #4b38c9;
+  transform: translateY(-1px);
+}
+
+.onboarding-submit:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+  transform: none;
+}
+
+@media (max-width: 560px) {
+  .onboarding-card {
+    padding: 30px 22px;
+  }
+
+  .onboarding-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .onboarding-card h1 {
+    font-size: 24px;
+  }
+}

@@ -30,6 +30,7 @@ export async function POST(request: Request) {
   const companyName = text(body.companyName);
   const representativeName = text(body.representativeName);
   const brandName = text(body.brandName);
+  const phone = text(body.phone, 40);
   const websiteUrl = normalizeWebsiteUrl(body.websiteUrl);
   if (!companyName || !representativeName || !brandName) {
     return NextResponse.json(
@@ -60,7 +61,7 @@ export async function POST(request: Request) {
     p_company_name: companyName,
     p_representative_name: representativeName,
     p_brand_name: brandName,
-    p_business_number: text(body.businessNumber, 40) || "",
+    p_business_number: "",
     p_billing_email: text(body.billingEmail) || user.email,
     p_website_url: websiteUrl || "",
     p_avatar_url:
@@ -71,6 +72,10 @@ export async function POST(request: Request) {
   const workspace = Array.isArray(data) ? data[0] : data;
   if (error || !workspace?.customer_id) {
     return NextResponse.json({ error: "고객사 정보를 만들지 못했습니다." }, { status: 500 });
+  }
+
+  if (phone) {
+    await admin.from("customers").update({ phone }).eq("id", workspace.customer_id);
   }
 
   return NextResponse.json({
