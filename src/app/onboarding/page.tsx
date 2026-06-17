@@ -29,6 +29,13 @@ function normalizeWebsiteUrl(value: string) {
   return `https://${trimmed}`;
 }
 
+function formatPhone(value: string) {
+  const digits = value.replace(/\D/g, "").slice(0, 11);
+  if (digits.length <= 3) return digits;
+  if (digits.length <= 7) return `${digits.slice(0, 3)}-${digits.slice(3)}`;
+  return `${digits.slice(0, 3)}-${digits.slice(3, 7)}-${digits.slice(7)}`;
+}
+
 function OnboardingContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -97,15 +104,16 @@ function OnboardingContent() {
         <div className="onboarding-grid">
           {[
             ["companyName", "회사명", "organization", true],
-            ["representativeName", "대표 담당자", "name", true],
+            ["representativeName", "담당자명", "name", true],
             ["phone", "휴대폰번호", "tel", false],
-            ["billingEmail", "연락 이메일", "email", false],
+            ["billingEmail", "이메일", "email", false],
             ["brandName", "주요 운영 브랜드명", "organization", true],
             ["websiteUrl", "브랜드 홈페이지 URL", "url", false],
           ].map(([field, label, autoComplete, required]) => {
             const isBrandName = field === "brandName";
             const isWebsiteUrl = field === "websiteUrl";
             const isPhone = field === "phone";
+            const isRepName = field === "representativeName";
             return (
             <label key={String(field)}>
               {label}
@@ -113,6 +121,7 @@ function OnboardingContent() {
                 type={field === "billingEmail" ? "email" : isPhone ? "tel" : "text"}
                 required={Boolean(required)}
                 autoComplete={String(autoComplete)}
+                inputMode={isPhone ? "numeric" : undefined}
                 placeholder={
                   isBrandName
                     ? "예: 밍구네 발바닥"
@@ -120,18 +129,20 @@ function OnboardingContent() {
                       ? "예: https://mingu.kr"
                       : isPhone
                         ? "예: 010-1234-5678"
-                        : undefined
+                        : isRepName
+                          ? "예) 홍길동"
+                          : undefined
                 }
                 value={form[field as keyof OnboardingForm]}
                 onChange={(event) =>
-                  updateField(field as keyof OnboardingForm, event.target.value)
+                  updateField(
+                    field as keyof OnboardingForm,
+                    isPhone ? formatPhone(event.target.value) : event.target.value,
+                  )
                 }
               />
               {isBrandName ? (
                 <small>우선 운영할 대표 브랜드명을 입력해 주세요.</small>
-              ) : null}
-              {isWebsiteUrl ? (
-                <small>http를 입력하지 않아도 자동으로 https:// 형식으로 저장됩니다.</small>
               ) : null}
             </label>
           );
