@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useState } from "react";
+import { trackMetaEvent } from "@/lib/meta/client";
 
 const businessTypeOptions = [
   "자사몰을 직접 운영해요",
@@ -112,6 +113,16 @@ export default function ContactPage() {
         return;
       }
 
+      await trackMetaEvent("Lead", {
+        customData: {
+          content_name: "contact_diagnosis",
+          status: "submitted",
+        },
+        userData: {
+          email: form.workEmail,
+          phone: form.phone,
+        },
+      });
       window.location.assign("/contact/success");
     } catch {
       setError("네트워크 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.");

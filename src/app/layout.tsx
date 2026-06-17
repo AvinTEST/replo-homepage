@@ -2,6 +2,7 @@ import "../styles/globals.css";
 import "./source-home/source-home.css";
 import Script from "next/script";
 import type { ReactNode } from "react";
+import { MetaPixel } from "@/components/meta/MetaPixel";
 
 const siteTitle = "리플로 Replo | CS 운영 대행 · 고객센터 자동화 · CX 운영 설계";
 const siteDescription =
@@ -44,6 +45,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     <html lang="ko">
       <body>
         {children}
+        <MetaPixel />
         <Script id="replo-channelio" strategy="afterInteractive">
           {`
             (function() {

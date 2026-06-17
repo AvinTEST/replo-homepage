@@ -245,14 +245,37 @@
   gap: 10px;
 }
 
+/* Placeholder shown while the auth state is resolved client-side, so the
+   login/logout control does not flash in after hydration. */
+.replo-source-home .mnav-auth-skeleton {
+  display: inline-block;
+  width: 64px;
+  height: 32px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #eef0f4 25%, #e2e6ee 37%, #eef0f4 63%);
+  background-size: 400% 100%;
+  animation: reploAuthSkeleton 1.2s ease-in-out infinite;
+}
+
+@keyframes reploAuthSkeleton {
+  0% { background-position: 100% 50%; }
+  100% { background-position: 0 50%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .replo-source-home .mnav-auth-skeleton {
+    animation: none;
+  }
+}
+
+.replo-source-home button.btn {
+  font-family: inherit;
+}
+
 .replo-source-home .mnav-burger {
   background: none;
   border: 0;
   color: var(--ink-900);
-  display: none;
-}
-
-.replo-source-home .mnav-mobile-login {
   display: none;
 }
 
@@ -291,29 +314,119 @@
   padding: 14px 6px;
 }
 
-.replo-source-home .msheet-actions {
+.replo-source-home .home-auth-modal {
+  align-items: center;
+  background: rgba(31, 41, 51, .42);
   display: flex;
-  flex-direction: column;
-  gap: 10px;
-  margin-top: 18px;
+  inset: 0;
+  justify-content: center;
+  padding: 24px;
+  position: fixed;
+  z-index: 100;
 }
 
-.replo-source-home .msheet-actions .btn {
-  border-bottom: 0;
-  padding: 0 18px;
+.replo-source-home .home-auth-dialog {
+  background: #fff;
+  border: 1px solid #d8dde3;
+  border-radius: 16px;
+  box-shadow: 0 18px 50px rgba(31, 41, 51, .16);
+  max-width: 420px;
+  padding: 48px 42px 38px;
+  position: relative;
+  text-align: center;
   width: 100%;
 }
 
-.replo-source-home .msheet-actions .btn-primary {
-  color: #fff;
+.replo-source-home .home-auth-close {
+  align-items: center;
+  background: transparent;
+  border: 0;
+  color: var(--ink-500);
+  display: inline-flex;
+  height: 32px;
+  justify-content: center;
+  position: absolute;
+  right: 14px;
+  top: 14px;
+  width: 32px;
+}
+
+.replo-source-home .home-auth-close:hover {
+  color: var(--ink-900);
+}
+
+.replo-source-home .home-auth-brand {
+  display: flex;
+  justify-content: center;
+}
+
+.replo-source-home .home-auth-brand .logo {
+  font-size: 28px;
+}
+
+.replo-source-home .home-auth-dialog h2 {
+  color: var(--ink-900);
+  font-size: 26px;
+  font-weight: 800;
+  letter-spacing: -.035em;
+  line-height: 1.25;
+  margin: 34px 0 0;
+}
+
+.replo-source-home .home-auth-dialog .home-auth-description {
+  color: var(--ink-500);
+  font-size: 14px;
+  line-height: 1.6;
+  margin: 10px 0 0;
+}
+
+.replo-source-home .home-auth-dialog .home-auth-error {
+  background: #fff1f2;
+  border: 1px solid #fecdd3;
+  border-radius: 10px;
+  color: #b42332;
+  font-size: 13px;
+  line-height: 1.55;
+  margin: 20px 0 0;
+  padding: 12px 14px;
+  text-align: left;
+}
+
+.replo-source-home .home-auth-action {
+  margin-top: 32px;
+}
+
+.replo-source-home .home-auth-action .google-auth-button {
+  border-color: #cbd2da;
+  border-radius: 9px;
+  font-size: 15px;
+  height: 52px;
+  font-weight: 700;
+}
+
+.replo-source-home .home-auth-action .google-auth-button:hover {
+  background: var(--violet-tint);
+  border-color: var(--violet-600);
+}
+
+.replo-source-home .home-auth-dialog small {
+  color: var(--ink-400);
+  display: block;
+  font-size: 12px;
+  line-height: 1.65;
+  margin-top: 22px;
+  text-align: center;
 }
 
 @media (max-width: 900px) {
-  .replo-source-home .mnav-desktop-login { display: none; }
-  .replo-source-home .mnav-desktop-cta { display: none; }
-  .replo-source-home .mnav-mobile-login { display: inline-flex; }
   .replo-source-home .mnav-links { display: none; }
   .replo-source-home .mnav-burger { display: inline-flex; }
+}
+
+@media (max-width: 560px) {
+  .replo-source-home .home-auth-modal { padding: 16px; }
+  .replo-source-home .home-auth-dialog { border-radius: 14px; padding: 42px 24px 30px; }
+  .replo-source-home .home-auth-dialog h2 { font-size: 24px; margin-top: 30px; }
 }
 
 .replo-source-home .sec {
@@ -1616,7 +1729,230 @@
   align-items: stretch;
   display: grid;
   gap: 14px;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.replo-source-home .billing-toggle {
+  align-items: center;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-pill);
+  display: flex;
+  gap: 4px;
+  justify-content: center;
+  margin: 0 auto 22px;
+  padding: 4px;
+  width: fit-content;
+}
+
+.replo-source-home .billing-opt {
+  background: transparent;
+  border: 0;
+  border-radius: var(--r-pill);
+  color: var(--ink-500);
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 700;
+  padding: 9px 22px;
+  transition: .16s ease;
+  white-space: nowrap;
+}
+
+.replo-source-home .billing-opt:hover {
+  color: var(--ink-800);
+}
+
+.replo-source-home .billing-opt.active {
+  background: var(--violet-600);
+  box-shadow: 0 4px 12px rgba(91, 71, 224, .28);
+  color: #fff;
+}
+
+.replo-source-home .tier-free-badge {
+  align-self: flex-start;
+  background: var(--violet-50);
+  border: 1px solid var(--violet-100);
+  border-radius: var(--r-pill);
+  color: var(--violet-700);
+  font-size: 11.5px;
+  font-weight: 800;
+  letter-spacing: .01em;
+  padding: 5px 12px;
+  white-space: nowrap;
+}
+
+.replo-source-home .tier-free-badge--top {
+  left: 50%;
+  position: absolute;
+  top: -11px;
+  transform: translateX(-50%);
+}
+
+.replo-source-home .partner-tier-price .price-lowest {
+  font-weight: 600;
+}
+
+/* 연간 정가/할인 표기 */
+.replo-source-home .tier-price-yearly {
+  align-items: flex-start;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.replo-source-home .tier-price .price-list,
+.replo-source-home .partner-tier-price .price-list {
+  color: var(--ink-400);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.replo-source-home .tier-price .price-now {
+  color: var(--ink-900);
+  font-size: 25px;
+  font-weight: 900;
+  letter-spacing: -.02em;
+  line-height: 1;
+}
+
+.replo-source-home .price-off {
+  background: #fdecec;
+  border: 1px solid #f7c8c8;
+  border-radius: var(--r-pill);
+  color: #d92d20;
+  display: inline-flex;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: .01em;
+  padding: 4px 10px;
+  white-space: nowrap;
+}
+
+.replo-source-home .partner-tier-price .price-off {
+  font-size: 13px;
+  margin-top: 8px;
+}
+
+.replo-source-home .partner-tier {
+  align-items: center;
+  background:
+    radial-gradient(circle at 88% 10%, rgba(120, 100, 255, .25), transparent 34%),
+    linear-gradient(135deg, #fff 0%, var(--violet-50) 100%);
+  border: 2px solid var(--violet-600);
+  border-radius: var(--r-xl);
+  box-shadow: 0 24px 60px rgba(91, 71, 224, .24);
+  display: grid;
+  gap: 28px;
+  grid-template-columns: 170px minmax(0, 1fr) 220px;
+  margin-bottom: 24px;
+  padding: 36px 28px 28px;
+  position: relative;
+}
+
+.replo-source-home .partner-tier-brand {
+  align-items: flex-start;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.replo-source-home .partner-tier-logo {
+  align-items: center;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  display: inline-flex;
+  min-height: 42px;
+  padding: 10px 13px;
+}
+
+.replo-source-home .partner-tier-logo img {
+  display: block;
+  height: 20px;
+  max-width: 112px;
+  width: 100%;
+}
+
+.replo-source-home .partner-tier-label {
+  background: var(--ink-900);
+  border-radius: var(--r-pill);
+  box-shadow: 0 8px 20px rgba(24, 20, 51, .22);
+  color: #fff;
+  display: inline-flex;
+  font-size: 14px;
+  font-weight: 800;
+  left: 50%;
+  letter-spacing: .02em;
+  padding: 8px 22px;
+  position: absolute;
+  top: -18px;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  z-index: 1;
+}
+
+.replo-source-home .partner-tier-copy .tier-name {
+  margin-bottom: 8px;
+}
+
+.replo-source-home .partner-tier-copy p {
+  color: var(--ink-700);
+  font-size: 14px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.replo-source-home .partner-tier-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-top: 10px;
+}
+
+.replo-source-home .partner-tier-meta .tier-vol {
+  margin-top: 0;
+}
+
+.replo-source-home .partner-tier-action {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.replo-source-home .partner-tier-price {
+  align-items: flex-start;
+  background: rgba(255, 255, 255, .88);
+  border: 1px solid var(--violet-100);
+  border-radius: 14px;
+  display: flex;
+  flex-direction: column;
+  min-width: 180px;
+  padding: 16px 18px;
+}
+
+.replo-source-home .partner-tier-price del {
+  color: var(--ink-400);
+  font-size: 14px;
+  margin-bottom: 7px;
+}
+
+.replo-source-home .partner-tier-price strong {
+  color: var(--violet-700);
+  font-size: 30px;
+  font-weight: 900;
+  letter-spacing: -.025em;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.replo-source-home .partner-tier-price small {
+  color: var(--ink-400);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.replo-source-home .partner-tier-cta {
+  width: 100%;
 }
 
 .replo-source-home .tier {
@@ -1729,6 +2065,21 @@
 
 .replo-source-home .tier-cta {
   margin-top: 20px;
+}
+
+/* 흰색 배경 + 검정 글씨 CTA (이 플랜으로 시작 · 영업팀 문의 · 플랜별 기능 전체 비교) */
+.replo-source-home .tier-cta.btn-ghost,
+.replo-source-home .matrix-toggle .btn-ghost {
+  background: #fff;
+  border-color: var(--line);
+  color: var(--ink-900);
+}
+
+.replo-source-home .tier-cta.btn-ghost:hover,
+.replo-source-home .matrix-toggle .btn-ghost:hover {
+  background: #fff;
+  border-color: var(--ink-900);
+  color: var(--ink-900);
 }
 
 .replo-source-home .matrix-toggle {
@@ -2004,6 +2355,9 @@
 @media (max-width: 1080px) {
   .replo-source-home .pricing5 { grid-template-columns: repeat(3, 1fr); }
   .replo-source-home .proc-row { grid-template-columns: repeat(3, 1fr); }
+  .replo-source-home .partner-tier {
+    grid-template-columns: 150px minmax(0, 1fr) 220px;
+  }
   .replo-source-home .expertise-grid {
     gap: 18px;
   }
@@ -2048,6 +2402,13 @@
   }
   .replo-source-home .pricing5 {
     grid-template-columns: 1fr 1fr;
+  }
+  .replo-source-home .partner-tier {
+    gap: 20px;
+    grid-template-columns: 140px minmax(0, 1fr);
+  }
+  .replo-source-home .partner-tier-action {
+    grid-column: 2;
   }
 }
 
@@ -2128,6 +2489,14 @@
   .replo-source-home .proc-row,
   .replo-source-home .pricing5 {
     grid-template-columns: 1fr;
+  }
+  .replo-source-home .partner-tier {
+    gap: 18px;
+    grid-template-columns: 1fr;
+    padding: 24px 22px;
+  }
+  .replo-source-home .partner-tier-action {
+    grid-column: auto;
   }
   .replo-source-home .hero-pitch {
     padding: 72px 0 86px;

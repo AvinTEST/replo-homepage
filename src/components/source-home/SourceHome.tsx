@@ -1,7 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { GoogleAuthButton } from "../auth/GoogleAuthButton";
 import { homeCopy } from "../../content/homeCopy";
+import { createClient } from "../../lib/supabase/client";
+import { shouldShowPortalLogin } from "../../lib/deployment/host";
 
 const PATHS: Record<string, string> = {
   arrowRight: "M5 12h14M13 5l7 7-7 7",
@@ -73,8 +77,79 @@ function ButtonLink({
   );
 }
 
-function MarketingNav() {
+function LoginModal({
+  authError,
+  open,
+  onClose,
+}: {
+  authError: boolean;
+  open: boolean;
+  onClose: () => void;
+}) {
+  useEffect(() => {
+    if (!open) return;
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [onClose, open]);
+
+  if (!open) return null;
+
+  return (
+    <div className="home-auth-modal" role="presentation" onMouseDown={onClose}>
+      <div
+        aria-labelledby="home-auth-title"
+        aria-modal="true"
+        className="home-auth-dialog"
+        role="dialog"
+        onMouseDown={(event) => event.stopPropagation()}
+      >
+        <button className="home-auth-close" type="button" onClick={onClose} aria-label="로그인 창 닫기">
+          <Icon name="x" size={21} />
+        </button>
+        <div className="home-auth-brand">
+          <Logo />
+        </div>
+        <h2 id="home-auth-title">Replo에 로그인</h2>
+        <p className="home-auth-description">Google 계정으로 간편하게 시작하세요.</p>
+        {authError ? (
+          <p className="home-auth-error" role="alert">
+            Google 인증을 완료하지 못했습니다. 다시 시도해 주세요.
+          </p>
+        ) : null}
+        <div className="home-auth-action">
+          <GoogleAuthButton label="Google로 계속하기" />
+        </div>
+        <small>처음 로그인하면 회사와 브랜드 정보를 등록합니다.</small>
+      </div>
+    </div>
+  );
+}
+
+function MarketingNav({
+  authenticated,
+  authReady,
+  onLogin,
+  onLogout,
+  showPortalLogin,
+}: {
+  authenticated: boolean;
+  authReady: boolean;
+  onLogin: () => void;
+  onLogout: () => void;
+  showPortalLogin: boolean;
+}) {
   const [menu, setMenu] = useState(false);
+  const showAuthControls = showPortalLogin || authenticated;
 
   useEffect(() => {
     if (!menu) return;
@@ -99,9 +174,16 @@ function MarketingNav() {
             ))}
           </nav>
           <div className="mnav-cta">
-            <ButtonLink className="mnav-desktop-login" href="/login" variant="ghost" size="sm">로그인</ButtonLink>
-            <ButtonLink className="mnav-desktop-cta" size="sm">{homeCopy.navigation.cta}</ButtonLink>
-            <ButtonLink className="mnav-mobile-login" href="/login" size="sm">로그인</ButtonLink>
+            {!authReady ? (
+              <span className="mnav-auth-skeleton" aria-label="로그인 상태 확인 중" role="status" />
+            ) : showAuthControls ? (
+              <button className="btn btn-ghost btn-sm" type="button" onClick={authenticated ? onLogout : onLogin}>
+                {authenticated ? "로그아웃" : "로그인"}
+              </button>
+            ) : null}
+            <ButtonLink href={authenticated ? "/dashboard" : "/contact"} size="sm">
+              {authenticated ? "대시보드 바로가기" : homeCopy.navigation.cta}
+            </ButtonLink>
             <button className="mnav-burger" type="button" onClick={() => setMenu(true)} aria-label="메뉴 열기">
               <Icon name="menu" size={26} />
             </button>
@@ -119,9 +201,22 @@ function MarketingNav() {
           {homeCopy.navigation.links.map(({ id, label }) => (
             <a key={id} href={`#${id}`} onClick={() => setMenu(false)}>{label}</a>
           ))}
-          <div className="msheet-actions">
-            <ButtonLink href="/login" variant="ghost">로그인</ButtonLink>
-            <ButtonLink>{homeCopy.navigation.cta}</ButtonLink>
+          <div className="col gap-10" style={{ marginTop: 18 }}>
+            {authReady && showAuthControls ? (
+              <button
+                className="btn btn-ghost"
+                type="button"
+                onClick={() => {
+                  setMenu(false);
+                  authenticated ? onLogout() : onLogin();
+                }}
+              >
+                {authenticated ? "로그아웃" : "로그인"}
+              </button>
+            ) : null}
+            <ButtonLink href={authenticated ? "/dashboard" : "/contact"}>
+              {authenticated ? "대시보드 바로가기" : homeCopy.navigation.cta}
+            </ButtonLink>
           </div>
         </div>
       </div>
@@ -524,30 +619,32 @@ function FeatureMatrix() {
 
 function LandingPricing() {
   const [showMatrix, setShowMatrix] = useState(false);
+  const pricing = homeCopy.pricing;
 
   return (
     <section className="sec-tight" style={{ background: "var(--bg)" }} id="pricing-sec">
       <div className="deco"><div className="deco-grid mask-top" /></div>
       <div className="wrap">
-        <div className="sec-head sec-center" style={{ marginBottom: 52 }}>
-          <span className="eyebrow-pill">{homeCopy.pricing.eyebrow}</span>
-          <h2 className="t-h1">{homeCopy.pricing.title}</h2>
-          <p className="t-lead" style={{ marginTop: 16 }}>{homeCopy.pricing.description}</p>
+        <div className="sec-head sec-center" style={{ marginBottom: 36 }}>
+          <span className="eyebrow-pill">{pricing.eyebrow}</span>
+          <h2 className="t-h1">{pricing.title}</h2>
+          <p className="t-lead" style={{ marginTop: 16 }}>{pricing.description}</p>
         </div>
         <div className="pricing5">
-          {homeCopy.pricing.plans.map(({ en, ko, price, volume, best, description, features }) => (
-            <div className={`tier${best ? " best" : ""}`} key={en}>
-              {best ? <span className="tier-badge">{homeCopy.pricing.recommended}</span> : null}
+          {pricing.plans.map(({ en, ko, price, volume, description, features }) => (
+            <div className="tier" key={en}>
               <div className="tier-name-en">{en}</div>
               <div className="tier-name">{ko}</div>
-              <div className="tier-price">{price}{price.startsWith("₩") ? <small>{homeCopy.pricing.monthlyUnit}</small> : null}</div>
+              <div className="tier-price">
+                {price}
+              </div>
               <span className="tier-vol">{volume}</span>
               <p style={{ fontSize: 12.5, color: "var(--ink-400)", lineHeight: 1.55, margin: "14px 0 0", wordBreak: "keep-all", minHeight: 54 }}>{description}</p>
               <ul className="tier-feats">
                 {features.map((feature) => <li key={feature}><Icon name="check" size={15} stroke={2.3} />{feature}</li>)}
               </ul>
-              <ButtonLink size="sm" variant={best ? "primary" : "ghost"} className="btn-block tier-cta">
-                {en === "Enterprise" ? homeCopy.pricing.enterpriseCta : homeCopy.pricing.standardCta}
+              <ButtonLink size="sm" variant="ghost" className="btn-block tier-cta">
+                {en === "Enterprise" ? pricing.enterpriseCta : pricing.standardCta}
               </ButtonLink>
             </div>
           ))}
@@ -646,10 +743,59 @@ function Footer() {
 }
 
 export function SourceHome() {
+  const router = useRouter();
+  // Auth, host, and login deep-links are resolved client-side so the page can
+  // be served as static HTML. `authReady` gates the nav auth control until the
+  // session is known, avoiding a login/logout button flash.
+  const [authReady, setAuthReady] = useState(false);
+  const [authenticated, setAuthenticated] = useState(false);
+  const [showPortalLogin, setShowPortalLogin] = useState(false);
+  const [authError, setAuthError] = useState(false);
+  const [loginOpen, setLoginOpen] = useState(false);
+
+  useEffect(() => {
+    setShowPortalLogin(shouldShowPortalLogin(window.location.hostname));
+
+    const params = new URLSearchParams(window.location.search);
+    const wantLogin = params.get("login") === "1";
+    if (params.get("error") === "auth_failed") setAuthError(true);
+
+    const supabase = createClient();
+    let active = true;
+    // getSession reads the session from the cookie/storage without a network
+    // round-trip, so it resolves almost instantly on the client.
+    supabase.auth.getSession().then(({ data }) => {
+      if (!active) return;
+      const isAuthed = Boolean(data.session);
+      setAuthenticated(isAuthed);
+      if (wantLogin && !isAuthed) setLoginOpen(true);
+      setAuthReady(true);
+    });
+    const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
+      setAuthenticated(Boolean(session));
+    });
+    return () => {
+      active = false;
+      sub.subscription.unsubscribe();
+    };
+  }, []);
+
+  async function handleLogout() {
+    await createClient().auth.signOut();
+    setAuthenticated(false);
+    router.refresh();
+  }
+
   return (
     <div className="replo-source-home">
       <div className="mkt">
-        <MarketingNav />
+        <MarketingNav
+          authenticated={authenticated}
+          authReady={authReady}
+          onLogin={() => setLoginOpen(true)}
+          onLogout={handleLogout}
+          showPortalLogin={showPortalLogin}
+        />
         <Hero />
         <ChecklistSection />
         <CauseSection />
@@ -666,6 +812,7 @@ export function SourceHome() {
         <CtaSection />
         <Footer />
       </div>
+      <LoginModal authError={authError} open={loginOpen} onClose={() => setLoginOpen(false)} />
     </div>
   );
 }
