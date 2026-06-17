@@ -5,6 +5,11 @@ import {
   type SupabaseMetricRow,
 } from "@/lib/dashboard/aggregate";
 import { calendarMonthRange } from "@/lib/dashboard/dates";
+import {
+  buildDemoMetricRows,
+  DEMO_PLAN_LIMIT,
+  DEMO_PLAN_NAME,
+} from "@/data/dashboard-demo";
 import type { DashboardResponse, Grain } from "@/types/dashboard";
 
 export async function loadPortalTenant(tenantId: string) {
@@ -78,31 +83,59 @@ export async function loadDashboard(input: {
   if (monthlyMetricsResult.error) throw monthlyMetricsResult.error;
   const integration = integrationsResult.data;
 
+  let selectedMetrics = (metricsResult.data ?? []) as SupabaseMetricRow[];
+  let monthlyMetrics = (monthlyMetricsResult.data ?? []) as SupabaseMetricRow[];
+  let planName = tenantResult.data.plan_name as string;
+  let monthlyPlanLimit = Number(tenantResult.data.monthly_plan_limit);
+  let sync = {
+    status:
+      integration?.status === "connected"
+        ? ("ok" as const)
+        : integration?.status === "error"
+          ? ("error" as const)
+          : ("never_synced" as const),
+    lastSyncAt: (integration?.last_sync_at as string | null) ?? null,
+    message:
+      (integration?.last_error as string | null) ??
+      (integration?.last_sync_status as string | null) ??
+      "아직 동기화된 데이터가 없습니다.",
+  };
+
+  // 라이브 런칭 프리뷰: 실데이터가 한 건도 없는 워크스페이스에는
+  // dev 대시보드와 동일한 화면이 보이도록 더미 데이터를 채워 줍니다.
+  // 실데이터가 들어오면(아래 조건이 false) 자동으로 비활성화됩니다.
+  if (selectedMetrics.length === 0 && monthlyMetrics.length === 0) {
+    monthlyMetrics = buildDemoMetricRows(month.start, month.end);
+    let demoSelected = buildDemoMetricRows(input.start, input.end);
+    if (input.channel) {
+      demoSelected = demoSelected.filter((row) => row.channel === input.channel);
+    }
+    if (input.task) {
+      demoSelected = demoSelected.filter((row) => row.task_type === input.task);
+    }
+    selectedMetrics = demoSelected;
+    if (!monthlyPlanLimit) monthlyPlanLimit = DEMO_PLAN_LIMIT;
+    if (!planName || planName === "Basic") planName = DEMO_PLAN_NAME;
+    sync = {
+      status: "ok",
+      lastSyncAt: `${month.end}T09:00:00+09:00`,
+      message: "샘플 데이터로 미리보기 중입니다.",
+    };
+  }
+
   return buildDashboardFromMetricFixtures({
     tenant: {
       id: tenantResult.data.id as string,
       name: tenantResult.data.display_name as string,
-      planName: tenantResult.data.plan_name as string,
-      monthlyPlanLimit: Number(tenantResult.data.monthly_plan_limit),
+      planName,
+      monthlyPlanLimit,
     },
     grain: input.grain,
     start: input.start,
     end: input.end,
     referenceDate: month.end,
-    selectedMetrics: (metricsResult.data ?? []) as SupabaseMetricRow[],
-    monthlyMetrics: (monthlyMetricsResult.data ?? []) as SupabaseMetricRow[],
-    sync: {
-      status:
-        integration?.status === "connected"
-          ? "ok"
-          : integration?.status === "error"
-            ? "error"
-            : "never_synced",
-      lastSyncAt: (integration?.last_sync_at as string | null) ?? null,
-      message:
-        (integration?.last_error as string | null) ??
-        (integration?.last_sync_status as string | null) ??
-        "아직 동기화된 데이터가 없습니다.",
-    },
+    selectedMetrics,
+    monthlyMetrics,
+    sync,
   });
 }
