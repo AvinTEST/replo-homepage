@@ -631,19 +631,21 @@ function LandingPricing() {
           <p className="t-lead" style={{ marginTop: 16 }}>{pricing.description}</p>
         </div>
         <div className="pricing5">
-          {pricing.plans.map(({ en, ko, price, volume, description, features }) => (
-            <div className="tier" key={en}>
+          {pricing.plans.map(({ en, ko, price, volume, best, description, features }) => (
+            <div className={`tier${best ? " best" : ""}`} key={en}>
+              {best ? <span className="tier-badge">{pricing.recommended}</span> : null}
               <div className="tier-name-en">{en}</div>
               <div className="tier-name">{ko}</div>
               <div className="tier-price">
                 {price}
+                {price.startsWith("₩") ? <small>{pricing.monthlyUnit}</small> : null}
               </div>
               <span className="tier-vol">{volume}</span>
               <p style={{ fontSize: 12.5, color: "var(--ink-400)", lineHeight: 1.55, margin: "14px 0 0", wordBreak: "keep-all", minHeight: 54 }}>{description}</p>
               <ul className="tier-feats">
                 {features.map((feature) => <li key={feature}><Icon name="check" size={15} stroke={2.3} />{feature}</li>)}
               </ul>
-              <ButtonLink size="sm" variant="ghost" className="btn-block tier-cta">
+              <ButtonLink size="sm" variant={best ? "primary" : "ghost"} className="btn-block tier-cta">
                 {en === "Enterprise" ? pricing.enterpriseCta : pricing.standardCta}
               </ButtonLink>
             </div>
