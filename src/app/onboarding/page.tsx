@@ -83,6 +83,10 @@ function OnboardingContent() {
         content_name: "workspace_onboarding",
         status: "completed",
       },
+      userData: {
+        email: form.billingEmail,
+        phone: form.phone,
+      },
     });
     router.replace("/dashboard");
     router.refresh();

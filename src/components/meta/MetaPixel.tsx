@@ -20,7 +20,23 @@ export function MetaPixel() {
           s.parentNode.insertBefore(t,s)}(window, document,'script',
           'https://connect.facebook.net/en_US/fbevents.js');
           fbq('init', '${pixelId}');
-          fbq('track', 'PageView');
+          (function(){
+            var rnd = (self.crypto && crypto.randomUUID)
+              ? crypto.randomUUID()
+              : Math.random().toString(36).slice(2);
+            var eventId = 'replo_pageview_' + Date.now() + '_' + rnd;
+            fbq('track', 'PageView', {}, { eventID: eventId });
+            fetch('/api/meta/events', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                eventName: 'PageView',
+                eventId: eventId,
+                eventSourceUrl: location.href
+              }),
+              keepalive: true
+            }).catch(function(){});
+          })();
         `}
       </Script>
       <noscript>

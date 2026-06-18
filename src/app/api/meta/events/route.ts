@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { sendMetaCapiEvent } from "@/lib/meta/server";
 
-const allowedEvents = new Set(["Lead", "CompleteRegistration", "complete_onboarding"]);
+const allowedEvents = new Set(["PageView", "Lead", "CompleteRegistration", "complete_onboarding"]);
 
 export async function POST(request: Request) {
   const body = (await request.json().catch(() => ({}))) as Record<string, unknown>;
