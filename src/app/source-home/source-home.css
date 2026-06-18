@@ -1728,8 +1728,8 @@
 .replo-source-home .pricing5 {
   align-items: stretch;
   display: grid;
-  gap: 14px;
-  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
 }
 
 .replo-source-home .billing-toggle {
