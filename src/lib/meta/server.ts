@@ -30,6 +30,19 @@ function getCookie(request: Request | undefined, name: string) {
   return match ? decodeURIComponent(match.slice(name.length + 1)) : undefined;
 }
 
+// Build the fbc click-id param from the fbclid in the landing URL when the
+// _fbc cookie isn't available yet (e.g. the first PageView from an ad click,
+// before fbevents.js has set the cookie). Format: fb.{domainIndex}.{tsMs}.{fbclid}
+function fbcFromUrl(url?: string) {
+  if (!url) return undefined;
+  try {
+    const fbclid = new URL(url).searchParams.get("fbclid");
+    return fbclid ? `fb.1.${Date.now()}.${fbclid}` : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
 export async function sendMetaCapiEvent(input: SendMetaEventInput) {
   const pixelId = process.env.META_PIXEL_ID || process.env.NEXT_PUBLIC_FACEBOOK_PIXEL_ID;
   const accessToken = process.env.META_ACCESS_TOKEN;
@@ -42,7 +55,7 @@ export async function sendMetaCapiEvent(input: SendMetaEventInput) {
     client_ip_address: getIp(input.request),
     client_user_agent: input.request?.headers.get("user-agent") ?? undefined,
     fbp: getCookie(input.request, "_fbp"),
-    fbc: getCookie(input.request, "_fbc"),
+    fbc: getCookie(input.request, "_fbc") ?? fbcFromUrl(input.eventSourceUrl),
     ...input.userData,
   };
 
