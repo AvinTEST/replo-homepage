@@ -115,16 +115,18 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Invalid JSON payload" }, { status: 400 });
   }
 
-  // 3. Only react to new customer rows; acknowledge anything else with 200 so
-  //    Supabase does not retry events we intentionally ignore.
+  // 3. Only react to new workspace rows; acknowledge anything else with 200 so
+  //    Supabase does not retry events we intentionally ignore. The source table
+  //    was renamed customers -> workspaces, so the DB webhook now reports
+  //    table: "workspaces". (The Airtable destination table stays "Customers".)
   if (payload.type !== "INSERT") {
     return NextResponse.json({ ok: true, skipped: true, reason: "Not an INSERT" });
   }
-  if (payload.table !== "customers") {
+  if (payload.table !== "workspaces") {
     return NextResponse.json({
       ok: true,
       skipped: true,
-      reason: "Not the customers table",
+      reason: "Not the workspaces table",
     });
   }
   if (!payload.record) {
@@ -152,7 +154,7 @@ export async function POST(request: Request) {
     //    a) If we already recorded an Airtable id on this customer, skip.
     if (admin) {
       const { data: existing } = await admin
-        .from("customers")
+        .from("workspaces")
         .select("airtable_record_id")
         .eq("id", record.id)
         .maybeSingle();
@@ -201,7 +203,7 @@ export async function POST(request: Request) {
     const hasMappedData = Object.keys(fields).some((k) => k !== idField);
     if (!hasMappedData) {
       console.error("[airtable.customers] empty field mapping", {
-        customerId: record.id,
+        workspaceId: record.id,
       });
       return NextResponse.json(
         { error: "Mapped Airtable fields are empty" },
@@ -224,7 +226,7 @@ export async function POST(request: Request) {
       });
       if (admin) {
         await admin
-          .from("customers")
+          .from("workspaces")
           .update({ airtable_sync_error: safeError.slice(0, 500) })
           .eq("id", record.id)
           .then(undefined, () => undefined);
@@ -240,7 +242,7 @@ export async function POST(request: Request) {
       if (updateError) {
         warning = "Supabase write-back failed";
         console.error("[airtable.customers] Supabase write-back failed", {
-          customerId: record.id,
+          workspaceId: record.id,
         });
       }
     } else {
@@ -263,15 +265,15 @@ export async function POST(request: Request) {
 
 async function writeBack(
   admin: ReturnType<typeof createAdminClient>,
-  customerId: string,
+  workspaceId: string,
   airtableRecordId: string,
 ) {
   return admin
-    .from("customers")
+    .from("workspaces")
     .update({
       airtable_record_id: airtableRecordId,
       airtable_synced_at: new Date().toISOString(),
       airtable_sync_error: null,
     })
-    .eq("id", customerId);
+    .eq("id", workspaceId);
 }

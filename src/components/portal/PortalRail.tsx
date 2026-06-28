@@ -52,11 +52,9 @@ function NavIcon({ type }: { type: PortalSection }) {
 }
 
 export function PortalRail({
-  tenantId,
   active,
   workspaceName,
 }: {
-  tenantId: string;
   active: PortalSection;
   workspaceName: string;
 }) {

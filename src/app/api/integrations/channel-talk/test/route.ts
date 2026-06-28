@@ -1,19 +1,19 @@
 import { NextResponse } from "next/server";
 import { ChannelTalkConnector } from "@/lib/connectors/channelTalkConnector";
 import {
-  canManageCustomer,
-  getCurrentCustomerAccess,
-} from "@/lib/customers/access";
+  canManageWorkspace,
+  getCurrentWorkspaceAccess,
+} from "@/lib/workspaces/access";
 import {
   connectorFromStoredIntegration,
-  getCustomerIntegration,
-} from "@/lib/integrations/customerIntegrations";
+  getWorkspaceIntegration,
+} from "@/lib/integrations/workspaceIntegrations";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 export async function POST(request: Request) {
-  const access = await getCurrentCustomerAccess();
+  const access = await getCurrentWorkspaceAccess();
   if (!access) return NextResponse.json({ error: "로그인이 필요합니다." }, { status: 401 });
-  if (!canManageCustomer(access)) {
+  if (!canManageWorkspace(access)) {
     return NextResponse.json({ error: "연동을 테스트할 권한이 없습니다." }, { status: 403 });
   }
 
@@ -26,7 +26,7 @@ export async function POST(request: Request) {
     let connector: ChannelTalkConnector;
     let integrationId: string | null = null;
     if (body.integrationId) {
-      const integration = await getCustomerIntegration(access.customer.id, body.integrationId);
+      const integration = await getWorkspaceIntegration(access.workspace.id, body.integrationId);
       if (!integration) {
         return NextResponse.json({ error: "연동 정보를 찾을 수 없습니다." }, { status: 404 });
       }

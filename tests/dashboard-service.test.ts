@@ -158,7 +158,7 @@ test("billing rules apply is_billable and weight", () => {
   assert.equal(calculateBillableCount(10, "channel_talk", "채널톡", "채팅", new Map()), 10);
 
   const metrics = buildDailyMetricRows({
-    tenantId: "tenant-fixture",
+    workspaceId: "customer-fixture",
     dateKey: "2026-06-09",
     updatedAt: "2026-06-09T00:00:00.000Z",
     billingRules: rules,
@@ -244,7 +244,7 @@ test("ChannelTalk calls use openedAt and only missed state counts as missed", ()
   assert.equal(channelTalkCallStatus({ state: "missed" }), "missed");
 
   const metrics = buildDailyMetricRows({
-    tenantId: "tenant-fixture",
+    workspaceId: "customer-fixture",
     dateKey: "2026-06-08",
     updatedAt: "2026-06-08T00:00:00.000Z",
     billingRules: new Map(),
@@ -275,7 +275,7 @@ test("ChannelTalk calls use openedAt and only missed state counts as missed", ()
 
 test("inbound call totals include missed calls without billing them", () => {
   const metrics = buildDailyMetricRows({
-    tenantId: "tenant-fixture",
+    workspaceId: "customer-fixture",
     dateKey: "2026-06-08",
     updatedAt: "2026-06-08T00:00:00.000Z",
     billingRules: new Map(),
@@ -386,17 +386,17 @@ test("cron bearer secret validation uses a constant-time digest comparison", () 
   assert.equal(isValidBearerSecret(null, "correct-secret"), false);
 });
 
-test("cron sync targets reject null tenancy and preserve multiple integrations", () => {
+test("cron sync targets reject null customers and preserve multiple integrations", () => {
   assert.deepEqual(
     validSyncTargets([
-      { id: "integration-a", tenant_id: "tenant-1" },
-      { id: "integration-b", tenant_id: "tenant-1" },
-      { id: "integration-a", tenant_id: "tenant-1" },
-      { id: "integration-c", tenant_id: null },
+      { id: "integration-a", workspace_id: "customer-1" },
+      { id: "integration-b", workspace_id: "customer-1" },
+      { id: "integration-a", workspace_id: "customer-1" },
+      { id: "integration-c", workspace_id: null },
     ]),
     [
-      { integrationId: "integration-a", tenantId: "tenant-1" },
-      { integrationId: "integration-b", tenantId: "tenant-1" },
+      { integrationId: "integration-a", workspaceId: "customer-1" },
+      { integrationId: "integration-b", workspaceId: "customer-1" },
     ],
   );
 });

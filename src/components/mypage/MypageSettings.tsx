@@ -10,7 +10,6 @@ import { createClient } from "@/lib/supabase/client";
 type Section = "profile" | "plan" | "members";
 
 type Props = {
-  tenantId: string;
   canManage: boolean;
   loginEmail: string;
   roleLabel: string;
@@ -108,7 +107,7 @@ export function MypageSettings(props: Props) {
 
   return (
     <div className="mypage-shell">
-      <PortalRail tenantId={props.tenantId} active="account" workspaceName={profile.brandName} />
+      <PortalRail active="account" workspaceName={profile.brandName} />
 
       <aside className="mypage-menu">
         <div className="mypage-menu-head">

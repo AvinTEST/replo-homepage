@@ -47,15 +47,15 @@ export async function POST(request: Request) {
 
   const admin = createAdminClient();
   const { data: existing } = await admin
-    .from("customer_members")
-    .select("customer_id")
+    .from("workspace_members")
+    .select("workspace_id")
     .eq("user_id", user.id)
     .eq("status", "active")
     .limit(1)
     .maybeSingle();
-  if (existing) return NextResponse.json({ ok: true, customerId: existing.customer_id });
+  if (existing) return NextResponse.json({ ok: true, workspaceId: existing.workspace_id });
 
-  const { data, error } = await admin.rpc("initialize_customer_workspace", {
+  const { data, error } = await admin.rpc("initialize_workspace", {
     p_user_id: user.id,
     p_email: user.email,
     p_company_name: companyName,
@@ -70,17 +70,16 @@ export async function POST(request: Request) {
         : "",
   });
   const workspace = Array.isArray(data) ? data[0] : data;
-  if (error || !workspace?.customer_id) {
+  if (error || !workspace?.workspace_id) {
     return NextResponse.json({ error: "고객사 정보를 만들지 못했습니다." }, { status: 500 });
   }
 
   if (phone) {
-    await admin.from("customers").update({ phone }).eq("id", workspace.customer_id);
+    await admin.from("workspaces").update({ phone }).eq("id", workspace.workspace_id);
   }
 
   return NextResponse.json({
     ok: true,
-    customerId: workspace.customer_id,
-    tenantId: workspace.tenant_id,
+    workspaceId: workspace.workspace_id,
   });
 }

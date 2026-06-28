@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 import { PortalShell } from "@/components/portal/PortalShell";
 import { defaultRange } from "@/lib/dashboard/dates";
 import { loadDashboard } from "@/lib/dashboard/service";
-import { getCurrentCustomerAccess } from "@/lib/customers/access";
+import { getCurrentWorkspaceAccess } from "@/lib/workspaces/access";
 import { getSessionClaims } from "@/lib/supabase/claims";
 
 export const dynamic = "force-dynamic";
@@ -11,12 +11,12 @@ export default async function ReportsPage() {
   const claims = await getSessionClaims();
   if (!claims) redirect("/login?next=/dashboard/reports");
 
-  const access = await getCurrentCustomerAccess();
+  const access = await getCurrentWorkspaceAccess();
   if (!access) redirect("/onboarding");
 
   const range = defaultRange("month");
   const data = await loadDashboard({
-    tenantId: access.tenantId,
+    workspaceId: access.workspace.id,
     grain: "month",
     start: range.start,
     end: range.end,
@@ -24,7 +24,6 @@ export default async function ReportsPage() {
 
   return (
     <PortalShell
-      tenantId={access.tenantId}
       tenantName={data.tenant.name}
       planName={data.tenant.planName}
       active="reports"

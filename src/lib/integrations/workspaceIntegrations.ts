@@ -11,15 +11,15 @@ export function maskAccessKey(value: string) {
   return `${value.slice(0, 4)}••••••${value.slice(-4)}`;
 }
 
-export async function getCustomerIntegration(customerId: string, id: string) {
+export async function getWorkspaceIntegration(workspaceId: string, id: string) {
   const admin = createAdminClient();
   const { data, error } = await admin
     .from("channel_integrations")
     .select(
-      "id, customer_id, brand_id, provider, channel_name, display_name, access_key_masked, access_key_encrypted, access_secret_encrypted, status, last_checked_at, last_synced_at, created_at",
+      "id, workspace_id, brand_id, provider, channel_name, display_name, access_key_masked, access_key_encrypted, access_secret_encrypted, status, last_checked_at, last_synced_at, created_at",
     )
     .eq("id", id)
-    .eq("customer_id", customerId)
+    .eq("workspace_id", workspaceId)
     .maybeSingle();
   if (error) throw error;
   return data;

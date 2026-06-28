@@ -1,25 +1,25 @@
 import { createHash, randomBytes } from "crypto";
 import { NextResponse } from "next/server";
 import {
-  canManageCustomer,
-  getCurrentCustomerAccess,
-  type CustomerRole,
-} from "@/lib/customers/access";
+  canManageWorkspace,
+  getCurrentWorkspaceAccess,
+  type WorkspaceRole,
+} from "@/lib/workspaces/access";
 import { getAuthCallbackUrl } from "@/lib/auth/redirect";
 import { createAdminClient } from "@/lib/supabase/admin";
 
-const INVITABLE_ROLES: CustomerRole[] = ["admin", "editor", "viewer"];
+const INVITABLE_ROLES: WorkspaceRole[] = ["admin", "editor", "viewer"];
 
 export async function POST(request: Request) {
-  const access = await getCurrentCustomerAccess();
+  const access = await getCurrentWorkspaceAccess();
   if (!access) return NextResponse.json({ error: "로그인이 필요합니다." }, { status: 401 });
-  if (!canManageCustomer(access)) {
+  if (!canManageWorkspace(access)) {
     return NextResponse.json({ error: "멤버를 초대할 권한이 없습니다." }, { status: 403 });
   }
 
   const body = (await request.json().catch(() => ({}))) as {
     email?: string;
-    role?: CustomerRole;
+    role?: WorkspaceRole;
   };
   const email = body.email?.trim().toLowerCase() ?? "";
   const role = body.role;
@@ -32,17 +32,17 @@ export async function POST(request: Request) {
 
   const admin = createAdminClient();
   const { data: profile } = await admin
-    .from("profiles")
-    .select("user_id")
+    .from("users")
+    .select("id")
     .eq("email", email)
     .limit(1)
     .maybeSingle();
   if (profile) {
     const { data: existingMember } = await admin
-      .from("customer_members")
+      .from("workspace_members")
       .select("id")
-      .eq("customer_id", access.customer.id)
-      .eq("user_id", profile.user_id)
+      .eq("workspace_id", access.workspace.id)
+      .eq("user_id", profile.id)
       .maybeSingle();
     if (existingMember) {
       return NextResponse.json({ error: "이미 등록된 멤버입니다." }, { status: 409 });
@@ -56,7 +56,7 @@ export async function POST(request: Request) {
     .from("member_invites")
     .upsert(
       {
-        customer_id: access.customer.id,
+        workspace_id: access.workspace.id,
         email,
         role,
         token_hash: tokenHash,
@@ -65,7 +65,7 @@ export async function POST(request: Request) {
         invited_by: access.user.id,
         updated_at: new Date().toISOString(),
       },
-      { onConflict: "customer_id,email" },
+      { onConflict: "workspace_id,email" },
     )
     .select("id")
     .single();
@@ -76,13 +76,13 @@ export async function POST(request: Request) {
   const { error: authInviteError } = await admin.auth.admin.inviteUserByEmail(email, {
     redirectTo: getAuthCallbackUrl(),
     data: {
-      customer_id: access.customer.id,
+      workspace_id: access.workspace.id,
       invited_role: role,
     },
   });
 
   await admin.from("audit_logs").insert({
-    customer_id: access.customer.id,
+    workspace_id: access.workspace.id,
     actor_user_id: access.user.id,
     action: "member.invited",
     target_type: "member_invite",

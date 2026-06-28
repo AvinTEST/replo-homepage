@@ -15,18 +15,18 @@ import {
 } from "@/lib/integrations/service";
 
 export async function syncChannelTalk(
-  tenantId: string,
+  workspaceId: string,
   integrationId: string,
   range?: { from: string; to: string },
 ) {
   const admin = requireAdminClient();
   const [integration, tenantResult, rulesResult] = await Promise.all([
-    getChannelTalkIntegration(tenantId, integrationId),
-    admin.from("tenants").select("timezone").eq("id", tenantId).single(),
+    getChannelTalkIntegration(workspaceId, integrationId),
+    admin.from("workspaces").select("timezone").eq("id", workspaceId).single(),
     admin
       .from("billing_task_rules")
       .select("provider, channel, task_type, is_billable, weight")
-      .eq("tenant_id", tenantId),
+      .eq("workspace_id", workspaceId),
   ]);
   if (!integration) {
     throw new Error("채널톡 credential을 먼저 등록해 주세요.");
@@ -50,7 +50,7 @@ export async function syncChannelTalk(
   const { data: job, error: jobError } = await admin
     .from("sync_jobs")
     .insert({
-      tenant_id: tenantId,
+      workspace_id: workspaceId,
       integration_id: integration.id,
       provider: "channel_talk",
       status: "running",
@@ -68,7 +68,7 @@ export async function syncChannelTalk(
     const { data: removedOpenEvents, error: removeOpenError } = await admin
       .from("operation_events")
       .delete()
-      .eq("tenant_id", tenantId)
+      .eq("workspace_id", workspaceId)
       .eq("integration_id", integration.id)
       .neq("status", "closed")
       .select("date_key");
@@ -77,12 +77,12 @@ export async function syncChannelTalk(
     const { data: previousEvents, error: previousEventsError } = await admin
       .from("operation_events")
       .select("date_key")
-      .eq("tenant_id", tenantId)
+      .eq("workspace_id", workspaceId)
       .eq("integration_id", integration.id);
     if (previousEventsError) throw previousEventsError;
 
     const payload = events.map((event) => ({
-      tenant_id: tenantId,
+      workspace_id: workspaceId,
       integration_id: integration.id,
       provider: event.provider,
       external_id: event.externalId,
@@ -105,7 +105,7 @@ export async function syncChannelTalk(
       const { error } = await admin
         .from("operation_events")
         .upsert(payload, {
-          onConflict: "tenant_id,integration_id,provider,external_id",
+          onConflict: "workspace_id,integration_id,provider,external_id",
         });
       if (error) throw error;
     }
@@ -119,12 +119,12 @@ export async function syncChannelTalk(
       const { data: dayEvents, error } = await admin
         .from("operation_events")
         .select("provider, channel, task_type, direction, status, count")
-        .eq("tenant_id", tenantId)
+        .eq("workspace_id", workspaceId)
         .eq("date_key", dateKey);
       if (error) throw error;
 
       const metrics = buildDailyMetricRows({
-        tenantId,
+        workspaceId,
         dateKey,
         events: (dayEvents ?? []) as OperationEventMetricRow[],
         billingRules,
@@ -133,14 +133,14 @@ export async function syncChannelTalk(
       const { error: clearMetricError } = await admin
         .from("daily_operation_metrics")
         .delete()
-        .eq("tenant_id", tenantId)
+        .eq("workspace_id", workspaceId)
         .eq("date_key", dateKey)
         .eq("provider", "channel_talk");
       if (clearMetricError) throw clearMetricError;
       if (metrics.length) {
         const { error: metricError } = await admin
           .from("daily_operation_metrics")
-          .upsert(metrics, { onConflict: "tenant_id,date_key,provider,channel,task_type" });
+          .upsert(metrics, { onConflict: "workspace_id,date_key,provider,channel,task_type" });
         if (metricError) throw metricError;
       }
     }

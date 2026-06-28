@@ -28,14 +28,13 @@ export async function POST(
     const { data: existing, error: existingError } = await admin
       .from("channel_integrations")
       .select("id")
-      .eq("tenant_id", params.tenantId)
+      .eq("workspace_id", params.tenantId)
       .eq("provider", "channel_talk")
-      .is("customer_id", null)
       .maybeSingle();
     if (existingError) throw existingError;
 
     const integration = {
-      tenant_id: params.tenantId,
+      workspace_id: params.tenantId,
       provider: "channel_talk",
       display_name: "채널톡",
       status: "connected",
@@ -54,7 +53,6 @@ export async function POST(
         .eq("id", existing.id)
       : await admin.from("channel_integrations").insert({
         ...integration,
-        tenant_id: params.tenantId,
       });
     if (error) throw error;
     return NextResponse.json({ ok: true, message: "채널톡 연결 정보를 안전하게 저장했습니다." });

@@ -1,7 +1,7 @@
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
-import { syncProfileAndLegacyMembership } from "@/lib/customers/access";
+import { syncProfileAndLegacyMembership } from "@/lib/workspaces/access";
 import { createMetaEventId } from "@/lib/meta/eventIds";
 import { sendMetaCapiEvent } from "@/lib/meta/server";
 
@@ -85,8 +85,8 @@ export async function GET(request: Request) {
   const user = session.user;
 
   try {
-    const customerId = await syncProfileAndLegacyMembership(user);
-    const eventId = customerId ? "" : createMetaEventId("complete_registration");
+    const workspaceId = await syncProfileAndLegacyMembership(user);
+    const eventId = workspaceId ? "" : createMetaEventId("complete_registration");
     if (eventId) {
       await sendMetaCapiEvent({
         eventName: "CompleteRegistration",
@@ -98,7 +98,7 @@ export async function GET(request: Request) {
       });
     }
     return redirectWithCookies(
-      `${origin}${customerId ? "/dashboard" : `/onboarding?registered=1&event_id=${encodeURIComponent(eventId)}`}`,
+      `${origin}${workspaceId ? "/dashboard" : `/onboarding?registered=1&event_id=${encodeURIComponent(eventId)}`}`,
       cookiesToSet,
       responseHeaders,
     );
@@ -111,15 +111,15 @@ export async function GET(request: Request) {
     // Existing members can continue through RLS even if an admin-only profile
     // synchronization step is temporarily unavailable.
     const { data: membership } = await supabase
-      .from("customer_members")
-      .select("customer_id")
+      .from("workspace_members")
+      .select("workspace_id")
       .eq("user_id", user.id)
       .eq("status", "active")
       .limit(1)
       .maybeSingle();
 
     return redirectWithCookies(
-      `${origin}${membership?.customer_id ? "/dashboard" : "/onboarding"}`,
+      `${origin}${membership?.workspace_id ? "/dashboard" : "/onboarding"}`,
       cookiesToSet,
       responseHeaders,
     );

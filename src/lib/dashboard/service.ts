@@ -12,25 +12,34 @@ import {
 } from "@/data/dashboard-demo";
 import type { DashboardResponse, Grain } from "@/types/dashboard";
 
-export async function loadPortalTenant(tenantId: string) {
+export async function loadPortalTenant(workspaceId: string) {
   const admin = createAdminClient();
-  const { data, error } = await admin
-    .from("tenants")
-    .select("id, display_name, plan_name")
-    .eq("id", tenantId)
-    .single();
+  const [{ data: customer, error }, { data: subscription }] = await Promise.all([
+    admin
+      .from("workspaces")
+      .select("id, company_name")
+      .eq("id", workspaceId)
+      .single(),
+    admin
+      .from("subscriptions")
+      .select("plan_name")
+      .eq("workspace_id", workspaceId)
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle(),
+  ]);
 
-  if (error || !data) throw new Error("Tenant not found");
+  if (error || !customer) throw new Error("Customer not found");
 
   return {
-    id: data.id as string,
-    name: (data.display_name as string | null) || "워크스페이스",
-    planName: (data.plan_name as string | null) || "미등록",
+    id: customer.id as string,
+    name: (customer.company_name as string | null) || "워크스페이스",
+    planName: (subscription?.plan_name as string | null) || "미등록",
   };
 }
 
 export async function loadDashboard(input: {
-  tenantId: string;
+  workspaceId: string;
   grain: Grain;
   start: string;
   end: string;
@@ -39,31 +48,38 @@ export async function loadDashboard(input: {
 }): Promise<DashboardResponse> {
   const admin = createAdminClient();
 
-  const [tenantResult, integrationsResult] = await Promise.all([
+  const [workspaceResult, subscriptionResult, integrationsResult] = await Promise.all([
     admin
-      .from("tenants")
-      .select("id, display_name, plan_name, monthly_plan_limit, timezone")
-      .eq("id", input.tenantId)
+      .from("workspaces")
+      .select("id, company_name, timezone")
+      .eq("id", input.workspaceId)
       .single(),
+    admin
+      .from("subscriptions")
+      .select("plan_name, included_tickets")
+      .eq("workspace_id", input.workspaceId)
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle(),
     admin
       .from("channel_integrations")
       .select("status, last_sync_at, last_sync_status, last_error")
-      .eq("tenant_id", input.tenantId)
+      .eq("workspace_id", input.workspaceId)
       .order("last_sync_at", { ascending: false })
       .limit(1)
       .maybeSingle(),
   ]);
 
-  if (tenantResult.error || !tenantResult.data) throw new Error("Tenant not found");
+  if (workspaceResult.error || !workspaceResult.data) throw new Error("Customer not found");
 
-  const timezone = (tenantResult.data.timezone as string | null) || "Asia/Seoul";
+  const timezone = (workspaceResult.data.timezone as string | null) || "Asia/Seoul";
   const month = calendarMonthRange(timezone);
   const metricColumns =
     "date_key, provider, channel, task_type, total_count, answered_count, missed_count, billable_count";
   let metricsQuery = admin
     .from("daily_operation_metrics")
     .select(metricColumns)
-    .eq("tenant_id", input.tenantId)
+    .eq("workspace_id", input.workspaceId)
     .gte("date_key", input.start)
     .lte("date_key", input.end);
   if (input.channel) metricsQuery = metricsQuery.eq("channel", input.channel);
@@ -71,7 +87,7 @@ export async function loadDashboard(input: {
   const monthlyMetricsQuery = admin
     .from("daily_operation_metrics")
     .select(metricColumns)
-    .eq("tenant_id", input.tenantId)
+    .eq("workspace_id", input.workspaceId)
     .gte("date_key", month.start)
     .lte("date_key", month.end)
     .order("date_key", { ascending: true });
@@ -85,8 +101,8 @@ export async function loadDashboard(input: {
 
   let selectedMetrics = (metricsResult.data ?? []) as SupabaseMetricRow[];
   let monthlyMetrics = (monthlyMetricsResult.data ?? []) as SupabaseMetricRow[];
-  let planName = tenantResult.data.plan_name as string;
-  let monthlyPlanLimit = Number(tenantResult.data.monthly_plan_limit);
+  let planName = (subscriptionResult.data?.plan_name as string | null) || "미등록";
+  let monthlyPlanLimit = Number(subscriptionResult.data?.included_tickets ?? 0);
   let sync = {
     status:
       integration?.status === "connected"
@@ -125,8 +141,8 @@ export async function loadDashboard(input: {
 
   return buildDashboardFromMetricFixtures({
     tenant: {
-      id: tenantResult.data.id as string,
-      name: tenantResult.data.display_name as string,
+      id: workspaceResult.data.id as string,
+      name: workspaceResult.data.company_name as string,
       planName,
       monthlyPlanLimit,
     },

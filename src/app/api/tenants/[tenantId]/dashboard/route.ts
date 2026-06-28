@@ -21,7 +21,7 @@ export async function GET(
 
   try {
     const data = await loadDashboard({
-      tenantId: params.tenantId,
+      workspaceId: params.tenantId,
       grain: "day",
       start,
       end,

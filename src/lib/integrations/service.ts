@@ -24,14 +24,14 @@ export function requireAdminClient() {
   return createAdminClient();
 }
 
-export async function listIntegrations(tenantId: string): Promise<IntegrationSummary[]> {
+export async function listIntegrations(workspaceId: string): Promise<IntegrationSummary[]> {
   const admin = requireAdminClient();
   const { data, error } = await admin
     .from("channel_integrations")
     .select(
       "id, provider, display_name, status, encrypted_credentials, access_key_encrypted, access_secret_encrypted, last_sync_at, last_sync_status, last_error",
     )
-    .eq("tenant_id", tenantId)
+    .eq("workspace_id", workspaceId)
     .order("display_name");
   if (error) throw error;
 
@@ -50,12 +50,12 @@ export async function listIntegrations(tenantId: string): Promise<IntegrationSum
   }));
 }
 
-export async function getChannelTalkIntegration(tenantId: string, integrationId?: string) {
+export async function getChannelTalkIntegration(workspaceId: string, integrationId?: string) {
   const admin = requireAdminClient();
   let query = admin
     .from("channel_integrations")
     .select("*")
-    .eq("tenant_id", tenantId)
+    .eq("workspace_id", workspaceId)
     .eq("provider", "channel_talk");
   if (integrationId) query = query.eq("id", integrationId);
   const { data, error } = await query

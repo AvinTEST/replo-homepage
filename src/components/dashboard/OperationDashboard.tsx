@@ -446,7 +446,6 @@ export function OperationDashboard({
   const usage = Math.min(100, Math.max(0, data.planUsage.usageRate));
   return (
     <PortalShell
-      tenantId={tenantId}
       tenantName={data.tenant.name}
       planName={data.tenant.planName}
       active="dashboard"

@@ -1,26 +1,26 @@
 import { NextResponse } from "next/server";
 import { ChannelTalkConnector } from "@/lib/connectors/channelTalkConnector";
 import {
-  canManageCustomer,
-  getCurrentCustomerAccess,
-} from "@/lib/customers/access";
+  canManageWorkspace,
+  getCurrentWorkspaceAccess,
+} from "@/lib/workspaces/access";
 import {
   encryptedChannelTalkCredentials,
-  getCustomerIntegration,
-} from "@/lib/integrations/customerIntegrations";
+  getWorkspaceIntegration,
+} from "@/lib/integrations/workspaceIntegrations";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 export async function PATCH(
   request: Request,
   { params }: { params: { id: string } },
 ) {
-  const access = await getCurrentCustomerAccess();
+  const access = await getCurrentWorkspaceAccess();
   if (!access) return NextResponse.json({ error: "로그인이 필요합니다." }, { status: 401 });
-  if (!canManageCustomer(access)) {
+  if (!canManageWorkspace(access)) {
     return NextResponse.json({ error: "연동을 수정할 권한이 없습니다." }, { status: 403 });
   }
 
-  const integration = await getCustomerIntegration(access.customer.id, params.id);
+  const integration = await getWorkspaceIntegration(access.workspace.id, params.id);
   if (!integration) {
     return NextResponse.json({ error: "연동 정보를 찾을 수 없습니다." }, { status: 404 });
   }
@@ -49,12 +49,12 @@ export async function PATCH(
         .from("brands")
         .upsert(
           {
-            customer_id: access.customer.id,
+            workspace_id: access.workspace.id,
             name: body.brandName.trim().slice(0, 200),
             status: "active",
             updated_at: new Date().toISOString(),
           },
-          { onConflict: "customer_id,name" },
+          { onConflict: "workspace_id,name" },
         )
         .select("id")
         .single();
@@ -82,11 +82,11 @@ export async function PATCH(
       .from("channel_integrations")
       .update(update)
       .eq("id", integration.id)
-      .eq("customer_id", access.customer.id);
+      .eq("workspace_id", access.workspace.id);
     if (error) throw error;
 
     await admin.from("audit_logs").insert({
-      customer_id: access.customer.id,
+      workspace_id: access.workspace.id,
       actor_user_id: access.user.id,
       action: "integration.updated",
       target_type: "channel_integration",
@@ -106,13 +106,13 @@ export async function DELETE(
   _request: Request,
   { params }: { params: { id: string } },
 ) {
-  const access = await getCurrentCustomerAccess();
+  const access = await getCurrentWorkspaceAccess();
   if (!access) return NextResponse.json({ error: "로그인이 필요합니다." }, { status: 401 });
-  if (!canManageCustomer(access)) {
+  if (!canManageWorkspace(access)) {
     return NextResponse.json({ error: "연동을 삭제할 권한이 없습니다." }, { status: 403 });
   }
 
-  const integration = await getCustomerIntegration(access.customer.id, params.id);
+  const integration = await getWorkspaceIntegration(access.workspace.id, params.id);
   if (!integration) {
     return NextResponse.json({ error: "연동 정보를 찾을 수 없습니다." }, { status: 404 });
   }
@@ -122,11 +122,11 @@ export async function DELETE(
     .from("channel_integrations")
     .delete()
     .eq("id", integration.id)
-    .eq("customer_id", access.customer.id);
+    .eq("workspace_id", access.workspace.id);
   if (error) return NextResponse.json({ error: "연동을 삭제하지 못했습니다." }, { status: 500 });
 
   await admin.from("audit_logs").insert({
-    customer_id: access.customer.id,
+    workspace_id: access.workspace.id,
     actor_user_id: access.user.id,
     action: "integration.deleted",
     target_type: "channel_integration",

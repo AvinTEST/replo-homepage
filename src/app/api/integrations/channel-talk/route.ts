@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
 import { ChannelTalkConnector } from "@/lib/connectors/channelTalkConnector";
 import {
-  canManageCustomer,
-  getCurrentCustomerAccess,
-} from "@/lib/customers/access";
-import { encryptedChannelTalkCredentials } from "@/lib/integrations/customerIntegrations";
+  canManageWorkspace,
+  getCurrentWorkspaceAccess,
+} from "@/lib/workspaces/access";
+import { encryptedChannelTalkCredentials } from "@/lib/integrations/workspaceIntegrations";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 const CONSENT_TYPE = "channel_talk_personal_data_outsourcing";
@@ -15,9 +15,9 @@ function value(body: Record<string, unknown>, key: string, max = 200) {
 }
 
 export async function POST(request: Request) {
-  const access = await getCurrentCustomerAccess();
+  const access = await getCurrentWorkspaceAccess();
   if (!access) return NextResponse.json({ error: "로그인이 필요합니다." }, { status: 401 });
-  if (!canManageCustomer(access)) {
+  if (!canManageWorkspace(access)) {
     return NextResponse.json({ error: "채널을 연동할 권한이 없습니다." }, { status: 403 });
   }
 
@@ -43,7 +43,7 @@ export async function POST(request: Request) {
   const { count } = await admin
     .from("channel_integrations")
     .select("id", { count: "exact", head: true })
-    .eq("customer_id", access.customer.id)
+    .eq("workspace_id", access.workspace.id)
     .eq("provider", "channel_talk")
     .eq("status", "connected");
   if ((count ?? 0) >= 10) {
@@ -59,12 +59,12 @@ export async function POST(request: Request) {
       .from("brands")
       .upsert(
         {
-          customer_id: access.customer.id,
+          workspace_id: access.workspace.id,
           name: brandName,
           status: "active",
           updated_at: new Date().toISOString(),
         },
-        { onConflict: "customer_id,name" },
+        { onConflict: "workspace_id,name" },
       )
       .select("id")
       .single();
@@ -74,8 +74,7 @@ export async function POST(request: Request) {
     const { data: integration, error: integrationError } = await admin
       .from("channel_integrations")
       .insert({
-        tenant_id: access.tenantId,
-        customer_id: access.customer.id,
+        workspace_id: access.workspace.id,
         brand_id: brand.id,
         provider: "channel_talk",
         display_name: channelName,
@@ -93,7 +92,7 @@ export async function POST(request: Request) {
 
     const forwardedFor = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim();
     const { error: consentError } = await admin.from("integration_consents").insert({
-      customer_id: access.customer.id,
+      workspace_id: access.workspace.id,
       integration_id: integration.id,
       consent_type: CONSENT_TYPE,
       agreed_by: access.user.id,
@@ -105,7 +104,7 @@ export async function POST(request: Request) {
     }
 
     await admin.from("audit_logs").insert({
-      customer_id: access.customer.id,
+      workspace_id: access.workspace.id,
       actor_user_id: access.user.id,
       action: "integration.channel_talk_created",
       target_type: "channel_integration",

@@ -13,7 +13,7 @@ export type OperationEventMetricRow = {
 };
 
 export function buildDailyMetricRows(input: {
-  tenantId: string;
+  workspaceId: string;
   dateKey: string;
   events: OperationEventMetricRow[];
   billingRules: Map<string, BillingTaskRule>;
@@ -67,7 +67,7 @@ export function buildDailyMetricRows(input: {
   }
 
   return Array.from(groups.values()).map((group) => ({
-    tenant_id: input.tenantId,
+    workspace_id: input.workspaceId,
     date_key: input.dateKey,
     provider: group.provider,
     channel: group.channel,

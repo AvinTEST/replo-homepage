@@ -5,25 +5,26 @@ import { createClient } from "@/lib/supabase/server";
 export type TenantAccess = {
   userId: string;
   tenantId: string;
-  role: "owner" | "admin" | "manager" | "viewer";
+  role: "owner" | "admin" | "editor" | "viewer";
 };
 
-export async function getTenantAccess(tenantId: string): Promise<TenantAccess | null> {
+export async function getTenantAccess(workspaceId: string): Promise<TenantAccess | null> {
   const claims = await getSessionClaims();
   if (!claims) return null;
 
   const supabase = await createClient();
   const { data } = await supabase
-    .from("tenant_users")
-    .select("tenant_id, role")
-    .eq("tenant_id", tenantId)
+    .from("workspace_members")
+    .select("workspace_id, role")
+    .eq("workspace_id", workspaceId)
     .eq("user_id", claims.userId)
+    .eq("status", "active")
     .maybeSingle();
 
   if (!data) return null;
   return {
     userId: claims.userId,
-    tenantId: data.tenant_id as string,
+    tenantId: data.workspace_id as string,
     role: data.role as TenantAccess["role"],
   };
 }

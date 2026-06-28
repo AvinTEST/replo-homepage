@@ -1,9 +1,9 @@
 import { NextResponse } from "next/server";
-import { getCurrentCustomerAccess } from "@/lib/customers/access";
+import { getCurrentWorkspaceAccess } from "@/lib/workspaces/access";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 export async function GET() {
-  const access = await getCurrentCustomerAccess();
+  const access = await getCurrentWorkspaceAccess();
   if (!access) {
     return NextResponse.json({ error: "로그인이 필요합니다." }, { status: 401 });
   }
@@ -12,14 +12,14 @@ export async function GET() {
   const [{ data: members, error: membersError }, { data: invites, error: invitesError }] =
     await Promise.all([
       admin
-        .from("customer_members")
+        .from("workspace_members")
         .select("id, user_id, role, status, last_seen_at, created_at")
-        .eq("customer_id", access.customer.id)
+        .eq("workspace_id", access.workspace.id)
         .order("created_at", { ascending: true }),
       admin
         .from("member_invites")
         .select("id, email, role, status, expires_at, created_at")
-        .eq("customer_id", access.customer.id)
+        .eq("workspace_id", access.workspace.id)
         .eq("status", "pending")
         .order("created_at", { ascending: false }),
     ]);
@@ -28,20 +28,20 @@ export async function GET() {
   }
 
   const userIds = (members ?? []).map((member) => member.user_id);
-  const { data: profiles } = userIds.length
+  const { data: users } = userIds.length
     ? await admin
-        .from("profiles")
-        .select("user_id, name, email, avatar_url")
-        .in("user_id", userIds)
+        .from("users")
+        .select("id, name, email, avatar_url")
+        .in("id", userIds)
     : { data: [] };
-  const profileMap = new Map((profiles ?? []).map((profile) => [profile.user_id, profile]));
+  const userMap = new Map((users ?? []).map((user) => [user.id, user]));
 
   return NextResponse.json({
     role: access.membership.role,
     members: (members ?? []).map((member) => ({
       ...member,
-      name: profileMap.get(member.user_id)?.name ?? "이름 미등록",
-      email: profileMap.get(member.user_id)?.email ?? "이메일 미등록",
+      name: userMap.get(member.user_id)?.name ?? "이름 미등록",
+      email: userMap.get(member.user_id)?.email ?? "이메일 미등록",
       isCurrentUser: member.user_id === access.user.id,
     })),
     invites: invites ?? [],

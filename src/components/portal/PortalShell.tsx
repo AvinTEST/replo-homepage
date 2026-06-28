@@ -6,14 +6,12 @@ import { createClient } from "@/lib/supabase/client";
 import { PortalRail, type PortalSection } from "./PortalRail";
 
 export function PortalShell({
-  tenantId,
   tenantName,
   planName,
   active,
   sidebar,
   children,
 }: {
-  tenantId: string;
   tenantName: string;
   planName: string;
   active: PortalSection;
@@ -29,7 +27,7 @@ export function PortalShell({
 
   return (
     <div className="ops-dashboard">
-      <PortalRail tenantId={tenantId} active={active} workspaceName={tenantName} />
+      <PortalRail active={active} workspaceName={tenantName} />
       <aside className={`dashboard-sidebar ${sidebar ? "" : "context-empty"}`}>
         <div className="sidebar-workspace">
           <span>WORKSPACE</span>

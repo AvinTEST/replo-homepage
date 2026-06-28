@@ -15,7 +15,7 @@ export async function POST(request: Request) {
     const integrationId = new URL(request.url).searchParams.get("integrationId");
     let query = admin
       .from("channel_integrations")
-      .select("id, tenant_id")
+      .select("id, workspace_id")
       .eq("provider", "channel_talk")
       .eq("status", "connected");
     if (integrationId) query = query.eq("id", integrationId);
@@ -27,7 +27,7 @@ export async function POST(request: Request) {
       try {
         results.push({
           ...target,
-          ...(await syncChannelTalk(target.tenantId, target.integrationId)),
+          ...(await syncChannelTalk(target.workspaceId, target.integrationId)),
         });
       } catch {
         results.push({ ...target, ok: false });

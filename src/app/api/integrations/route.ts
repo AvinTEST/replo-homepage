@@ -1,9 +1,9 @@
 import { NextResponse } from "next/server";
-import { getCurrentCustomerAccess } from "@/lib/customers/access";
+import { getCurrentWorkspaceAccess } from "@/lib/workspaces/access";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 export async function GET() {
-  const access = await getCurrentCustomerAccess();
+  const access = await getCurrentWorkspaceAccess();
   if (!access) return NextResponse.json({ error: "로그인이 필요합니다." }, { status: 401 });
 
   const admin = createAdminClient();
@@ -13,12 +13,12 @@ export async function GET() {
       .select(
         "id, brand_id, provider, channel_name, display_name, access_key_masked, status, last_checked_at, last_synced_at, created_at",
       )
-      .eq("customer_id", access.customer.id)
+      .eq("workspace_id", access.workspace.id)
       .order("created_at", { ascending: false }),
     admin
       .from("brands")
       .select("id, name, website_url, status")
-      .eq("customer_id", access.customer.id)
+      .eq("workspace_id", access.workspace.id)
       .order("created_at", { ascending: true }),
   ]);
   if (error) {

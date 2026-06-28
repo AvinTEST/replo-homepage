@@ -4,18 +4,17 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { getSessionClaims } from "@/lib/supabase/claims";
 import { createClient } from "@/lib/supabase/server";
 
-export type CustomerRole = "owner" | "admin" | "editor" | "viewer";
+export type WorkspaceRole = "owner" | "admin" | "editor" | "viewer";
 
-export type CustomerAccess = {
+export type WorkspaceAccess = {
   user: { id: string; email: string | null };
-  tenantId: string;
   membership: {
     id: string;
-    customer_id: string;
-    role: CustomerRole;
+    workspace_id: string;
+    role: WorkspaceRole;
     status: string;
   };
-  customer: {
+  workspace: {
     id: string;
     company_name: string;
     contact_name: string | null;
@@ -47,31 +46,31 @@ export async function syncProfileAndLegacyMembership(user: User) {
   const avatarUrl =
     metadataText(user, "avatar_url") || metadataText(user, "picture") || null;
 
-  const { error: profileError } = await admin.from("profiles").upsert(
+  const { error: profileError } = await admin.from("users").upsert(
     {
-      user_id: user.id,
+      id: user.id,
       name,
       email,
       avatar_url: avatarUrl,
       updated_at: new Date().toISOString(),
     },
-    { onConflict: "user_id" },
+    { onConflict: "id" },
   );
   if (profileError) throw profileError;
 
   const { data: existingMembership, error: membershipError } = await admin
-    .from("customer_members")
-    .select("customer_id")
+    .from("workspace_members")
+    .select("workspace_id")
     .eq("user_id", user.id)
     .eq("status", "active")
     .limit(1)
     .maybeSingle();
   if (membershipError) throw membershipError;
-  if (existingMembership) return existingMembership.customer_id as string;
+  if (existingMembership) return existingMembership.workspace_id as string;
 
   const { data: pendingInvite, error: inviteError } = await admin
     .from("member_invites")
-    .select("id, customer_id, role")
+    .select("id, workspace_id, role")
     .eq("email", email.toLowerCase())
     .eq("status", "pending")
     .gt("expires_at", new Date().toISOString())
@@ -80,15 +79,15 @@ export async function syncProfileAndLegacyMembership(user: User) {
     .maybeSingle();
   if (inviteError) throw inviteError;
   if (pendingInvite) {
-    const { error: acceptError } = await admin.from("customer_members").upsert(
+    const { error: acceptError } = await admin.from("workspace_members").upsert(
       {
-        customer_id: pendingInvite.customer_id,
+        workspace_id: pendingInvite.workspace_id,
         user_id: user.id,
         role: pendingInvite.role,
         status: "active",
         last_seen_at: new Date().toISOString(),
       },
-      { onConflict: "customer_id,user_id" },
+      { onConflict: "workspace_id,user_id" },
     );
     if (acceptError) throw acceptError;
 
@@ -96,11 +95,11 @@ export async function syncProfileAndLegacyMembership(user: User) {
       .from("member_invites")
       .update({ status: "accepted", updated_at: new Date().toISOString() })
       .eq("id", pendingInvite.id);
-    return pendingInvite.customer_id as string;
+    return pendingInvite.workspace_id as string;
   }
 
   const { data: legacyCustomer, error: legacyError } = await admin
-    .from("customers")
+    .from("workspaces")
     .select("id")
     .eq("user_id", user.id)
     .limit(1)
@@ -108,28 +107,28 @@ export async function syncProfileAndLegacyMembership(user: User) {
   if (legacyError) throw legacyError;
   if (!legacyCustomer) return null;
 
-  const { error: insertError } = await admin.from("customer_members").upsert(
+  const { error: insertError } = await admin.from("workspace_members").upsert(
     {
-      customer_id: legacyCustomer.id,
+      workspace_id: legacyCustomer.id,
       user_id: user.id,
       role: "owner",
       status: "active",
       last_seen_at: new Date().toISOString(),
     },
-    { onConflict: "customer_id,user_id" },
+    { onConflict: "workspace_id,user_id" },
   );
   if (insertError) throw insertError;
   return legacyCustomer.id as string;
 }
 
-export async function getCurrentCustomerAccess(): Promise<CustomerAccess | null> {
+export async function getCurrentWorkspaceAccess(): Promise<WorkspaceAccess | null> {
   const claims = await getSessionClaims();
   if (!claims) return null;
 
   const supabase = await createClient();
   const { data: membership, error: membershipError } = await supabase
-    .from("customer_members")
-    .select("id, customer_id, role, status")
+    .from("workspace_members")
+    .select("id, workspace_id, role, status")
     .eq("user_id", claims.userId)
     .eq("status", "active")
     .order("created_at", { ascending: true })
@@ -137,23 +136,22 @@ export async function getCurrentCustomerAccess(): Promise<CustomerAccess | null>
     .maybeSingle();
   if (membershipError || !membership) return null;
 
-  const { data: customer, error: customerError } = await supabase
-    .from("customers")
+  const { data: workspace, error: workspaceError } = await supabase
+    .from("workspaces")
     .select(
-      "id, company_name, contact_name, phone, website_url, email, status, business_number, billing_email, representative_name, tenant_id",
+      "id, company_name, contact_name, phone, website_url, email, status, business_number, billing_email, representative_name",
     )
-    .eq("id", membership.customer_id)
+    .eq("id", membership.workspace_id)
     .maybeSingle();
-  if (customerError || !customer?.tenant_id) return null;
+  if (workspaceError || !workspace) return null;
 
   return {
     user: { id: claims.userId, email: claims.email },
-    tenantId: customer.tenant_id as string,
-    membership: membership as CustomerAccess["membership"],
-    customer: customer as CustomerAccess["customer"],
+    membership: membership as WorkspaceAccess["membership"],
+    workspace: workspace as WorkspaceAccess["workspace"],
   };
 }
 
-export function canManageCustomer(access: CustomerAccess) {
+export function canManageWorkspace(access: WorkspaceAccess) {
   return access.membership.role === "owner" || access.membership.role === "admin";
 }

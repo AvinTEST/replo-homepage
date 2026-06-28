@@ -1,12 +1,12 @@
 import { NextResponse } from "next/server";
 import { findSelectablePlan } from "@/lib/billing/plans";
-import { canManageCustomer, getCurrentCustomerAccess } from "@/lib/customers/access";
+import { canManageWorkspace, getCurrentWorkspaceAccess } from "@/lib/workspaces/access";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 export async function PATCH(request: Request) {
-  const access = await getCurrentCustomerAccess();
+  const access = await getCurrentWorkspaceAccess();
   if (!access) return NextResponse.json({ error: "로그인이 필요합니다." }, { status: 401 });
-  if (!canManageCustomer(access)) {
+  if (!canManageWorkspace(access)) {
     return NextResponse.json({ error: "플랜을 변경할 권한이 없습니다." }, { status: 403 });
   }
 
@@ -20,7 +20,7 @@ export async function PATCH(request: Request) {
   const { data: subscription } = await admin
     .from("subscriptions")
     .select("id, plan_name")
-    .eq("customer_id", access.customer.id)
+    .eq("workspace_id", access.workspace.id)
     .order("created_at", { ascending: false })
     .limit(1)
     .maybeSingle();
@@ -34,7 +34,7 @@ export async function PATCH(request: Request) {
   const subscriptionResult = subscription
     ? await admin.from("subscriptions").update(subscriptionValues).eq("id", subscription.id)
     : await admin.from("subscriptions").insert({
-        customer_id: access.customer.id,
+        workspace_id: access.workspace.id,
         ...subscriptionValues,
       });
   if (subscriptionResult.error) {
@@ -42,21 +42,13 @@ export async function PATCH(request: Request) {
   }
 
   const now = new Date().toISOString();
-  const [tenantResult] = await Promise.all([
+  await Promise.all([
     admin
-      .from("tenants")
-      .update({
-        plan_name: plan.id,
-        monthly_plan_limit: plan.includedTickets,
-        updated_at: now,
-      })
-      .eq("id", access.tenantId),
-    admin
-      .from("customers")
+      .from("workspaces")
       .update({ status: "active", updated_at: now })
-      .eq("id", access.customer.id),
+      .eq("id", access.workspace.id),
     admin.from("audit_logs").insert({
-      customer_id: access.customer.id,
+      workspace_id: access.workspace.id,
       actor_user_id: access.user.id,
       action: "subscription.plan_updated",
       target_type: "subscription",
@@ -64,10 +56,6 @@ export async function PATCH(request: Request) {
       metadata: { previous_plan: subscription?.plan_name ?? null, plan: plan.id },
     }),
   ]);
-  const tenantError = tenantResult.error;
-  if (tenantError) {
-    return NextResponse.json({ error: "대시보드 플랜 정보를 갱신하지 못했습니다." }, { status: 500 });
-  }
 
   return NextResponse.json({
     ok: true,

@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { canManageCustomer, getCurrentCustomerAccess } from "@/lib/customers/access";
+import { canManageWorkspace, getCurrentWorkspaceAccess } from "@/lib/workspaces/access";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 function text(value: unknown, maxLength = 200) {
@@ -22,9 +22,9 @@ function validEmail(value: string) {
 }
 
 export async function PATCH(request: Request) {
-  const access = await getCurrentCustomerAccess();
+  const access = await getCurrentWorkspaceAccess();
   if (!access) return NextResponse.json({ error: "로그인이 필요합니다." }, { status: 401 });
-  if (!canManageCustomer(access)) {
+  if (!canManageWorkspace(access)) {
     return NextResponse.json({ error: "고객 정보를 수정할 권한이 없습니다." }, { status: 403 });
   }
 
@@ -57,9 +57,9 @@ export async function PATCH(request: Request) {
 
   const admin = createAdminClient();
   const now = new Date().toISOString();
-  const [customerResult, tenantResult, brandLookup] = await Promise.all([
+  const [workspaceResult, brandLookup] = await Promise.all([
     admin
-      .from("customers")
+      .from("workspaces")
       .update({
         company_name: companyName,
         representative_name: representativeName,
@@ -71,31 +71,18 @@ export async function PATCH(request: Request) {
         billing_email: billingEmail || email,
         updated_at: now,
       })
-      .eq("id", access.customer.id),
-    admin
-      .from("tenants")
-      .update({
-        company_name: companyName,
-        display_name: brandName,
-        updated_at: now,
-      })
-      .eq("id", access.tenantId),
+      .eq("id", access.workspace.id),
     admin
       .from("brands")
       .select("id")
-      .eq("customer_id", access.customer.id)
+      .eq("workspace_id", access.workspace.id)
       .order("created_at", { ascending: true })
       .limit(1)
       .maybeSingle(),
   ]);
-  const customerError = customerResult.error;
-  if (customerError) {
+  const workspaceError = workspaceResult.error;
+  if (workspaceError) {
     return NextResponse.json({ error: "고객 정보를 저장하지 못했습니다." }, { status: 500 });
-  }
-
-  const tenantError = tenantResult.error;
-  if (tenantError) {
-    return NextResponse.json({ error: "워크스페이스 정보를 저장하지 못했습니다." }, { status: 500 });
   }
 
   if (brandLookup.error) {
@@ -108,18 +95,18 @@ export async function PATCH(request: Request) {
         .update({ name: brandName, website_url: websiteUrl || null, updated_at: now })
         .eq("id", brand.id)
     : admin.from("brands").insert({
-        customer_id: access.customer.id,
+        workspace_id: access.workspace.id,
         name: brandName,
         website_url: websiteUrl || null,
       });
   const [brandResult] = await Promise.all([
     brandRequest,
     admin.from("audit_logs").insert({
-      customer_id: access.customer.id,
+      workspace_id: access.workspace.id,
       actor_user_id: access.user.id,
       action: "customer.profile_updated",
       target_type: "customer",
-      target_id: access.customer.id,
+      target_id: access.workspace.id,
       metadata: { company_name: companyName, brand_name: brandName },
     }),
   ]);

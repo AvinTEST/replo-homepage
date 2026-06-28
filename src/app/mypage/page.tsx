@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { MypageSettings } from "@/components/mypage/MypageSettings";
-import { getCurrentCustomerAccess } from "@/lib/customers/access";
+import { getCurrentWorkspaceAccess } from "@/lib/workspaces/access";
 import { getSessionClaims } from "@/lib/supabase/claims";
 import { createClient } from "@/lib/supabase/server";
 import "./mypage.css";
@@ -18,34 +18,25 @@ export default async function MyPage() {
   const claims = await getSessionClaims();
   if (!claims) redirect("/login");
 
-  const access = await getCurrentCustomerAccess();
+  const access = await getCurrentWorkspaceAccess();
   if (!access) redirect("/onboarding");
   const loginEmail = claims.email;
   if (!loginEmail) redirect("/login");
 
   const supabase = await createClient();
 
-  const [brandResult, tenantResult] =
-    await Promise.all([
-      supabase
-        .from("brands")
-        .select("name")
-        .eq("customer_id", access.customer.id)
-        .order("created_at", { ascending: true })
-        .limit(1)
-        .maybeSingle(),
-      supabase
-        .from("tenants")
-        .select("display_name")
-        .eq("id", access.tenantId)
-        .maybeSingle(),
-    ]);
+  const brandResult = await supabase
+    .from("brands")
+    .select("name")
+    .eq("workspace_id", access.workspace.id)
+    .order("created_at", { ascending: true })
+    .limit(1)
+    .maybeSingle();
 
-  const customer = access.customer;
+  const customer = access.workspace;
 
   return (
     <MypageSettings
-      tenantId={access.tenantId}
       canManage={access.membership.role === "owner" || access.membership.role === "admin"}
       loginEmail={loginEmail}
       roleLabel={roleLabels[access.membership.role] ?? access.membership.role}
@@ -53,7 +44,6 @@ export default async function MyPage() {
         companyName: customer.company_name,
         brandName:
           brandResult.data?.name ??
-          tenantResult.data?.display_name ??
           customer.company_name,
         representativeName: customer.representative_name ?? customer.contact_name ?? "",
         contactName: customer.contact_name ?? "",
