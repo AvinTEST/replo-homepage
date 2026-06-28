@@ -132,9 +132,9 @@ function OnboardingContent() {
                   isCompany
                     ? "예: 주식회사 아빈코퍼레이션"
                     : isBrandName
-                      ? "예: 밍구네 발바닥"
+                      ? "예: 리플로"
                       : isWebsiteUrl
-                        ? "예: https://mingu.kr"
+                        ? "예: https://replo.kr"
                         : isPhone
                           ? "예: 010-1234-5678"
                           : isRepName

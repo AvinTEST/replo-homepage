@@ -112,7 +112,7 @@ export function MypageSettings(props: Props) {
 
       <aside className="mypage-menu">
         <div className="mypage-menu-head">
-          <Link href={`/dashboard/${props.tenantId}`} aria-label="대시보드로 돌아가기">‹</Link>
+          <Link href="/dashboard" aria-label="대시보드로 돌아가기">‹</Link>
           <strong>설정</strong>
         </div>
         <div className="mypage-menu-list">

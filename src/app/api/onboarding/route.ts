@@ -40,7 +40,7 @@ export async function POST(request: Request) {
   }
   if (websiteUrl === null) {
     return NextResponse.json(
-      { error: "브랜드 홈페이지 URL을 입력해 주세요. 예: https://mingu.kr" },
+      { error: "브랜드 홈페이지 URL을 입력해 주세요. 예: https://replo.kr" },
       { status: 400 },
     );
   }

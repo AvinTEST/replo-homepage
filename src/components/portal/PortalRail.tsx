@@ -61,8 +61,8 @@ export function PortalRail({
   workspaceName: string;
 }) {
   const items: Array<{ id: PortalSection; href: string; label: string }> = [
-    { id: "dashboard", href: `/dashboard/${tenantId}`, label: "대시보드" },
-    { id: "reports", href: `/dashboard/${tenantId}/reports`, label: "리포트" },
+    { id: "dashboard", href: "/dashboard", label: "대시보드" },
+    { id: "reports", href: "/dashboard/reports", label: "리포트" },
     { id: "account", href: "/mypage", label: "계정" },
   ];
 
