@@ -635,7 +635,7 @@ function LandingPricing() {
           <h2 className="t-h1">{pricing.title}</h2>
           <p className="t-lead" style={{ marginTop: 16 }}>{pricing.description}</p>
         </div>
-        <div className="pricing3">
+        <div className="pricing4">
           {pricing.plans.map(({ en, ko, price, originalPrice, volume, best, badge, deadline, description, features }) => (
             <div className={`tier${best ? " best" : ""}`} key={en}>
               {badge ? (

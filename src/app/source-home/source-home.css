@@ -1725,11 +1725,11 @@
   word-break: keep-all;
 }
 
-.replo-source-home .pricing3 {
+.replo-source-home .pricing4 {
   align-items: stretch;
   display: grid;
   gap: 18px;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
 .replo-source-home .billing-toggle {
@@ -2400,7 +2400,7 @@
 }
 
 @media (max-width: 1080px) {
-  .replo-source-home .pricing3 { grid-template-columns: repeat(3, 1fr); }
+  .replo-source-home .pricing4 { grid-template-columns: repeat(2, 1fr); }
   .replo-source-home .proc-row { grid-template-columns: repeat(3, 1fr); }
   .replo-source-home .partner-tier {
     grid-template-columns: 150px minmax(0, 1fr) 220px;
@@ -2447,7 +2447,7 @@
   .replo-source-home .ftm {
     min-width: 720px;
   }
-  .replo-source-home .pricing3 {
+  .replo-source-home .pricing4 {
     grid-template-columns: 1fr;
   }
   .replo-source-home .partner-tier {
@@ -2534,7 +2534,7 @@
 @media (max-width: 520px) {
   .replo-source-home .urg-grid,
   .replo-source-home .proc-row,
-  .replo-source-home .pricing3 {
+  .replo-source-home .pricing4 {
     grid-template-columns: 1fr;
   }
   .replo-source-home .partner-tier {
