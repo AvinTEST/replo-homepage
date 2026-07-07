@@ -473,51 +473,66 @@ function ProcessSection() {
 }
 
 function CostSection() {
+  const cost = homeCopy.cost;
+  const hireRows = cost.rows.map(({ item, hire }) => ({ item, value: hire }));
+
   return (
-    <section className="sec-tight" style={{ background: "var(--bg)" }} id="cost-sec">
-      <div className="deco"><div className="deco-grid mask-top" /></div>
+    <section className="sec-tight cost-section" id="cost-sec">
+      <div className="deco"><div className="deco-grid mask-top cost-grid" /></div>
       <div className="wrap">
         <div className="sec-head sec-center" style={{ maxWidth: 840 }}>
-          <span className="eyebrow-pill">{homeCopy.cost.eyebrow}</span>
-          <h2 className="t-h1">{homeCopy.cost.title[0]}<br />{homeCopy.cost.title[1]}</h2>
-          <p className="t-lead" style={{ marginTop: 16 }}>{homeCopy.cost.description}</p>
+          <span className="eyebrow-pill">{cost.eyebrow}</span>
+          <h2 className="t-h1">{cost.title[0]}<br />{cost.title[1]}</h2>
+          <p className="t-lead" style={{ marginTop: 16 }}>{cost.description}</p>
         </div>
 
-        <div className="cost1-wrap">
-          <div className="cost1-scroll">
-            <table className="cost1">
-              <thead>
-                <tr>
-                  <th className="c1-item">{homeCopy.cost.headers.item}</th>
-                  <th className="c1-hire"><span className="c1-dot" style={{ background: "var(--red)" }} />{homeCopy.cost.headers.hire} <small>{homeCopy.cost.headers.hireUnit}</small></th>
-                  <th className="c1-replo">{homeCopy.cost.headers.replo} <small>{homeCopy.cost.headers.reploUnit}</small></th>
-                </tr>
-              </thead>
-              <tbody>
-                {homeCopy.cost.rows.map(({ item, sub, hire, replo, free }) => (
-                  <tr key={item}>
-                    <td className="c1-item"><b>{item}</b><small>{sub}</small></td>
-                    <td className="c1-hireval">{hire}</td>
-                    <td className={`c1-reploval${free ? " free" : ""}`}>{replo}</td>
-                  </tr>
-                ))}
-                <tr className="c1-total">
-                  <td className="c1-item">{homeCopy.cost.totalLabel}</td>
-                  <td className="c1-hireval">{homeCopy.cost.hireTotal}</td>
-                  <td className="c1-reploval"><span className="c1-price">{homeCopy.cost.reploTotal}</span><span className="c1-badge">{homeCopy.cost.savingsBadge}</span></td>
-                </tr>
-              </tbody>
-              <tfoot>
-                <tr>
-                  <td className="c1-item">{homeCopy.cost.annualLabel}</td>
-                  <td className="c1-hireval">{homeCopy.cost.annualHire}</td>
-                  <td className="c1-reploval"><span className="c1-save">{homeCopy.cost.annualSavings}</span></td>
-                </tr>
-              </tfoot>
-            </table>
-          </div>
+        <div className="cost-compare" aria-label="직접 채용과 Replo 스타트 비용 비교">
+          <article className="cost-card cost-card-hire">
+            <div className="cost-card-head">
+              <span className="cost-card-kicker">In-house</span>
+              <h3>{cost.headers.hire}</h3>
+            </div>
+            <div className="cost-price">월 {cost.hireTotal}</div>
+            <p className="cost-subcopy">{cost.hireSubtitle}</p>
+            <div className="cost-items">
+              {hireRows.map(({ item, value }) => (
+                <div className="cost-item" key={item}>
+                  <span>{item}</span>
+                  <strong>{value}</strong>
+                </div>
+              ))}
+            </div>
+            <p className="cost-footnote">{cost.hireFootnote}</p>
+          </article>
+
+          <div className="cost-vs" aria-hidden="true">VS</div>
+
+          <article className="cost-card cost-card-replo">
+            <div className="cost-card-head">
+              <span className="cost-card-kicker">Replo</span>
+              <span className="cost-card-badge">{cost.reploBadge}</span>
+              <h3>{cost.reploTitle}</h3>
+            </div>
+            <div className="cost-price cost-price-replo">월 {cost.reploTotal}</div>
+            <p className="cost-subcopy">{cost.reploSubtitle}</p>
+            <div className="cost-items cost-includes">
+              {cost.reploIncludes.map((item) => (
+                <div className="cost-item" key={item}>
+                  <span><Icon name="check" size={15} stroke={2.4} />{item}</span>
+                </div>
+              ))}
+            </div>
+            <span className="cost-saving-pill">{cost.savingsBadge}</span>
+          </article>
         </div>
-        <p className="cost-note"><strong>{homeCopy.cost.noteLabel}</strong> · {homeCopy.cost.note}</p>
+
+        <div className="cost-result">
+          <span>{cost.annualLabel}</span>
+          <strong>{cost.resultTitle}</strong>
+          <p>{cost.resultDescription}</p>
+        </div>
+
+        <p className="cost-note"><strong>{cost.noteLabel}</strong> · {cost.note}</p>
       </div>
     </section>
   );
@@ -639,16 +654,16 @@ function LandingPricing() {
           {pricing.plans.map(({ en, ko, price, originalPrice, volume, best, badge, deadline, description, features }) => (
             <div className={`tier${best ? " best" : ""}`} key={en}>
               <div className="tier-head">
+                <div>
+                  <div className="tier-name-en">{en}</div>
+                  <div className="tier-name">{ko}</div>
+                </div>
                 {badge ? (
                   <div className="tier-limited" aria-label={`${badge} ${deadline ?? ""}`.trim()}>
                     <span className="tier-limited-kicker">{badge}</span>
                     {deadline ? <strong>{deadline}</strong> : null}
                   </div>
                 ) : null}
-                <div>
-                  <div className="tier-name-en">{en}</div>
-                  <div className="tier-name">{ko}</div>
-                </div>
               </div>
               <div className="tier-price-wrap">
                 {originalPrice ? <div className="tier-regular"><del>{originalPrice}</del></div> : null}
