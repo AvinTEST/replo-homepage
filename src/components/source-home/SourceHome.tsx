@@ -591,7 +591,12 @@ function FeatureMatrix() {
           <thead>
             <tr>
               <th className="f-name">{featureLabel}</th>
-              {columns.map((column, index) => <th className={index === bestIndex ? "best" : ""} key={column}>{column}</th>)}
+              {columns.map((column, index) => (
+                <th className={index === bestIndex ? "best" : ""} key={column}>
+                  {column}
+                  {index === bestIndex ? <span className="ftm-limited">7월 한정 · ~07.31</span> : null}
+                </th>
+              ))}
             </tr>
           </thead>
           <tbody>
@@ -630,16 +635,23 @@ function LandingPricing() {
           <h2 className="t-h1">{pricing.title}</h2>
           <p className="t-lead" style={{ marginTop: 16 }}>{pricing.description}</p>
         </div>
-        <div className="pricing5">
-          {pricing.plans.map(({ en, ko, price, volume, best, description, features }) => (
+        <div className="pricing3">
+          {pricing.plans.map(({ en, ko, price, volume, best, badge, deadline, description, features }) => (
             <div className={`tier${best ? " best" : ""}`} key={en}>
               {best ? <span className="tier-badge">{pricing.recommended}</span> : null}
+              {badge ? (
+                <div className="tier-limited" aria-label={`${badge} ${deadline ?? ""}`.trim()}>
+                  <span>{badge}</span>
+                  {deadline ? <strong>{deadline}</strong> : null}
+                </div>
+              ) : null}
               <div className="tier-name-en">{en}</div>
               <div className="tier-name">{ko}</div>
               <div className="tier-price">
                 {price}
                 {price.startsWith("₩") ? <small>{pricing.monthlyUnit}</small> : null}
               </div>
+              {deadline ? <span className="tier-deadline">7월 한정 도입 혜택 · {deadline}</span> : null}
               <span className="tier-vol">{volume}</span>
               <p style={{ fontSize: 12.5, color: "var(--ink-400)", lineHeight: 1.55, margin: "14px 0 0", wordBreak: "keep-all", minHeight: 54 }}>{description}</p>
               <ul className="tier-feats">
