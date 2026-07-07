@@ -1968,36 +1968,47 @@
 }
 
 .replo-source-home .tier.best {
-  border: 1.5px solid var(--violet-500);
-  box-shadow: var(--sh-md);
+  border: 1.5px solid #f43f5e;
+  box-shadow: 0 18px 44px rgba(190, 18, 60, .12);
 }
 
 .replo-source-home .tier-limited {
   align-items: center;
-  align-self: stretch;
-  background: linear-gradient(135deg, #fff3cf 0%, #fffaf0 58%, #fff 100%);
-  border: 1.5px solid #e8a928;
-  border-radius: 14px;
-  box-shadow: 0 12px 28px rgba(181, 121, 12, .14);
-  color: #7a4b00;
-  display: flex;
+  align-self: flex-start;
+  background: #fff1f2;
+  border: 1px solid #fecdd3;
+  border-radius: var(--r-pill);
+  color: #be123c;
+  display: inline-flex;
   flex-wrap: wrap;
-  font-size: 14px;
-  font-weight: 900;
-  gap: 8px;
-  justify-content: space-between;
-  line-height: 1.25;
+  gap: 6px;
+  line-height: 1.35;
   margin: 0 0 18px;
-  padding: 11px 13px;
+  padding: 6px 8px 6px 12px;
+  width: fit-content;
+}
+
+.replo-source-home .tier-limited-kicker {
+  color: #be123c;
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: .02em;
 }
 
 .replo-source-home .tier-limited strong {
-  background: #7a4b00;
+  background: #be123c;
   border-radius: var(--r-pill);
   color: #fff;
-  font-size: 12px;
-  padding: 5px 9px;
+  font-size: 11.5px;
+  font-weight: 900;
+  padding: 4px 8px;
   white-space: nowrap;
+}
+
+.replo-source-home .tier-limited-copy {
+  color: #9f1239;
+  font-size: 11.5px;
+  font-weight: 750;
 }
 
 .replo-source-home .tier-regular {
@@ -2012,19 +2023,6 @@
   font-weight: 800;
 }
 
-.replo-source-home .tier-deadline {
-  background: #fff7e6;
-  border: 1px solid #f4d38b;
-  border-radius: var(--r-pill);
-  color: var(--amber);
-  display: inline-flex;
-  font-size: 12px;
-  font-weight: 900;
-  line-height: 1.35;
-  margin-top: 10px;
-  padding: 5px 10px;
-}
-
 .replo-source-home .tier-name-en {
   color: var(--ink-400);
   font-size: 10px;
@@ -2035,7 +2033,7 @@
 }
 
 .replo-source-home .tier.best .tier-name-en {
-  color: var(--violet-600);
+  color: var(--ink-600);
 }
 
 .replo-source-home .tier-name {
@@ -2072,8 +2070,8 @@
 }
 
 .replo-source-home .tier.best .tier-vol {
-  background: var(--violet-50);
-  color: var(--violet-700);
+  background: #f8fafc;
+  color: #111827;
 }
 
 .replo-source-home .tier-feats {

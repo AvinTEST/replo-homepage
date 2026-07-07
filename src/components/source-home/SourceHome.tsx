@@ -633,15 +633,16 @@ function LandingPricing() {
         <div className="sec-head sec-center" style={{ marginBottom: 36 }}>
           <span className="eyebrow-pill">{pricing.eyebrow}</span>
           <h2 className="t-h1">{pricing.title}</h2>
-          <p className="t-lead" style={{ marginTop: 16 }}>{pricing.description}</p>
+          {pricing.description ? <p className="t-lead" style={{ marginTop: 16 }}>{pricing.description}</p> : null}
         </div>
         <div className="pricing4">
           {pricing.plans.map(({ en, ko, price, originalPrice, volume, best, badge, deadline, description, features }) => (
             <div className={`tier${best ? " best" : ""}`} key={en}>
               {badge ? (
                 <div className="tier-limited" aria-label={`${badge} ${deadline ?? ""}`.trim()}>
-                  <span>{badge}</span>
+                  <span className="tier-limited-kicker">{badge}</span>
                   {deadline ? <strong>{deadline}</strong> : null}
+                  <span className="tier-limited-copy">200건 도입 혜택</span>
                 </div>
               ) : null}
               <div className="tier-name-en">{en}</div>
@@ -651,7 +652,6 @@ function LandingPricing() {
                 {price}
                 {price.startsWith("₩") ? <small>{pricing.monthlyUnit}</small> : null}
               </div>
-              {deadline ? <span className="tier-deadline">7월 신청 고객 한정 · {deadline}</span> : null}
               <span className="tier-vol">{volume}</span>
               <p style={{ fontSize: 12.5, color: "var(--ink-400)", lineHeight: 1.55, margin: "14px 0 0", wordBreak: "keep-all", minHeight: 54 }}>{description}</p>
               <ul className="tier-feats">

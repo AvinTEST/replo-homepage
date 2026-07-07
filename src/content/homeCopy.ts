@@ -252,7 +252,7 @@ export const homeCopy = {
   pricing: {
     eyebrow: "Pricing",
     title: "운영 규모에 맞는 플랜",
-    description: "월 상담 200건 도입 플랜부터 500건 이상 성장 플랜까지, 현재 운영 규모에 맞춰 선택할 수 있습니다. 59만원 도입 플랜은 런칭 기념 7월 한정 혜택입니다.",
+    description: "",
     monthlyUnit: " / 월",
     standardCta: "이 플랜으로 시작",
     enterpriseCta: "영업팀 문의",
@@ -267,7 +267,7 @@ export const homeCopy = {
         originalPrice: "",
         volume: "월 상담 200건",
         best: true,
-        badge: "런칭 기념 7월 한정 도입 혜택",
+        badge: "런칭 기념 7월 한정",
         deadline: "~07.31까지",
         description: "초기 브랜드가 채팅·게시판·이메일 문의를 안정적으로 맡기고, 반복 문의 자동화와 운영 리포트까지 시작할 수 있는 7월 한정 도입 플랜",
         features: ["채팅·게시판·이메일 응대", "AI 응대 · 반복 문의 자동화", "FAQ 구축 · 상담 스크립트", "월간 운영 리포트", "데일리 현황 알림"],
