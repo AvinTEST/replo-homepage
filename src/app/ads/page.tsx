@@ -515,10 +515,12 @@ const styles = `
 }
 .ads-tier.pop { border: 1.5px solid var(--brand); background: linear-gradient(165deg, #fff, #F5F2FF); }
 .ads-tier .thead { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; margin-bottom: 10px; }
-.ads-tier .tname { display: inline-flex; align-items: center; gap: 7px; font-size: 16px; font-weight: 800; }
+.ads-tier .tname { display: inline-flex; align-items: center; gap: 7px; font-size: 16px; font-weight: 800; flex: 0 0 auto; }
 .ads-tier .tbadge { font-size: 10.5px; font-weight: 800; color: #fff; background: var(--brand); border-radius: 999px; padding: 3px 8px; }
-.ads-tier .tprice { font-size: 18px; font-weight: 800; color: var(--brand-deep); white-space: nowrap; }
-.ads-tier .tprice small { font-size: 11.5px; font-weight: 700; color: var(--muted); }
+.ads-tier .tprice { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; }
+.ads-tier .tprice b { font-size: 18px; font-weight: 800; color: var(--brand-deep); white-space: nowrap; }
+.ads-tier .tprice em { font-size: 11px; font-weight: 700; color: var(--muted); font-style: normal; white-space: nowrap; }
+.ads-tier .tprice em s { color: #B6B2C6; text-decoration-thickness: 1px; }
 .ads-tier .tvol {
   display: inline-block; font-size: 12.5px; font-weight: 800; color: var(--brand);
   background: var(--brand-soft); padding: 4px 11px; border-radius: 999px; margin-bottom: 14px;
@@ -831,7 +833,7 @@ export default function AdsLandingPage({ searchParams }: { searchParams: SearchP
         </h2>
         <div className="ads-inccard">
           <span className="cap">{IconSpark}7월 한정 · 월 59만원</span>
-          <p className="vol">{IconHeadset}월 문의 500건 기준 · 상담 응대 포함</p>
+          <p className="vol">{IconHeadset}월 상담 200건 기준 · 상담 응대 포함</p>
           <ul className="ads-inc">
             {included.map((it) => (
               <li className={it.lead ? "lead" : undefined} key={it.label}>

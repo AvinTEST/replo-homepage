@@ -20,7 +20,7 @@ const Arrow = (
 type Tier = {
   name: string;
   price: string;
-  unit?: string;
+  orig?: string;
   note?: string;
   volume: string;
   badge?: string;
@@ -28,12 +28,16 @@ type Tier = {
   features: string[];
 };
 
+// Mirrors the real plan ladder (src/lib/billing/plans.ts + homeCopy pricing):
+// Starter 59만원(7월 한정, 원가 99만원)/200건, Basic 99만원/500건,
+// Pro 179만원/1,000건, Enterprise 별도 협의/2,000건+.
 const tiers: Tier[] = [
   {
-    name: "런칭 특가",
+    name: "Starter",
     price: "월 59만원",
+    orig: "월 99만원",
     note: "7월 한정",
-    volume: "월 문의 500건 기준",
+    volume: "월 상담 200건",
     badge: "진행중",
     pop: true,
     features: [
@@ -45,25 +49,34 @@ const tiers: Tier[] = [
     ],
   },
   {
-    name: "그로스",
+    name: "Basic",
     price: "월 99만원",
-    volume: "월 문의 1,500건 기준",
+    volume: "월 상담 500건",
     features: [
-      "런칭 특가 전체 포함",
-      "다채널 응대 확대",
-      "우선 응대 처리",
+      "Starter 전체 포함",
+      "콜 · 채팅 · 게시판 · 이메일 응대",
+      "응대 기준 · 품질 안정화",
+      "월간 운영 리포트",
+    ],
+  },
+  {
+    name: "Pro",
+    price: "월 179만원",
+    volume: "월 상담 1,000건",
+    features: [
+      "다채널 상담 운영",
+      "CS 정책 설계 · 응대 가이드",
       "주간 운영 리포트",
     ],
   },
   {
-    name: "스케일",
-    price: "맞춤 견적",
-    volume: "월 문의 3,000건 이상",
+    name: "Enterprise",
+    price: "별도 협의",
+    volume: "월 상담 2,000건+",
     features: [
-      "전담 운영 매니저 배정",
-      "맞춤 자동화 · 채널 연동 설계",
-      "실시간 리포트 대시보드",
-      "SLA 기반 운영",
+      "전담 매니저 · 정기 CX 미팅",
+      "API · 시스템 연동",
+      "맞춤 운영 체계 설계",
     ],
   },
 ];
@@ -95,8 +108,14 @@ export function PlanTiers({ contactHref }: { contactHref: string }) {
                   {t.badge && <span className="tbadge">{t.badge}</span>}
                 </span>
                 <span className="tprice">
-                  {t.note && <small>{t.note} </small>}
-                  {t.price}
+                  <b>{t.price}</b>
+                  {(t.note || t.orig) && (
+                    <em>
+                      {t.note}
+                      {t.note && t.orig ? " · " : ""}
+                      {t.orig && <s>{t.orig}</s>}
+                    </em>
+                  )}
                 </span>
               </div>
               <span className="tvol">{t.volume}</span>
