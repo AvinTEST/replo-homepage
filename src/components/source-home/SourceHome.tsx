@@ -636,9 +636,8 @@ function LandingPricing() {
           <p className="t-lead" style={{ marginTop: 16 }}>{pricing.description}</p>
         </div>
         <div className="pricing3">
-          {pricing.plans.map(({ en, ko, price, volume, best, badge, deadline, description, features }) => (
+          {pricing.plans.map(({ en, ko, price, originalPrice, volume, best, badge, deadline, description, features }) => (
             <div className={`tier${best ? " best" : ""}`} key={en}>
-              {best ? <span className="tier-badge">{pricing.recommended}</span> : null}
               {badge ? (
                 <div className="tier-limited" aria-label={`${badge} ${deadline ?? ""}`.trim()}>
                   <span>{badge}</span>
@@ -647,11 +646,12 @@ function LandingPricing() {
               ) : null}
               <div className="tier-name-en">{en}</div>
               <div className="tier-name">{ko}</div>
+              {originalPrice ? <div className="tier-regular">정가 <del>{originalPrice}</del></div> : null}
               <div className="tier-price">
                 {price}
                 {price.startsWith("₩") ? <small>{pricing.monthlyUnit}</small> : null}
               </div>
-              {deadline ? <span className="tier-deadline">7월 한정 도입 혜택 · {deadline}</span> : null}
+              {deadline ? <span className="tier-deadline">7월 신청 고객 한정 · {deadline}</span> : null}
               <span className="tier-vol">{volume}</span>
               <p style={{ fontSize: 12.5, color: "var(--ink-400)", lineHeight: 1.55, margin: "14px 0 0", wordBreak: "keep-all", minHeight: 54 }}>{description}</p>
               <ul className="tier-feats">

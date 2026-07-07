@@ -1972,53 +1972,57 @@
   box-shadow: var(--sh-md);
 }
 
-.replo-source-home .tier-badge {
-  background: var(--ink-900);
-  border-radius: var(--r-pill);
-  color: #fff;
-  font-size: 10px;
-  font-weight: 800;
-  left: 50%;
-  letter-spacing: .05em;
-  padding: 4px 13px;
-  position: absolute;
-  top: -11px;
-  transform: translateX(-50%);
-  white-space: nowrap;
-}
-
 .replo-source-home .tier-limited {
   align-items: center;
-  align-self: flex-start;
-  background: linear-gradient(135deg, #fff7e6 0%, #fff 100%);
-  border: 1px solid #f4c36b;
-  border-radius: var(--r-pill);
-  color: #8a5600;
-  display: inline-flex;
+  align-self: stretch;
+  background: linear-gradient(135deg, #fff3cf 0%, #fffaf0 58%, #fff 100%);
+  border: 1.5px solid #e8a928;
+  border-radius: 14px;
+  box-shadow: 0 12px 28px rgba(181, 121, 12, .14);
+  color: #7a4b00;
+  display: flex;
   flex-wrap: wrap;
-  font-size: 12px;
-  font-weight: 800;
-  gap: 6px;
-  line-height: 1.2;
-  margin: 2px 0 16px;
-  padding: 7px 11px;
+  font-size: 14px;
+  font-weight: 900;
+  gap: 8px;
+  justify-content: space-between;
+  line-height: 1.25;
+  margin: 0 0 18px;
+  padding: 11px 13px;
 }
 
 .replo-source-home .tier-limited strong {
-  background: #8a5600;
+  background: #7a4b00;
   border-radius: var(--r-pill);
   color: #fff;
-  font-size: 11px;
-  padding: 3px 7px;
+  font-size: 12px;
+  padding: 5px 9px;
+  white-space: nowrap;
+}
+
+.replo-source-home .tier-regular {
+  color: var(--ink-400);
+  font-size: 13px;
+  font-weight: 700;
+  margin: -4px 0 9px;
+}
+
+.replo-source-home .tier-regular del {
+  color: var(--ink-500);
+  font-weight: 800;
 }
 
 .replo-source-home .tier-deadline {
+  background: #fff7e6;
+  border: 1px solid #f4d38b;
+  border-radius: var(--r-pill);
   color: var(--amber);
   display: inline-flex;
   font-size: 12px;
-  font-weight: 800;
+  font-weight: 900;
   line-height: 1.35;
   margin-top: 10px;
+  padding: 5px 10px;
 }
 
 .replo-source-home .tier-name-en {

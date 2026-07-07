@@ -2,9 +2,9 @@ export const selectablePlans = [
   {
     id: "Basic",
     label: "Basic",
-    monthlyFee: 590000,
-    includedTickets: 200,
-    description: "월 상담 200건",
+    monthlyFee: 990000,
+    includedTickets: 500,
+    description: "월 상담 500건",
   },
   {
     id: "Pro",
