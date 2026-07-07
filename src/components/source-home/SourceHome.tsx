@@ -644,7 +644,7 @@ function LandingPricing() {
                     <span className="tier-limited-kicker">{badge}</span>
                     {deadline ? <strong>{deadline}</strong> : null}
                   </div>
-                ) : <span className="tier-spacer" aria-hidden="true" />}
+                ) : null}
                 <div>
                   <div className="tier-name-en">{en}</div>
                   <div className="tier-name">{ko}</div>
