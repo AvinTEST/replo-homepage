@@ -655,7 +655,10 @@ function LandingPricing() {
             <div className={`tier${best ? " best" : ""}`} key={en}>
               {badge ? (
                 <div className="tier-benefit" aria-label={`${badge} ${deadline ?? ""}`.trim()}>
-                  <span>7월 한정 도입 혜택</span>
+                  <span className="tier-benefit-copy">
+                    <span className="tier-benefit-ribbon" aria-hidden="true">LIMITED</span>
+                    <span>7월 한정 도입 혜택</span>
+                  </span>
                   {deadline ? <strong>{deadline}</strong> : null}
                 </div>
               ) : null}
