@@ -653,16 +653,12 @@ function LandingPricing() {
         <div className="pricing4">
           {pricing.plans.map(({ en, ko, price, originalPrice, volume, best, badge, deadline, description, features }) => (
             <div className={`tier${best ? " best" : ""}`} key={en}>
-              {badge ? (
-                <div className="tier-benefit" aria-label={`${badge} ${deadline ?? ""}`.trim()}>
-                  <span className="tier-benefit-copy">
-                    <span className="tier-benefit-ribbon" aria-hidden="true">LIMITED</span>
-                    <span>7월 한정 도입 혜택</span>
-                  </span>
-                  {deadline ? <strong>{deadline}</strong> : null}
-                </div>
-              ) : null}
               <div className="tier-head">
+                {badge ? (
+                  <div className="tier-benefit" aria-label={`${badge} ${deadline ?? ""}`.trim()}>
+                    7월 한정 도입 혜택 {deadline ? <span>· {deadline}</span> : null}
+                  </div>
+                ) : null}
                 <div>
                   <div className="tier-name-en">{en}</div>
                   <div className="tier-name">{ko}</div>

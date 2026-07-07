@@ -1783,7 +1783,8 @@
 
 .replo-source-home .pricing-section {
   background:
-    radial-gradient(circle at 50% 0%, rgba(120, 100, 255, .12), transparent 42%),
+    radial-gradient(circle at 28% 18%, rgba(109, 93, 246, .10), transparent 32%),
+    radial-gradient(circle at 58% 34%, rgba(167, 139, 250, .13), transparent 38%),
     linear-gradient(180deg, #fbfbff 0%, var(--bg) 100%);
   overflow: hidden;
 }
@@ -1798,6 +1799,20 @@
   gap: 18px;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   padding-top: 18px;
+  position: relative;
+}
+
+.replo-source-home .pricing4::before {
+  background: radial-gradient(circle, rgba(109, 93, 246, .16), transparent 58%);
+  content: "";
+  filter: blur(18px);
+  height: 260px;
+  left: -18px;
+  opacity: .58;
+  pointer-events: none;
+  position: absolute;
+  top: 28px;
+  width: 340px;
 }
 
 .replo-source-home .billing-toggle {
@@ -2025,7 +2040,7 @@
 
 .replo-source-home .tier {
   background:
-    linear-gradient(180deg, rgba(248, 247, 255, .78) 0%, rgba(255, 255, 255, .98) 32%),
+    linear-gradient(180deg, rgba(248, 247, 255, .82) 0%, rgba(255, 255, 255, .98) 34%),
     #fff;
   border: 1px solid rgba(217, 219, 236, .98);
   border-radius: 18px;
@@ -2034,14 +2049,14 @@
   flex-direction: column;
   min-height: 500px;
   overflow: hidden;
-  padding: 22px 22px 22px;
+  padding: 24px 22px 22px;
   position: relative;
   transition: border-color .18s ease, box-shadow .18s ease, transform .18s ease;
+  z-index: 1;
 }
 
-
-.replo-source-home .tier:not(.best)::before {
-  background: linear-gradient(90deg, rgba(91, 71, 224, .34), rgba(120, 100, 255, .08));
+.replo-source-home .tier::before {
+  background: linear-gradient(90deg, rgba(109, 93, 246, .16), rgba(109, 93, 246, .045));
   border-radius: 18px 18px 0 0;
   content: "";
   height: 4px;
@@ -2049,91 +2064,81 @@
   position: absolute;
   right: 0;
   top: 0;
+  z-index: 1;
 }
 
-.replo-source-home .tier:not(.best):hover {
+.replo-source-home .tier:hover {
   border-color: rgba(120, 100, 255, .36);
   box-shadow: 0 18px 42px rgba(16, 22, 48, .11);
 }
 
 .replo-source-home .tier.best {
   background:
-    radial-gradient(circle at 82% 0%, rgba(120, 100, 255, .22), transparent 34%),
-    linear-gradient(180deg, #fbfaff 0%, #f2efff 100%);
-  border: 1.5px solid var(--violet-600);
-  box-shadow: 0 22px 58px rgba(91, 71, 224, .20);
-  padding-top: 0;
+    radial-gradient(circle at 84% 9%, rgba(167, 139, 250, .24), transparent 28%),
+    radial-gradient(circle at 18% 42%, rgba(109, 93, 246, .11), transparent 34%),
+    linear-gradient(180deg, #fdfcff 0%, #f5f1ff 48%, #fbfaff 100%);
+  border: 1.5px solid rgba(91, 75, 232, .78);
+  box-shadow:
+    0 24px 62px rgba(91, 71, 224, .20),
+    0 0 0 1px rgba(255, 255, 255, .72) inset;
+}
+
+.replo-source-home .tier.best::before {
+  background: linear-gradient(90deg, #7C5CFF, #5B4BE8, #A78BFA);
+}
+
+.replo-source-home .tier.best::after {
+  background:
+    radial-gradient(circle, rgba(109, 93, 246, .16) 0 2px, transparent 2.5px),
+    radial-gradient(circle, rgba(109, 93, 246, .12) 0 1.5px, transparent 2px),
+    radial-gradient(circle, rgba(109, 93, 246, .10) 0 1.5px, transparent 2px);
+  background-position: 0 0, 34px 22px, 16px 46px;
+  background-repeat: no-repeat;
+  content: "";
+  height: 58px;
+  opacity: .9;
+  pointer-events: none;
+  position: absolute;
+  right: 18px;
+  top: 70px;
+  width: 54px;
 }
 
 .replo-source-home .tier-benefit {
   align-items: center;
-  background:
-    linear-gradient(90deg, rgba(109, 93, 246, .18) 0 3px, transparent 3px),
-    linear-gradient(135deg, rgba(109, 93, 246, .14), rgba(109, 93, 246, .045));
-  border-bottom: 1px solid rgba(109, 93, 246, .16);
-  border-radius: 16px 16px 0 0;
+  align-self: flex-start;
+  background: linear-gradient(135deg, rgba(255, 255, 255, .92), rgba(239, 234, 255, .88));
+  border: 1px solid rgba(109, 93, 246, .22);
+  border-radius: var(--r-pill);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, .9),
+    0 8px 24px rgba(91, 75, 232, .12);
   color: #5B4BE8;
-  display: flex;
+  display: inline-flex;
   font-size: 12px;
   font-weight: 750;
-  justify-content: space-between;
-  line-height: 1.35;
-  margin: -1px -22px 22px;
-  min-height: 46px;
-  padding: 0 22px;
-}
-
-.replo-source-home .tier-benefit-copy {
-  align-items: center;
-  display: inline-flex;
-  gap: 10px;
-  min-width: 0;
-}
-
-.replo-source-home .tier-benefit-ribbon {
-  align-items: center;
-  background: linear-gradient(135deg, #6D5DF6 0%, #4F46E5 100%);
-  border-radius: 7px 7px 7px 2px;
-  color: #fff;
-  display: inline-flex;
-  flex: none;
-  font-size: 9px;
-  font-weight: 850;
-  height: 22px;
-  justify-content: center;
-  letter-spacing: .04em;
-  padding: 0 8px;
-  position: relative;
-}
-
-.replo-source-home .tier-benefit-ribbon::after {
-  border-color: transparent transparent rgba(79, 70, 229, .42) transparent;
-  border-style: solid;
-  border-width: 0 0 6px 6px;
-  bottom: -6px;
-  content: "";
-  left: 0;
-  position: absolute;
-}
-
-.replo-source-home .tier-benefit strong {
-  background: rgba(255, 255, 255, .72);
-  border: 1px solid rgba(109, 93, 246, .18);
-  border-radius: var(--r-pill);
-  color: #5B4BE8;
-  flex: none;
-  font-size: 11px;
-  font-weight: 750;
-  padding: 4px 8px;
+  gap: 6px;
+  line-height: 1.25;
+  margin: 0 0 14px;
+  max-width: 100%;
+  padding: 8px 12px;
   white-space: nowrap;
+}
+
+.replo-source-home .tier-benefit span {
+  color: inherit;
+  font-size: inherit;
+  font-weight: inherit;
 }
 
 .replo-source-home .tier-head {
   align-items: flex-start;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 0;
   min-height: 54px;
+  position: relative;
+  z-index: 2;
 }
 
 .replo-source-home .tier-name-en {
@@ -2160,6 +2165,23 @@
 .replo-source-home .tier-price-wrap {
   margin-top: 12px;
   min-height: 70px;
+  position: relative;
+  z-index: 2;
+}
+
+.replo-source-home .tier.best .tier-price-wrap::before {
+  background: radial-gradient(circle, rgba(109, 93, 246, .18), transparent 62%);
+  border-radius: 999px;
+  content: "";
+  filter: blur(10px);
+  height: 76px;
+  left: -16px;
+  opacity: .78;
+  pointer-events: none;
+  position: absolute;
+  top: 4px;
+  width: 190px;
+  z-index: -1;
 }
 
 .replo-source-home .tier-regular {
@@ -2256,11 +2278,16 @@
 .replo-source-home .tier.best .tier-cta.btn-primary {
   background: var(--violet-600);
   border-color: var(--violet-600);
-  box-shadow: 0 12px 26px rgba(91, 71, 224, .26);
+  box-shadow:
+    0 12px 26px rgba(91, 71, 224, .24),
+    0 0 0 5px rgba(109, 93, 246, .08);
 }
 
 .replo-source-home .tier.best .tier-cta.btn-primary:hover {
   background: var(--violet-700);
+  box-shadow:
+    0 14px 30px rgba(91, 71, 224, .28),
+    0 0 0 6px rgba(109, 93, 246, .10);
   transform: none;
 }
 
@@ -2620,6 +2647,11 @@
 }
 
 @media (max-width: 720px) {
+  .replo-source-home .tier-benefit {
+    flex-wrap: wrap;
+    gap: 4px;
+    white-space: normal;
+  }
   .replo-source-home .ftm {
     min-width: 720px;
   }
