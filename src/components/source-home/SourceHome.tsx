@@ -660,8 +660,7 @@ function LandingPricing() {
                 </div>
                 {badge ? (
                   <div className="tier-limited" aria-label={`${badge} ${deadline ?? ""}`.trim()}>
-                    <span className="tier-limited-kicker">{badge}</span>
-                    {deadline ? <strong>{deadline}</strong> : null}
+                    {badge}{deadline ? ` · ${deadline}` : ""}
                   </div>
                 ) : null}
               </div>

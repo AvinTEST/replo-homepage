@@ -2069,45 +2069,29 @@
   align-items: flex-start;
   display: flex;
   flex-direction: row;
-  gap: 12px;
+  flex-wrap: wrap;
+  gap: 10px 12px;
   justify-content: space-between;
   min-height: 54px;
 }
 
 .replo-source-home .tier-limited {
-  align-items: flex-end;
+  align-items: center;
   align-self: flex-start;
-  background: linear-gradient(135deg, #6D5DF6 0%, #4F46E5 100%);
-  border: 1px solid rgba(255, 255, 255, .35);
-  border-radius: 14px;
-  box-shadow: 0 12px 28px rgba(109, 93, 246, .24);
-  color: #fff;
-  display: inline-flex;
-  flex-direction: column;
-  flex: none;
-  gap: 5px;
-  line-height: 1.25;
-  padding: 8px 11px;
-  width: fit-content;
-}
-
-.replo-source-home .tier-limited-kicker {
-  color: #fff;
-  font-size: 12px;
-  font-weight: 900;
-  letter-spacing: .02em;
-  white-space: nowrap;
-}
-
-.replo-source-home .tier-limited strong {
-  background: rgba(255, 255, 255, .18);
-  border: 1px solid rgba(255, 255, 255, .25);
+  background: rgba(109, 93, 246, .08);
+  border: 1px solid rgba(109, 93, 246, .18);
   border-radius: var(--r-pill);
-  color: #fff;
-  font-size: 11px;
-  font-weight: 900;
-  padding: 3px 8px;
+  box-shadow: none;
+  color: #5B4BE8;
+  display: inline-flex;
+  flex: none;
+  font-size: 12px;
+  font-weight: 750;
+  letter-spacing: 0;
+  line-height: 1.35;
+  padding: 8px 12px;
   white-space: nowrap;
+  width: fit-content;
 }
 
 
