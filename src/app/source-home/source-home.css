@@ -1725,6 +1725,17 @@
   word-break: keep-all;
 }
 
+.replo-source-home .pricing-section {
+  background:
+    radial-gradient(circle at 50% 0%, rgba(120, 100, 255, .12), transparent 42%),
+    linear-gradient(180deg, #fbfbff 0%, var(--bg) 100%);
+  overflow: hidden;
+}
+
+.replo-source-home .pricing-grid {
+  opacity: .42;
+}
+
 .replo-source-home .pricing4 {
   align-items: stretch;
   display: grid;
@@ -1956,47 +1967,57 @@
 }
 
 .replo-source-home .tier {
-  background: var(--surface);
-  border: 1px solid var(--line);
-  border-radius: var(--r-lg);
-  box-shadow: var(--sh-sm);
+  background: rgba(255, 255, 255, .96);
+  border: 1px solid rgba(231, 233, 241, .95);
+  border-radius: 18px;
+  box-shadow: 0 10px 28px rgba(16, 22, 48, .06);
   display: flex;
   flex-direction: column;
-  padding: 28px 24px;
+  min-height: 510px;
+  padding: 26px 22px 22px;
   position: relative;
-  transition: .18s;
+  transition: border-color .18s ease, box-shadow .18s ease, transform .18s ease;
 }
 
 .replo-source-home .tier.best {
-  border: 1.5px solid #f43f5e;
-  box-shadow: 0 18px 44px rgba(190, 18, 60, .12);
+  background:
+    radial-gradient(circle at 82% 0%, rgba(120, 100, 255, .22), transparent 34%),
+    linear-gradient(180deg, #fbfaff 0%, #f2efff 100%);
+  border: 1.5px solid var(--violet-600);
+  box-shadow: 0 22px 58px rgba(91, 71, 224, .20);
+}
+
+.replo-source-home .tier-head {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  min-height: 88px;
 }
 
 .replo-source-home .tier-limited {
   align-items: center;
   align-self: flex-start;
-  background: #fff1f2;
-  border: 1px solid #fecdd3;
+  background: rgba(91, 71, 224, .10);
+  border: 1px solid rgba(91, 71, 224, .22);
   border-radius: var(--r-pill);
-  color: #be123c;
+  color: var(--violet-700);
   display: inline-flex;
   flex-wrap: wrap;
-  gap: 6px;
+  gap: 7px;
   line-height: 1.35;
-  margin: 0 0 18px;
   padding: 6px 8px 6px 12px;
   width: fit-content;
 }
 
 .replo-source-home .tier-limited-kicker {
-  color: #be123c;
+  color: var(--violet-700);
   font-size: 12px;
   font-weight: 900;
   letter-spacing: .02em;
 }
 
 .replo-source-home .tier-limited strong {
-  background: #be123c;
+  background: var(--violet-700);
   border-radius: var(--r-pill);
   color: #fff;
   font-size: 11.5px;
@@ -2005,83 +2026,110 @@
   white-space: nowrap;
 }
 
-.replo-source-home .tier-limited-copy {
-  color: #9f1239;
-  font-size: 11.5px;
-  font-weight: 750;
+.replo-source-home .tier-spacer {
+  display: block;
+  min-height: 28px;
+}
+
+.replo-source-home .tier-name-en {
+  color: var(--ink-400);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: .12em;
+  margin-bottom: 5px;
+  text-transform: uppercase;
+}
+
+.replo-source-home .tier.best .tier-name-en {
+  color: var(--violet-600);
+}
+
+.replo-source-home .tier-name {
+  color: var(--ink-900);
+  font-size: 20px;
+  font-weight: 900;
+  letter-spacing: -.01em;
+  line-height: 1.25;
+}
+
+.replo-source-home .tier-price-wrap {
+  margin-top: 14px;
+  min-height: 70px;
 }
 
 .replo-source-home .tier-regular {
   color: var(--ink-400);
   font-size: 13px;
   font-weight: 700;
-  margin: -4px 0 9px;
+  line-height: 1.1;
+  margin-bottom: 8px;
 }
 
 .replo-source-home .tier-regular del {
-  color: var(--ink-500);
-  font-weight: 800;
-}
-
-.replo-source-home .tier-name-en {
   color: var(--ink-400);
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: .1em;
-  margin-bottom: 5px;
-  text-transform: uppercase;
-}
-
-.replo-source-home .tier.best .tier-name-en {
-  color: var(--ink-600);
-}
-
-.replo-source-home .tier-name {
-  color: var(--ink-900);
-  font-size: 19px;
   font-weight: 800;
-  letter-spacing: -.01em;
-  margin-bottom: 14px;
+  text-decoration-color: rgba(134, 141, 166, .8);
+  text-decoration-thickness: 1.5px;
 }
 
 .replo-source-home .tier-price {
+  align-items: baseline;
   color: var(--ink-900);
-  font-size: 25px;
-  font-weight: 900;
-  letter-spacing: -.02em;
+  display: flex;
+  flex-wrap: wrap;
+  font-size: 29px;
+  font-weight: 950;
+  gap: 4px;
+  letter-spacing: -.025em;
   line-height: 1;
+}
+
+.replo-source-home .tier.best .tier-price {
+  color: var(--violet-700);
 }
 
 .replo-source-home .tier-price small {
   color: var(--ink-400);
   font-size: 13px;
-  font-weight: 500;
+  font-weight: 600;
+  letter-spacing: 0;
+}
+
+.replo-source-home .tier-desc {
+  color: var(--ink-500);
+  font-size: 13px;
+  line-height: 1.62;
+  margin: 14px 0 0;
+  min-height: 64px;
+  word-break: keep-all;
 }
 
 .replo-source-home .tier-vol {
-  background: var(--bg);
+  align-self: flex-start;
+  background: var(--bg-2);
+  border: 1px solid var(--line-2);
   border-radius: var(--r-pill);
-  color: var(--ink-500);
+  color: var(--ink-700);
   display: inline-flex;
   font-size: 12px;
-  font-weight: 600;
+  font-weight: 800;
   margin-top: 14px;
-  padding: 5px 12px;
+  padding: 6px 12px;
 }
 
 .replo-source-home .tier.best .tier-vol {
-  background: #f8fafc;
-  color: #111827;
+  background: #fff;
+  border-color: var(--violet-100);
+  color: var(--violet-700);
 }
 
 .replo-source-home .tier-feats {
-  border-top: 1px solid var(--line-2);
+  border-top: 1px solid rgba(231, 233, 241, .88);
   display: flex;
-  flex: 1;
   flex-direction: column;
   gap: 10px;
   list-style: none;
-  margin: 18px 0 0;
+  margin: 18px 0 22px;
   padding: 18px 0 0;
 }
 
@@ -2089,8 +2137,10 @@
   color: var(--ink-700);
   display: flex;
   font-size: 13px;
+  font-weight: 600;
   gap: 8px;
-  line-height: 1.5;
+  line-height: 1.48;
+  word-break: keep-all;
 }
 
 .replo-source-home .tier-feats li svg {
@@ -2100,7 +2150,18 @@
 }
 
 .replo-source-home .tier-cta {
-  margin-top: 20px;
+  margin-top: auto;
+}
+
+.replo-source-home .tier.best .tier-cta.btn-primary {
+  background: var(--violet-600);
+  border-color: var(--violet-600);
+  box-shadow: 0 12px 26px rgba(91, 71, 224, .26);
+}
+
+.replo-source-home .tier.best .tier-cta.btn-primary:hover {
+  background: var(--violet-700);
+  transform: none;
 }
 
 /* 흰색 배경 + 검정 글씨 CTA (이 플랜으로 시작 · 영업팀 문의 · 플랜별 기능 전체 비교) */
@@ -2114,8 +2175,8 @@
 .replo-source-home .tier-cta.btn-ghost:hover,
 .replo-source-home .matrix-toggle .btn-ghost:hover {
   background: #fff;
-  border-color: var(--ink-900);
-  color: var(--ink-900);
+  border-color: var(--violet-300);
+  color: var(--violet-700);
 }
 
 .replo-source-home .matrix-toggle {

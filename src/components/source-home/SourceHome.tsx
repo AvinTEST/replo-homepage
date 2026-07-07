@@ -627,8 +627,8 @@ function LandingPricing() {
   const pricing = homeCopy.pricing;
 
   return (
-    <section className="sec-tight" style={{ background: "var(--bg)" }} id="pricing-sec">
-      <div className="deco"><div className="deco-grid mask-top" /></div>
+    <section className="sec-tight pricing-section" id="pricing-sec">
+      <div className="deco"><div className="deco-grid mask-top pricing-grid" /></div>
       <div className="wrap">
         <div className="sec-head sec-center" style={{ marginBottom: 36 }}>
           <span className="eyebrow-pill">{pricing.eyebrow}</span>
@@ -638,27 +638,32 @@ function LandingPricing() {
         <div className="pricing4">
           {pricing.plans.map(({ en, ko, price, originalPrice, volume, best, badge, deadline, description, features }) => (
             <div className={`tier${best ? " best" : ""}`} key={en}>
-              {badge ? (
-                <div className="tier-limited" aria-label={`${badge} ${deadline ?? ""}`.trim()}>
-                  <span className="tier-limited-kicker">{badge}</span>
-                  {deadline ? <strong>{deadline}</strong> : null}
-                  <span className="tier-limited-copy">200건 도입 혜택</span>
+              <div className="tier-head">
+                {badge ? (
+                  <div className="tier-limited" aria-label={`${badge} ${deadline ?? ""}`.trim()}>
+                    <span className="tier-limited-kicker">{badge}</span>
+                    {deadline ? <strong>{deadline}</strong> : null}
+                  </div>
+                ) : <span className="tier-spacer" aria-hidden="true" />}
+                <div>
+                  <div className="tier-name-en">{en}</div>
+                  <div className="tier-name">{ko}</div>
                 </div>
-              ) : null}
-              <div className="tier-name-en">{en}</div>
-              <div className="tier-name">{ko}</div>
-              {originalPrice ? <div className="tier-regular">정가 <del>{originalPrice}</del></div> : null}
-              <div className="tier-price">
-                {price}
-                {price.startsWith("₩") ? <small>{pricing.monthlyUnit}</small> : null}
               </div>
+              <div className="tier-price-wrap">
+                {originalPrice ? <div className="tier-regular"><del>{originalPrice}</del></div> : null}
+                <div className="tier-price">
+                  {price}
+                  {price.startsWith("₩") ? <small>{pricing.monthlyUnit}</small> : null}
+                </div>
+              </div>
+              <p className="tier-desc">{description}</p>
               <span className="tier-vol">{volume}</span>
-              <p style={{ fontSize: 12.5, color: "var(--ink-400)", lineHeight: 1.55, margin: "14px 0 0", wordBreak: "keep-all", minHeight: 54 }}>{description}</p>
               <ul className="tier-feats">
                 {features.map((feature) => <li key={feature}><Icon name="check" size={15} stroke={2.3} />{feature}</li>)}
               </ul>
               <ButtonLink size="sm" variant={best ? "primary" : "ghost"} className="btn-block tier-cta">
-                {en === "Enterprise" ? pricing.enterpriseCta : pricing.standardCta}
+                {en === "Enterprise" ? pricing.enterpriseCta : best ? pricing.launchCta : pricing.standardCta}
               </ButtonLink>
             </div>
           ))}
