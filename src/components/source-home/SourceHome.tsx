@@ -655,14 +655,14 @@ function LandingPricing() {
             <div className={`tier${best ? " best" : ""}`} key={en}>
               <div className="tier-head">
                 <div>
+                  {badge ? (
+                    <div className="tier-limited" aria-label={`${badge} ${deadline ?? ""}`.trim()}>
+                      {badge}{deadline ? ` ${deadline}` : ""}
+                    </div>
+                  ) : null}
                   <div className="tier-name-en">{en}</div>
                   <div className="tier-name">{ko}</div>
                 </div>
-                {badge ? (
-                  <div className="tier-limited" aria-label={`${badge} ${deadline ?? ""}`.trim()}>
-                    {badge}{deadline ? ` · ${deadline}` : ""}
-                  </div>
-                ) : null}
               </div>
               <div className="tier-price-wrap">
                 {originalPrice ? <div className="tier-regular"><del>{originalPrice}</del></div> : null}

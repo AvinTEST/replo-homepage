@@ -2068,11 +2068,9 @@
 .replo-source-home .tier-head {
   align-items: flex-start;
   display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  gap: 10px 12px;
-  justify-content: space-between;
-  min-height: 54px;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 74px;
 }
 
 .replo-source-home .tier-limited {
@@ -2091,9 +2089,9 @@
   line-height: 1.35;
   padding: 8px 12px;
   white-space: nowrap;
+  margin-bottom: 9px;
   width: fit-content;
 }
-
 
 .replo-source-home .tier-name-en {
   color: var(--ink-400);
@@ -2181,11 +2179,6 @@
   padding: 6px 12px;
 }
 
-.replo-source-home .tier.best .tier-vol {
-  background: #fff;
-  border-color: var(--violet-100);
-  color: var(--violet-700);
-}
 
 .replo-source-home .tier-feats {
   border-top: 1px solid rgba(231, 233, 241, .88);
