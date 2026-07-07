@@ -1999,10 +1999,10 @@
 .replo-source-home .tier-limited {
   align-items: center;
   align-self: flex-start;
-  background: #be123c;
-  border: 1px solid #fb7185;
+  background: linear-gradient(135deg, #6D5DF6 0%, #4F46E5 100%);
+  border: 1px solid rgba(255, 255, 255, .35);
   border-radius: var(--r-pill);
-  box-shadow: 0 10px 24px rgba(190, 18, 60, .24);
+  box-shadow: 0 12px 28px rgba(109, 93, 246, .28);
   color: #fff;
   display: inline-flex;
   flex-wrap: wrap;
@@ -2023,9 +2023,10 @@
 }
 
 .replo-source-home .tier-limited strong {
-  background: #fff;
+  background: rgba(255, 255, 255, .18);
+  border: 1px solid rgba(255, 255, 255, .25);
   border-radius: var(--r-pill);
-  color: #be123c;
+  color: #fff;
   font-size: 11.5px;
   font-weight: 900;
   padding: 4px 8px;
