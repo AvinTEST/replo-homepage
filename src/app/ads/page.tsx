@@ -740,25 +740,6 @@ const styles = `
 }
 .ads-inc-more svg { width: 16px; height: 16px; stroke-width: 2.4; }
 .ads-inc li.lead .ads-inc-more { display: none; }
-.ads-inccard .ads-cta { margin-top: 16px; }
-.ads-inccard .note {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  min-height: 52px;
-  margin: 14px 0 0;
-  padding: 12px 14px;
-  border-radius: 17px;
-  background: rgba(248,247,255,.78);
-  border: 1px solid rgba(109,93,246,.14);
-  color: var(--ink);
-  font-size: 13px;
-  font-weight: 850;
-  line-height: 1.35;
-  text-align: center;
-}
-.ads-inccard .note svg { width: 18px; height: 18px; color: rgba(109,93,246,.76); flex: 0 0 auto; }
 @media (max-width: 380px) {
   .ads-inccard { padding-left: 14px; padding-right: 14px; }
   .ads-inc li.lead { grid-template-columns: 112px 1fr; padding: 18px 14px; }
@@ -1135,8 +1116,6 @@ export default function AdsLandingPage({ searchParams }: { searchParams: SearchP
               </li>
             ))}
           </ul>
-          <p className="note">{IconShield}<span>상담 후 계약 여부를 결정하셔도 됩니다.</span></p>
-          <a className="ads-cta" href={contactHref}>무료 운영 진단 받기{IconArrow}</a>
         </div>
 
         <PlanTiers contactHref={contactHref} />
