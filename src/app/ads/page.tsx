@@ -384,7 +384,7 @@ const styles = `
   margin-bottom: 3px;
 }
 .ads-fragment-copy {
-  margin: 18px 2px 0;
+  margin: 0 2px 18px;
   color: var(--ink);
   font-size: 21px;
   font-weight: 900;
@@ -393,40 +393,6 @@ const styles = `
   word-break: keep-all;
 }
 .ads-fragment-copy strong { color: var(--ink); }
-.ads-time-result {
-  margin-top: 18px;
-  display: grid;
-  gap: 6px;
-  border-radius: 18px;
-  padding: 16px;
-  background: rgba(255,255,255,.72);
-  border: 1px solid rgba(233,235,244,.92);
-}
-.ads-time-result span {
-  color: var(--muted);
-  display: block;
-  font-size: 12.5px;
-  font-weight: 800;
-  line-height: 1.35;
-}
-.ads-time-result strong {
-  color: var(--ink);
-  display: block;
-  font-size: 22px;
-  font-weight: 950;
-  letter-spacing: -0.05em;
-  line-height: 1.24;
-}
-.ads-time-result strong em {
-  color: var(--brand-deep);
-  font-style: normal;
-}
-.ads-time-result small {
-  color: #667085;
-  font-size: 11.5px;
-  font-weight: 750;
-  line-height: 1.35;
-}
 .ads-burden-foot {
   display: flex;
   align-items: center;
@@ -442,10 +408,6 @@ const styles = `
   line-height: 1.42;
 }
 .ads-burden-foot svg { width: 15px; height: 15px; flex: 0 0 auto; color: rgba(109,93,246,.78); }
-
-@media (max-width: 380px) {
-  .ads-time-result strong { font-size: 20px; }
-}
 
 /* ============ 3. Comparison ============ */
 .ads-compare { position: relative; display: grid; gap: 16px; }
@@ -967,19 +929,12 @@ export default function AdsLandingPage({ searchParams }: { searchParams: SearchP
       <section className="ads-band ads-band--lav" aria-labelledby="ads-problem-title">
         <div className="ads-burden" aria-label="대표님의 하루가 반복 CS로 쪼개지는 상황">
           <span className="ads-burden-label">{IconRepeat}혹시 이런 하루, 익숙하신가요?</span>
+          <h3 className="ads-fragment-copy" id="ads-problem-title">작은 문의들이 반복되면<br /><strong>대표님의 하루는 계속 쪼개집니다.</strong></h3>
 
           <div className="ads-interruptions">
             <div className="ads-interrupt"><span className="ic">{IconBolt}</span><p><span>광고를 보려는데</span>배송 문의가 들어옵니다.</p></div>
             <div className="ads-interrupt"><span className="ic">{IconDoc}</span><p><span>상품을 개선하려는데</span>교환 문의를 확인합니다.</p></div>
             <div className="ads-interrupt"><span className="ic">{IconChart}</span><p><span>매출을 봐야 하는데</span>환불 가능 여부를 판단합니다.</p></div>
-          </div>
-
-          <h3 className="ads-fragment-copy" id="ads-problem-title">작은 문의들이 반복되면<br /><strong>대표님의 하루는 계속 쪼개집니다.</strong></h3>
-
-          <div className="ads-time-result" aria-label="하루 3시간이 쌓이면 한 달 약 7.5일입니다">
-            <span>하루 3시간만 쌓여도</span>
-            <strong>한 달이면 <em>약 7.5일</em>입니다.</strong>
-            <small>20영업일 기준 월 60시간</small>
           </div>
 
           <p className="ads-burden-foot">{IconBot}<span>Replo는 반복 문의를 운영 기준으로 정리해, 대표님의 시간을 다시 확보합니다.</span></p>
