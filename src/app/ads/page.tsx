@@ -325,22 +325,22 @@ const styles = `
   border-radius: 24px;
   padding: 22px 18px 18px;
   background:
-    radial-gradient(circle at 84% 0%, rgba(109, 93, 246, .07), transparent 34%),
+    radial-gradient(circle at 84% 0%, rgba(109, 93, 246, .04), transparent 34%),
     linear-gradient(180deg, rgba(255, 255, 255, .98), rgba(248, 247, 252, .96));
   border: 1px solid rgba(228, 224, 248, .9);
-  box-shadow: 0 14px 34px rgba(17, 24, 39, .08), inset 0 1px 0 rgba(255,255,255,.9);
+  box-shadow: 0 12px 28px rgba(17, 24, 39, .06), inset 0 1px 0 rgba(255,255,255,.9);
   overflow: hidden;
 }
 .ads-burden-label {
   display: inline-flex;
   align-items: center;
   gap: 7px;
-  color: var(--brand-deep);
+  color: #475467;
   font-size: 12px;
-  font-weight: 850;
+  font-weight: 800;
   margin-bottom: 12px;
 }
-.ads-burden-label svg { width: 14px; height: 14px; }
+.ads-burden-label svg { width: 14px; height: 14px; color: rgba(109,93,246,.78); }
 .ads-interruptions {
   display: grid;
   gap: 10px;
@@ -352,9 +352,9 @@ const styles = `
   align-items: start;
   padding: 13px 14px;
   border-radius: 17px;
-  background: rgba(255,255,255,.86);
-  border: 1px solid rgba(238,235,251,.94);
-  box-shadow: 0 8px 20px rgba(17,24,39,.04), inset 0 1px 0 rgba(255,255,255,.86);
+  background: rgba(255,255,255,.72);
+  border: 1px solid rgba(233,235,244,.92);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.86);
 }
 .ads-interrupt .ic {
   width: 34px;
@@ -362,18 +362,15 @@ const styles = `
   border-radius: 12px;
   display: grid;
   place-items: center;
-  background: var(--brand-soft);
-  color: var(--brand);
+  background: rgba(109,93,246,.06);
+  color: rgba(91,75,232,.82);
   border: 1px solid rgba(109,93,246,.10);
 }
-.ads-interrupt:nth-child(1) .ic { background: var(--accent-blue-soft); color: var(--accent-blue); border-color: rgba(52,120,246,.14); }
-.ads-interrupt:nth-child(2) .ic { background: var(--accent-amber-soft); color: var(--accent-amber); border-color: rgba(217,145,27,.16); }
-.ads-interrupt:nth-child(3) .ic { background: var(--accent-teal-soft); color: var(--accent-teal); border-color: rgba(15,159,143,.14); }
 .ads-interrupt .ic svg { width: 17px; height: 17px; }
 .ads-interrupt p {
   color: #1F2937;
-  font-size: 15px;
-  font-weight: 820;
+  font-size: 14.5px;
+  font-weight: 780;
   letter-spacing: -0.025em;
   line-height: 1.45;
   margin: 0;
@@ -395,17 +392,15 @@ const styles = `
   line-height: 1.44;
   word-break: keep-all;
 }
-.ads-fragment-copy strong { color: var(--brand-deep); }
+.ads-fragment-copy strong { color: var(--ink); }
 .ads-time-result {
   margin-top: 18px;
   display: grid;
   gap: 6px;
   border-radius: 18px;
   padding: 16px;
-  background:
-    radial-gradient(circle at 92% 0%, rgba(109,93,246,.10), transparent 42%),
-    rgba(109,93,246,.06);
-  border: 1px solid rgba(109,93,246,.12);
+  background: rgba(255,255,255,.72);
+  border: 1px solid rgba(233,235,244,.92);
 }
 .ads-time-result span {
   color: var(--muted);
@@ -415,12 +410,16 @@ const styles = `
   line-height: 1.35;
 }
 .ads-time-result strong {
-  color: var(--brand-deep);
+  color: var(--ink);
   display: block;
-  font-size: 23px;
+  font-size: 22px;
   font-weight: 950;
   letter-spacing: -0.05em;
   line-height: 1.24;
+}
+.ads-time-result strong em {
+  color: var(--brand-deep);
+  font-style: normal;
 }
 .ads-time-result small {
   color: #667085;
@@ -435,14 +434,14 @@ const styles = `
   margin: 16px 0 0;
   padding: 12px 13px;
   border-radius: 15px;
-  background: rgba(109, 93, 246, .08);
-  border: 1px solid rgba(109, 93, 246, .12);
-  color: var(--brand-deep);
+  background: rgba(248, 249, 252, .86);
+  border: 1px solid rgba(233,235,244,.94);
+  color: #475467;
   font-size: 12.5px;
   font-weight: 800;
   line-height: 1.42;
 }
-.ads-burden-foot svg { width: 15px; height: 15px; flex: 0 0 auto; }
+.ads-burden-foot svg { width: 15px; height: 15px; flex: 0 0 auto; color: rgba(109,93,246,.78); }
 
 @media (max-width: 380px) {
   .ads-time-result strong { font-size: 20px; }
@@ -979,7 +978,7 @@ export default function AdsLandingPage({ searchParams }: { searchParams: SearchP
 
           <div className="ads-time-result" aria-label="하루 3시간이 쌓이면 한 달 약 7.5일입니다">
             <span>하루 3시간만 쌓여도</span>
-            <strong>한 달이면 약 7.5일입니다.</strong>
+            <strong>한 달이면 <em>약 7.5일</em>입니다.</strong>
             <small>20영업일 기준 월 60시간</small>
           </div>
 
