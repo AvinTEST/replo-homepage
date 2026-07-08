@@ -194,20 +194,21 @@ const styles = `
   gap: 8px;
   padding: 9px 12px;
   border-radius: 14px;
-  background: rgba(255, 255, 255, 0.78);
-  border: 1px solid rgba(228, 224, 248, 0.9);
-  box-shadow: 0 14px 30px rgba(17, 24, 39, 0.08), inset 0 1px 0 rgba(255,255,255,.8);
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
+  background: rgba(255, 255, 255, 0.48);
+  border: 1px solid rgba(228, 224, 248, 0.52);
+  box-shadow: 0 10px 22px rgba(17, 24, 39, 0.035), inset 0 1px 0 rgba(255,255,255,.62);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
   font-size: 11.5px;
-  font-weight: 700;
-  color: #4B5563;
+  font-weight: 650;
+  color: rgba(75, 85, 99, 0.52);
+  opacity: 0.62;
   pointer-events: none;
 }
 .ads-float .ic {
   width: 22px; height: 22px; border-radius: 7px;
   display: grid; place-items: center;
-  background: var(--brand-soft); color: var(--brand);
+  background: rgba(109, 93, 246, 0.055); color: rgba(109, 93, 246, 0.46);
 }
 .ads-float .ic svg { width: 13px; height: 13px; }
 
