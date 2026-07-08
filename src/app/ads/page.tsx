@@ -314,52 +314,157 @@ const styles = `
 }
 
 /* ============ 2. Problem ============ */
-.ads-flood {
+.ads-daymap {
   position: relative;
-  border-radius: 22px;
-  padding: 20px 18px 18px;
+  border-radius: 24px;
+  padding: 18px;
   background:
-    radial-gradient(110% 76% at 20% 0%, rgba(124, 107, 255, 0.16), transparent 62%),
-    linear-gradient(165deg, #242238 0%, #19172A 100%);
-  box-shadow: 0 18px 38px rgba(17, 24, 39, 0.24);
+    radial-gradient(circle at 86% 0%, rgba(124, 107, 255, .16), transparent 38%),
+    linear-gradient(180deg, rgba(255, 255, 255, .94), rgba(247, 245, 255, .96));
+  border: 1px solid rgba(109, 93, 246, .16);
+  box-shadow: 0 16px 36px rgba(79, 67, 216, .12), inset 0 1px 0 rgba(255,255,255,.9);
   overflow: hidden;
 }
-.ads-flood .fhead {
-  display: flex; align-items: center; gap: 8px;
-  font-size: 12.5px; font-weight: 800; color: #C9C2FF;
-  margin-bottom: 15px;
+.ads-daymap::before {
+  content: "";
+  position: absolute;
+  left: 35px;
+  top: 82px;
+  bottom: 24px;
+  width: 2px;
+  background: linear-gradient(180deg, rgba(109, 93, 246, .36), rgba(109, 93, 246, .08));
+  border-radius: 999px;
 }
-.ads-flood .fhead .pulse {
-  width: 8px; height: 8px; border-radius: 50%; background: #A78BFA;
-  box-shadow: 0 0 0 0 rgba(167, 139, 250, 0.5);
-  animation: adspulse 1.8s ease-out infinite;
+.ads-daytop {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 12px;
+  align-items: start;
+  margin-bottom: 16px;
+  position: relative;
+  z-index: 1;
 }
-@keyframes adspulse {
-  0% { box-shadow: 0 0 0 0 rgba(167, 139, 250, 0.45); }
-  100% { box-shadow: 0 0 0 9px rgba(167, 139, 250, 0); }
+.ads-daylabel {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--brand-deep);
+  font-size: 12px;
+  font-weight: 850;
+  margin-bottom: 6px;
 }
-.ads-alerts { display: grid; gap: 9px; }
-.ads-alert {
-  display: flex; align-items: center; gap: 11px;
-  background: rgba(255, 255, 255, 0.07);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 13px; padding: 11px 13px;
+.ads-daylabel svg { width: 14px; height: 14px; }
+.ads-daytop h3 {
+  margin: 0;
+  color: var(--ink);
+  font-size: 18px;
+  font-weight: 850;
+  letter-spacing: -0.03em;
+  line-height: 1.36;
 }
-.ads-alert .ai {
-  width: 30px; height: 30px; border-radius: 9px; flex: 0 0 auto;
-  display: grid; place-items: center;
-  background: rgba(122, 107, 255, 0.22); color: #B7ACFF;
+.ads-daymetric {
+  min-width: 82px;
+  border-radius: 17px;
+  padding: 10px 12px;
+  text-align: right;
+  background: #fff;
+  border: 1px solid rgba(228, 224, 248, .9);
+  box-shadow: 0 10px 22px rgba(17, 24, 39, .06);
 }
-.ads-alert .ai svg { width: 16px; height: 16px; }
-.ads-alert p { margin: 0; font-size: 14px; font-weight: 600; color: #EDEBF7; flex: 1; }
-.ads-alert .cnt {
-  font-size: 11px; font-weight: 800; color: #fff;
-  background: rgba(255,255,255,.14); border: 1px solid rgba(255,255,255,.14); border-radius: 999px; padding: 2px 8px; flex: 0 0 auto;
+.ads-daymetric b {
+  display: block;
+  color: var(--brand-deep);
+  font-size: 24px;
+  font-weight: 900;
+  letter-spacing: -0.045em;
+  line-height: 1;
 }
-.ads-flood .fnote {
-  margin: 15px 0 0; font-size: 13px; font-weight: 600; color: #A79FD6;
-  display: flex; align-items: center; gap: 7px;
+.ads-daymetric span {
+  display: block;
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 10.5px;
+  font-weight: 800;
+  white-space: nowrap;
 }
+.ads-dayrows {
+  display: grid;
+  gap: 10px;
+  position: relative;
+  z-index: 1;
+}
+.ads-dayrow {
+  display: grid;
+  grid-template-columns: 44px 1fr;
+  gap: 12px;
+  align-items: center;
+}
+.ads-daytime {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  min-height: 38px;
+  border-radius: 13px;
+  background: #fff;
+  border: 1px solid rgba(109, 93, 246, .16);
+  color: var(--brand-deep);
+  font-size: 11px;
+  font-weight: 850;
+  box-shadow: 0 6px 16px rgba(79, 67, 216, .10);
+}
+.ads-daytask {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 54px;
+  padding: 11px 13px;
+  border-radius: 16px;
+  background: rgba(255,255,255,.84);
+  border: 1px solid rgba(238, 235, 251, .94);
+}
+.ads-daytask .ic {
+  width: 30px;
+  height: 30px;
+  border-radius: 10px;
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  color: var(--brand);
+  background: rgba(243, 241, 255, .94);
+}
+.ads-daytask .ic svg { width: 16px; height: 16px; }
+.ads-daytask p {
+  margin: 0;
+  color: #374151;
+  font-size: 13.5px;
+  font-weight: 750;
+  line-height: 1.38;
+}
+.ads-daytask p span {
+  display: block;
+  color: var(--muted);
+  font-size: 11.5px;
+  font-weight: 650;
+  margin-top: 2px;
+}
+.ads-dayfoot {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 14px 0 0;
+  padding: 12px 13px;
+  border-radius: 15px;
+  background: rgba(109, 93, 246, .08);
+  border: 1px solid rgba(109, 93, 246, .12);
+  color: var(--brand-deep);
+  font-size: 12.5px;
+  font-weight: 800;
+  line-height: 1.42;
+}
+.ads-dayfoot svg { width: 15px; height: 15px; flex: 0 0 auto; }
 .ads-problem-line {
   margin: 22px 2px 0; text-align: center;
   font-size: 20px; line-height: 1.5; font-weight: 800; letter-spacing: -0.03em;
@@ -480,10 +585,12 @@ const styles = `
 }
 .ads-inccard > * { position: relative; }
 .ads-inccard .cap {
-  display: inline-flex; align-items: center; gap: 6px;
-  font-size: 13px; font-weight: 800; color: var(--brand-deep);
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  max-width: 100%;
+  white-space: nowrap;
+  font-size: 12.5px; font-weight: 800; color: var(--brand-deep);
   background: var(--brand-soft); border: 1px solid var(--border);
-  padding: 6px 14px; border-radius: 999px; margin-bottom: 18px;
+  padding: 7px 12px; border-radius: 999px; margin-bottom: 18px;
 }
 .ads-inc { list-style: none; margin: 0; padding: 0; display: grid; gap: 11px; }
 .ads-inc li {
@@ -500,6 +607,8 @@ const styles = `
 .ads-inc li .ck svg { width: 16px; height: 16px; }
 .ads-inc li.lead { border-color: rgba(109,93,246,.42); background: linear-gradient(120deg, #fff, #F6F3FF); }
 .ads-inc li.lead .ck { background: var(--brand); color: #fff; }
+.ads-inccard .cap svg { width: 13px; height: 13px; flex: 0 0 auto; }
+.ads-inccard .cap span { overflow: hidden; text-overflow: ellipsis; }
 .ads-inccard .vol {
   display: inline-flex; align-items: center; gap: 6px;
   font-size: 12.5px; font-weight: 700; color: var(--muted);
@@ -632,7 +741,6 @@ const styles = `
   .ads-wrap, .ads-band, .ads-hero, .ads-final { padding-left: 16px; padding-right: 16px; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .ads-flood .fhead .pulse { animation: none; }
   .ads-cta { transition: none; }
 }
 `;
@@ -778,14 +886,32 @@ export default function AdsLandingPage({ searchParams }: { searchParams: SearchP
           <span className="hl">성장할 시간</span>이 사라집니다.
         </h2>
 
-        <div className="ads-flood">
-          <div className="fhead"><span className="pulse" />문의 폭주 · 실시간</div>
-          <div className="ads-alerts">
-            <div className="ads-alert"><span className="ai">{IconChat}</span><p>교환 문의요</p><span className="cnt">98</span></div>
-            <div className="ads-alert"><span className="ai">{IconTruck}</span><p>배송 언제 되나요?</p><span className="cnt">112</span></div>
-            <div className="ads-alert"><span className="ai">{IconRefund}</span><p>환불 가능한가요?</p><span className="cnt">76</span></div>
+        <div className="ads-daymap" aria-label="대표가 직접 처리하는 하루 CS 업무 흐름">
+          <div className="ads-daytop">
+            <div>
+              <span className="ads-daylabel">{IconRepeat}반복되는 CS 루틴</span>
+              <h3>문의는 흩어지고,<br />대표님의 하루는 쪼개집니다.</h3>
+            </div>
+            <div className="ads-daymetric">
+              <b>286</b>
+              <span>누적 문의</span>
+            </div>
           </div>
-          <p className="fnote">{IconRepeat}<span>같은 문의를 매번 대표님이 직접 답변합니다.</span></p>
+          <div className="ads-dayrows">
+            <div className="ads-dayrow">
+              <span className="ads-daytime">09:40</span>
+              <div className="ads-daytask"><span className="ic">{IconTruck}</span><p>배송 일정 확인<span>송장 · 출고 상태 반복 확인</span></p></div>
+            </div>
+            <div className="ads-dayrow">
+              <span className="ads-daytime">13:20</span>
+              <div className="ads-daytask"><span className="ic">{IconRefund}</span><p>교환·환불 기준 답변<span>상황별 기준이 매번 달라짐</span></p></div>
+            </div>
+            <div className="ads-dayrow">
+              <span className="ads-daytime">17:50</span>
+              <div className="ads-daytask"><span className="ic">{IconChat}</span><p>게시판·DM 문의 마감<span>판매 업무보다 답변이 먼저</span></p></div>
+            </div>
+          </div>
+          <p className="ads-dayfoot">{IconBot}<span>반복 문의를 운영 기준으로 정리하지 않으면, 같은 답변이 매일 다시 쌓입니다.</span></p>
         </div>
 
         <p className="ads-problem-line">
@@ -856,7 +982,7 @@ export default function AdsLandingPage({ searchParams }: { searchParams: SearchP
           <span className="hl">월 59만원</span>에<br />포함되는 것
         </h2>
         <div className="ads-inccard">
-          <span className="cap">{IconSpark}7월 한정 · 월 59만원</span>
+          <span className="cap">{IconSpark}<span>7월 한정 월 59만원</span></span>
           <p className="vol">{IconHeadset}월 상담 200건 기준 · 상담 응대 포함</p>
           <ul className="ads-inc">
             {included.map((it) => (
