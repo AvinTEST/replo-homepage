@@ -367,124 +367,131 @@ const styles = `
   letter-spacing: -0.03em;
   line-height: 1.36;
 }
-.ads-timecore {
+.ads-workcore {
   flex: 0 0 auto;
   width: 92px;
-  height: 92px;
-  border-radius: 50%;
+  min-height: 92px;
+  border-radius: 22px;
   display: grid;
   place-items: center;
-  background:
-    radial-gradient(circle at 50% 50%, #fff 0 49%, transparent 50%),
-    conic-gradient(var(--accent-teal) 0 78%, rgba(15, 159, 143, .14) 78% 100%);
-  box-shadow: 0 12px 26px rgba(79, 67, 216, .13), inset 0 1px 0 rgba(255,255,255,.9);
+  text-align: center;
+  background: linear-gradient(160deg, #fff, var(--accent-teal-soft));
+  border: 1px solid rgba(15, 159, 143, .18);
+  box-shadow: 0 12px 26px rgba(15, 159, 143, .12), inset 0 1px 0 rgba(255,255,255,.9);
 }
-.ads-timecore b {
+.ads-workcore b {
   display: block;
   color: var(--accent-teal);
-  font-size: 25px;
-  font-weight: 900;
-  letter-spacing: -0.045em;
+  font-size: 27px;
+  font-weight: 950;
+  letter-spacing: -0.055em;
   line-height: 1;
 }
-.ads-timecore span {
+.ads-workcore span {
   display: block;
-  margin-top: 3px;
+  margin-top: 5px;
   color: var(--muted);
   font-size: 10px;
-  font-weight: 800;
-  text-align: center;
+  font-weight: 850;
+  line-height: 1.25;
 }
-.ads-timebreakdown {
+.ads-workdays {
   display: grid;
-  gap: 11px;
+  gap: 12px;
   margin-top: 18px;
   position: relative;
   z-index: 1;
 }
-.ads-timeitem {
-  display: grid;
-  grid-template-columns: 34px 1fr 48px;
-  align-items: center;
-  gap: 10px;
-}
-.ads-timeitem .ic {
-  width: 34px;
-  height: 34px;
-  border-radius: 12px;
-  display: grid;
-  place-items: center;
-  background: rgba(243, 241, 255, .94);
-  color: var(--brand);
-  border: 1px solid rgba(109, 93, 246, .10);
-}
-.ads-timeitem:nth-child(1) .ic { background: var(--accent-blue-soft); color: var(--accent-blue); border-color: rgba(52, 120, 246, .14); }
-.ads-timeitem:nth-child(2) .ic { background: var(--accent-amber-soft); color: var(--accent-amber); border-color: rgba(217, 145, 27, .16); }
-.ads-timeitem:nth-child(3) .ic { background: var(--accent-teal-soft); color: var(--accent-teal); border-color: rgba(15, 159, 143, .14); }
-.ads-timeitem .ic svg { width: 17px; height: 17px; }
-.ads-timetrack {
-  min-width: 0;
-}
-.ads-timetrack p {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  margin: 0 0 6px;
-  color: #374151;
-  font-size: 13px;
-  font-weight: 800;
-}
-.ads-timetrack p small {
-  color: var(--muted);
-  font-size: 10.5px;
-  font-weight: 750;
-  white-space: nowrap;
-}
-.ads-timemeter {
-  height: 8px;
-  border-radius: 999px;
-  background: rgba(109, 93, 246, .10);
-  overflow: hidden;
-}
-.ads-timemeter span {
-  display: block;
-  height: 100%;
-  border-radius: inherit;
-  background: linear-gradient(90deg, rgba(109, 93, 246, .55), var(--brand));
-}
-.ads-timeitem:nth-child(1) .ads-timemeter span { background: linear-gradient(90deg, rgba(52,120,246,.46), var(--accent-blue)); }
-.ads-timeitem:nth-child(2) .ads-timemeter span { background: linear-gradient(90deg, rgba(217,145,27,.42), var(--accent-amber)); }
-.ads-timeitem:nth-child(3) .ads-timemeter span { background: linear-gradient(90deg, rgba(15,159,143,.42), var(--accent-teal)); }
-.ads-timevalue {
-  min-width: 42px;
-  text-align: right;
-  color: var(--brand-deep);
-  font-size: 13.5px;
-  font-weight: 900;
-}
-.ads-timesummary {
+.ads-workdays-head {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 8px;
-  margin-top: 14px;
-  position: relative;
-  z-index: 1;
 }
-.ads-timesummary span {
-  border-radius: 13px;
-  padding: 10px 11px;
-  background: rgba(255,255,255,.82);
+.ads-workdays-head span {
+  border-radius: 15px;
+  padding: 11px 12px;
+  background: rgba(255,255,255,.84);
   border: 1px solid rgba(238,235,251,.92);
   color: #374151;
   font-size: 12px;
   font-weight: 800;
   line-height: 1.35;
 }
-.ads-timesummary b {
+.ads-workdays-head b {
   color: var(--accent-teal);
-  font-size: 15px;
+  font-size: 18px;
+  font-weight: 950;
+}
+.ads-workcalendar {
+  border-radius: 18px;
+  padding: 14px;
+  background: rgba(255,255,255,.86);
+  border: 1px solid rgba(238,235,251,.94);
+  box-shadow: 0 8px 20px rgba(17,24,39,.045), inset 0 1px 0 rgba(255,255,255,.86);
+}
+.ads-workcalendar-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.ads-workcalendar-top strong {
+  color: var(--ink);
+  font-size: 13px;
   font-weight: 900;
+  line-height: 1.35;
+  word-break: keep-all;
+}
+.ads-workcalendar-top small {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 750;
+}
+.ads-workblocks {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+.ads-workblock {
+  min-height: 46px;
+  border-radius: 13px;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(160deg, var(--accent-teal-soft), #fff);
+  border: 1px solid rgba(15, 159, 143, .18);
+  color: var(--accent-teal);
+  font-size: 11px;
+  font-weight: 900;
+}
+.ads-workblock.partial {
+  background:
+    linear-gradient(90deg, var(--accent-teal-soft) 0 50%, rgba(255,255,255,.9) 50% 100%);
+}
+.ads-worksplit {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 8px;
+}
+.ads-worksplit span {
+  min-height: 58px;
+  border-radius: 15px;
+  padding: 10px;
+  background: rgba(255,255,255,.78);
+  border: 1px solid rgba(238,235,251,.92);
+  color: #374151;
+  font-size: 11.5px;
+  font-weight: 800;
+  line-height: 1.35;
+}
+.ads-worksplit span:nth-child(1) b { color: var(--accent-blue); }
+.ads-worksplit span:nth-child(2) b { color: var(--accent-amber); }
+.ads-worksplit span:nth-child(3) b { color: var(--accent-teal); }
+.ads-worksplit b {
+  display: block;
+  font-size: 15px;
+  font-weight: 950;
+  margin-bottom: 3px;
 }
 .ads-burden-foot {
   position: relative;
@@ -492,7 +499,7 @@ const styles = `
   display: flex;
   align-items: center;
   gap: 8px;
-  margin: 16px 0 0;
+  margin: 14px 0 0;
   padding: 12px 13px;
   border-radius: 15px;
   background: rgba(109, 93, 246, .08);
@@ -1040,16 +1047,25 @@ export default function AdsLandingPage({ searchParams }: { searchParams: SearchP
               <span className="ads-burden-label">{IconRepeat}하루 CS 소요 시간</span>
               <h3>CS로 매일 평균<br />3시간이 소요되고 있습니다.</h3>
             </div>
-            <div className="ads-timecore"><div><b>3h</b><span>일 평균</span></div></div>
+            <div className="ads-workcore"><div><b>3h</b><span>매일<br />소요</span></div></div>
           </div>
-          <div className="ads-timesummary">
-            <span><b>15h</b><br />주간 누적</span>
-            <span><b>60h</b><br />월간 누적</span>
-          </div>
-          <div className="ads-timebreakdown">
-            <div className="ads-timeitem"><span className="ic">{IconChat}</span><div className="ads-timetrack"><p>문의 답변 작성<small>채팅 · 게시판 · DM</small></p><div className="ads-timemeter"><span style={{ width: "72%" }} /></div></div><span className="ads-timevalue">1.4h</span></div>
-            <div className="ads-timeitem"><span className="ic">{IconTruck}</span><div className="ads-timetrack"><p>주문·배송 확인<small>송장 · 출고 상태</small></p><div className="ads-timemeter"><span style={{ width: "52%" }} /></div></div><span className="ads-timevalue">1.0h</span></div>
-            <div className="ads-timeitem"><span className="ic">{IconRefund}</span><div className="ads-timetrack"><p>교환·환불 판단<small>상황별 기준 확인</small></p><div className="ads-timemeter"><span style={{ width: "32%" }} /></div></div><span className="ads-timevalue">0.6h</span></div>
+          <div className="ads-workdays">
+            <div className="ads-workdays-head">
+              <span><b>약 2일</b><br />주마다 CS에 사용</span>
+              <span><b>7.5일</b><br />월마다 CS만 하는 시간</span>
+            </div>
+            <div className="ads-workcalendar">
+              <div className="ads-workcalendar-top"><strong>월 60시간은 8시간 근무일 기준 7.5일</strong><small>월간 누적</small></div>
+              <div className="ads-workblocks" aria-hidden="true">
+                <span className="ads-workblock">1일</span><span className="ads-workblock">2일</span><span className="ads-workblock">3일</span><span className="ads-workblock">4일</span>
+                <span className="ads-workblock">5일</span><span className="ads-workblock">6일</span><span className="ads-workblock">7일</span><span className="ads-workblock partial">0.5일</span>
+              </div>
+            </div>
+            <div className="ads-worksplit">
+              <span><b>1.4h</b>문의 답변</span>
+              <span><b>1.0h</b>주문·배송 확인</span>
+              <span><b>0.6h</b>교환·환불 판단</span>
+            </div>
           </div>
           <p className="ads-burden-foot">{IconBot}<span>반복 문의를 운영 기준으로 정리하면, 대표님의 시간을 다시 확보할 수 있습니다.</span></p>
         </div>
