@@ -576,35 +576,74 @@ const styles = `
 /* ============ 5. Price includes ============ */
 .ads-inccard {
   position: relative;
-  border-radius: 24px; padding: 24px 20px;
+  border-radius: 26px;
+  padding: 24px 16px 18px;
   background:
-    radial-gradient(circle at 80% 0%, rgba(124,107,255,.13), transparent 38%),
-    linear-gradient(165deg, #ffffff 0%, #F6F3FF 100%);
+    radial-gradient(circle at 86% 6%, rgba(124,107,255,.13), transparent 34%),
+    radial-gradient(circle at 12% 28%, rgba(52,120,246,.07), transparent 30%),
+    linear-gradient(180deg, rgba(255,255,255,.98), rgba(249,247,255,.96));
   border: 1px solid rgba(109, 93, 246, 0.18);
-  box-shadow: 0 16px 36px rgba(79, 67, 216, 0.12), inset 0 1px 0 rgba(255,255,255,.82);
+  box-shadow: 0 18px 42px rgba(79, 67, 216, 0.12), inset 0 1px 0 rgba(255,255,255,.88);
   overflow: hidden;
 }
-.ads-inccard::after {
-  content: ""; position: absolute; width: 160px; height: 160px; left: -50px; bottom: -60px;
-  background: radial-gradient(circle, rgba(122, 107, 255, 0.16), transparent 70%);
+.ads-inccard::before {
+  content: "";
+  position: absolute;
+  right: -58px;
+  top: -54px;
+  width: 178px;
+  height: 178px;
+  border: 1px solid rgba(109,93,246,.12);
+  border-radius: 44% 56% 48% 52%;
+  transform: rotate(-18deg);
 }
-.ads-inccard > * { position: relative; }
-.ads-inccard .cap {
-  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+.ads-inccard::after {
+  content: "";
+  position: absolute;
+  width: 170px;
+  height: 170px;
+  left: -64px;
+  bottom: -70px;
+  background: radial-gradient(circle, rgba(122, 107, 255, 0.13), transparent 70%);
+}
+.ads-inccard > * { position: relative; z-index: 1; }
+.ads-inc-pills {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 18px;
+  flex-wrap: wrap;
+}
+.ads-inccard .cap,
+.ads-inccard .vol {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
   max-width: 100%;
   white-space: nowrap;
-  font-size: 12.5px; font-weight: 800; color: var(--brand-deep);
-  background: var(--brand-soft); border: 1px solid var(--border);
-  padding: 7px 12px; border-radius: 999px; margin-bottom: 14px;
+  border-radius: 999px;
+  padding: 9px 13px;
+  margin: 0;
+  font-size: 12.5px;
+  font-weight: 850;
+  line-height: 1;
 }
-.ads-inccard .cap svg { width: 13px; height: 13px; flex: 0 0 auto; }
-.ads-inccard .cap span { overflow: hidden; text-overflow: ellipsis; }
+.ads-inccard .cap {
+  color: var(--brand-deep);
+  background: rgba(243, 241, 255, .88);
+  border: 1px solid rgba(109,93,246,.18);
+}
 .ads-inccard .vol {
-  display: inline-flex; align-items: center; gap: 6px;
-  font-size: 12.5px; font-weight: 700; color: var(--muted);
-  margin: 0 0 16px;
+  color: #2563B8;
+  background: rgba(238,245,255,.9);
+  border: 1px solid rgba(52,120,246,.16);
 }
-.ads-inccard .vol svg { width: 14px; height: 14px; color: var(--brand); }
+.ads-inccard .cap svg,
+.ads-inccard .vol svg { width: 13px; height: 13px; flex: 0 0 auto; }
+.ads-inccard .cap span,
+.ads-inccard .vol span { overflow: hidden; text-overflow: ellipsis; }
 .ads-inc {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -615,42 +654,119 @@ const styles = `
 }
 .ads-inc li {
   position: relative;
-  min-height: 92px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 13px;
-  border-radius: 16px;
-  background: rgba(255,255,255,.88);
-  border: 1px solid #EEEBFB;
+  min-height: 132px;
+  display: grid;
+  grid-template-columns: 54px 1fr auto;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 12px;
+  border-radius: 18px;
+  background: rgba(255,255,255,.74);
+  border: 1px solid rgba(222,229,242,.92);
   color: #1F2937;
-  font-size: 13.5px;
-  font-weight: 800;
-  line-height: 1.34;
+  box-shadow: 0 8px 18px rgba(17,24,39,.035), inset 0 1px 0 rgba(255,255,255,.82);
 }
 .ads-inc li.lead {
   grid-column: 1 / -1;
-  min-height: 76px;
-  flex-direction: row;
+  min-height: 178px;
+  grid-template-columns: 138px 1fr;
+  gap: 16px;
+  padding: 22px 18px;
+  border-color: rgba(109,93,246,.24);
+  background:
+    radial-gradient(circle at 22% 48%, rgba(109,93,246,.14), transparent 32%),
+    linear-gradient(135deg, rgba(255,255,255,.94), rgba(246,243,255,.88));
+  box-shadow: 0 12px 26px rgba(79,67,216,.10), inset 0 1px 0 rgba(255,255,255,.9);
+}
+.ads-inc .ck {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background:
+    radial-gradient(circle at 30% 25%, rgba(255,255,255,.95), transparent 32%),
+    linear-gradient(145deg, #F6F3FF, #EEF5FF);
+  color: rgba(109,93,246,.82);
+  border: 1px solid rgba(109,93,246,.12);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.8);
+}
+.ads-inc .ck svg { width: 24px; height: 24px; }
+.ads-inc li.lead .ck {
+  width: 122px;
+  height: 122px;
+  border-radius: 34px;
+  color: #fff;
+  background:
+    radial-gradient(circle at 28% 24%, rgba(255,255,255,.55), transparent 22%),
+    linear-gradient(135deg, #B980FF 0%, #6D5DF6 58%, #4E8BFF 100%);
+  border: 1px solid rgba(255,255,255,.56);
+  box-shadow: 0 18px 34px rgba(91,75,232,.22), inset 0 1px 0 rgba(255,255,255,.45);
+}
+.ads-inc li.lead .ck svg { width: 50px; height: 50px; stroke-width: 1.55; }
+.ads-inc-copy { min-width: 0; }
+.ads-inc-copy b {
+  display: block;
+  color: var(--ink);
+  font-size: 15px;
+  font-weight: 900;
+  letter-spacing: -0.035em;
+  line-height: 1.3;
+  word-break: keep-all;
+}
+.ads-inc-copy p {
+  margin: 7px 0 0;
+  color: #5F6676;
+  font-size: 12.5px;
+  font-weight: 650;
+  line-height: 1.52;
+  letter-spacing: -0.025em;
+  word-break: keep-all;
+}
+.ads-inc li.lead .ads-inc-copy b {
+  font-size: 25px;
+  letter-spacing: -0.055em;
+}
+.ads-inc li.lead .ads-inc-copy p {
+  margin-top: 10px;
+  font-size: 14px;
+  line-height: 1.65;
+  color: #4B5563;
+}
+.ads-inc-more {
+  color: rgba(109,93,246,.72);
+  width: 16px;
+  height: 16px;
+}
+.ads-inc-more svg { width: 16px; height: 16px; stroke-width: 2.4; }
+.ads-inc li.lead .ads-inc-more { display: none; }
+.ads-inccard .ads-cta { margin-top: 16px; }
+.ads-inccard .note {
+  display: flex;
   align-items: center;
-  justify-content: flex-start;
-  border-color: rgba(109,93,246,.42);
-  background: linear-gradient(120deg, #fff, #F6F3FF);
+  justify-content: center;
+  gap: 8px;
+  min-height: 52px;
+  margin: 14px 0 0;
+  padding: 12px 14px;
+  border-radius: 17px;
+  background: rgba(248,247,255,.78);
+  border: 1px solid rgba(109,93,246,.14);
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 850;
+  line-height: 1.35;
+  text-align: center;
 }
-.ads-inc li .ck {
-  width: 28px; height: 28px; border-radius: 10px; flex: 0 0 auto;
-  display: grid; place-items: center;
-  background: var(--brand-soft); color: var(--brand);
+.ads-inccard .note svg { width: 18px; height: 18px; color: rgba(109,93,246,.76); flex: 0 0 auto; }
+@media (max-width: 380px) {
+  .ads-inccard { padding-left: 14px; padding-right: 14px; }
+  .ads-inc li.lead { grid-template-columns: 112px 1fr; padding: 18px 14px; }
+  .ads-inc li.lead .ck { width: 100px; height: 100px; border-radius: 28px; }
+  .ads-inc li.lead .ads-inc-copy b { font-size: 22px; }
+  .ads-inc li { grid-template-columns: 1fr auto; align-content: start; min-height: 138px; }
+  .ads-inc li:not(.lead) .ck { width: 46px; height: 46px; grid-column: 1 / -1; }
 }
-.ads-inc li:nth-child(2) .ck { background: var(--accent-teal-soft); color: var(--accent-teal); }
-.ads-inc li:nth-child(3) .ck { background: var(--accent-blue-soft); color: var(--accent-blue); }
-.ads-inc li:nth-child(4) .ck { background: var(--accent-amber-soft); color: var(--accent-amber); }
-.ads-inc li:nth-child(5) .ck { background: var(--brand-soft); color: var(--brand); }
-.ads-inc li .ck svg { width: 16px; height: 16px; }
-.ads-inc li.lead .ck { background: var(--brand); color: #fff; }
-.ads-inccard .ads-cta { margin-top: 20px; }
-.ads-inccard .note { text-align: center; font-size: 12.5px; color: var(--muted); margin: 12px 0 0; }
 
 /* plan tiers (client toggle) */
 .ads-tiers-wrap { margin-top: 14px; }
@@ -860,11 +976,11 @@ const flowSteps = [
 ];
 
 const included = [
-  { label: "상담 응대", lead: true },
-  { label: "자동화 구조 설계" },
-  { label: "챗봇 플로우 설계" },
-  { label: "FAQ / SOP 정리" },
-  { label: "운영 리포트" },
+  { icon: IconHeadset, title: "상담 응대", desc: "채팅 · 게시판 · 이메일 등 다양한 채널의 문의를 전문 상담사가 응대합니다.", lead: true },
+  { icon: IconFlow, title: "자동화 구조 설계", desc: "반복 문의의 흐름과 운영 구조를 정리합니다." },
+  { icon: IconBot, title: "챗봇 플로우 설계", desc: "문의 유형에 맞는 응대 시나리오를 설계합니다." },
+  { icon: IconDoc, title: "FAQ / SOP 정리", desc: "자주 묻는 질문과 운영 기준을 문서화합니다." },
+  { icon: IconChart, title: "운영 리포트", desc: "상담 데이터 분석과 개선 포인트를 제공합니다." },
 ];
 
 const recommended = [
@@ -1003,17 +1119,24 @@ export default function AdsLandingPage({ searchParams }: { searchParams: SearchP
           <span className="hl">월 59만원</span>에<br />포함되는 것
         </h2>
         <div className="ads-inccard">
-          <span className="cap">{IconSpark}<span>7월 한정 월 59만원</span></span>
-          <p className="vol">{IconHeadset}월 상담 200건 기준 · 상담 응대 포함</p>
+          <div className="ads-inc-pills">
+            <span className="cap">{IconSpark}<span>7월 한정 월 59만원</span></span>
+            <span className="vol">{IconHeadset}<span>월 상담 200건 기준 · 상담 응대 포함</span></span>
+          </div>
           <ul className="ads-inc">
             {included.map((it) => (
-              <li className={it.lead ? "lead" : undefined} key={it.label}>
-                <span className="ck">{IconCheck}</span>{it.label}
+              <li className={it.lead ? "lead" : undefined} key={it.title}>
+                <span className="ck">{it.icon}</span>
+                <div className="ads-inc-copy">
+                  <b>{it.title}</b>
+                  <p>{it.desc}</p>
+                </div>
+                <span className="ads-inc-more" aria-hidden="true">{IconArrow}</span>
               </li>
             ))}
           </ul>
+          <p className="note">{IconShield}<span>상담 후 계약 여부를 결정하셔도 됩니다.</span></p>
           <a className="ads-cta" href={contactHref}>무료 운영 진단 받기{IconArrow}</a>
-          <p className="note">상담 후 계약 여부를 결정하셔도 됩니다.</p>
         </div>
 
         <PlanTiers contactHref={contactHref} />
