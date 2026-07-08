@@ -892,8 +892,8 @@ export default function AdsLandingPage({ searchParams }: { searchParams: SearchP
         <span className="ads-glow g1" aria-hidden="true" />
         <span className="ads-glow g2" aria-hidden="true" />
         {HeroLines}
-        <div className="ads-float f1" aria-hidden="true"><span className="ic">{IconChat}</span>새 문의 응대중</div>
-        <div className="ads-float f2" aria-hidden="true"><span className="ic">{IconBot}</span>자동 처리 98%</div>
+        <div className="ads-float f1" aria-hidden="true"><span className="ic">{IconChat}</span>문의 흐름 정리</div>
+        <div className="ads-float f2" aria-hidden="true"><span className="ic">{IconBot}</span>반복 문의 기준화</div>
 
         <div className="ads-hero-inner">
           <span className="ads-badge">{IconSpark}리플로 런칭 혜택</span>
