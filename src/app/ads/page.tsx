@@ -232,17 +232,27 @@ const styles = `
 
 .ads-hero h1 {
   font-size: 30px;
-  line-height: 1.32;
+  line-height: 1.34;
   font-weight: 850;
   letter-spacing: -0.04em;
-  margin: 17px 0 15px;
+  margin: 18px 0 16px;
 }
 .ads-hero h1 .hl {
   color: var(--brand);
   background: linear-gradient(120deg, var(--brand-2), var(--brand-deep));
   -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
 }
+.ads-hero h1 .price {
+  display: inline-block;
+  font-size: 1.38em;
+  font-weight: 900;
+  letter-spacing: -0.05em;
+  line-height: 1;
+  background: linear-gradient(150deg, #8577FF, var(--brand-deep));
+  -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+}
 .ads-hero .ads-sub { padding: 0 6px; }
+.ads-hero .ads-cta { margin-top: 28px; }
 
 /* Hero price card — dimensional */
 .ads-offer {
@@ -992,36 +1002,16 @@ export default function AdsLandingPage({ searchParams }: { searchParams: SearchP
         <span className="ads-glow g1" aria-hidden="true" />
         <span className="ads-glow g2" aria-hidden="true" />
         {HeroLines}
-        <div className="ads-float f1" aria-hidden="true"><span className="ic">{IconChat}</span>문의 흐름 정리</div>
-        <div className="ads-float f2" aria-hidden="true"><span className="ic">{IconBot}</span>반복 문의 기준화</div>
 
         <div className="ads-hero-inner">
-          <span className="ads-badge">{IconSpark}리플로 런칭 혜택</span>
+          <span className="ads-badge">{IconSpark}7월 한정 · 리플로 런칭 혜택</span>
           <h1 id="ads-hero-title">
-            CS직원 뽑기 전,<br />
-            <span className="hl">월 59만원</span>으로<br />
-            CS 운영대행부터
+            <span className="price">월 59만원</span>으로 시작하는<br />
+            CS 운영 대행 패키지
           </h1>
-          <p className="ads-sub">상담 응대 · 자동화 · 챗봇 구조설계 · 운영 기준 정리까지</p>
-
-          <div className="ads-offer">
-            <span className="limited">{IconSpark}7월 한정</span>
-            <div className="ads-price">
-              <span className="won">월</span>
-              <span className="num">59</span>
-              <span className="unit">만원</span>
-            </div>
-            <div className="tags">AI 자동화 · 챗봇 구조설계 · <b>CS 운영대행</b></div>
-          </div>
+          <p className="ads-sub">상담 응대 · 자동화 설계 · 챗봇 구조 설계 · 운영 기준 정리까지</p>
 
           <a className="ads-cta" href={contactHref}>무료 운영 진단 받기{IconArrow}</a>
-          <p className="ads-reassure">상담 후 계약 여부를 결정하셔도 됩니다.</p>
-
-          <div className="ads-trust">
-            <span>{IconShield}상담 후 결정</span>
-            <span>{IconBolt}바로 운영 시작</span>
-            <span>{IconHeadset}전문 상담사 응대</span>
-          </div>
         </div>
       </section>
 
