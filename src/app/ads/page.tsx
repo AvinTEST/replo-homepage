@@ -314,47 +314,46 @@ const styles = `
 }
 
 /* ============ 2. Problem ============ */
-.ads-daymap {
+.ads-burden {
   position: relative;
   border-radius: 24px;
   padding: 18px;
   background:
-    radial-gradient(circle at 86% 0%, rgba(124, 107, 255, .16), transparent 38%),
-    linear-gradient(180deg, rgba(255, 255, 255, .94), rgba(247, 245, 255, .96));
+    radial-gradient(circle at 76% 12%, rgba(124, 107, 255, .16), transparent 34%),
+    linear-gradient(180deg, rgba(255, 255, 255, .96), rgba(247, 245, 255, .96));
   border: 1px solid rgba(109, 93, 246, .16);
   box-shadow: 0 16px 36px rgba(79, 67, 216, .12), inset 0 1px 0 rgba(255,255,255,.9);
   overflow: hidden;
 }
-.ads-daymap::before {
+.ads-burden::after {
   content: "";
   position: absolute;
-  left: 35px;
-  top: 82px;
-  bottom: 24px;
-  width: 2px;
-  background: linear-gradient(180deg, rgba(109, 93, 246, .36), rgba(109, 93, 246, .08));
-  border-radius: 999px;
+  width: 170px;
+  height: 170px;
+  right: -72px;
+  bottom: -86px;
+  background: radial-gradient(circle, rgba(109, 93, 246, .12), transparent 66%);
+  pointer-events: none;
 }
-.ads-daytop {
-  display: grid;
-  grid-template-columns: 1fr auto;
+.ads-burden-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
   gap: 12px;
-  align-items: start;
-  margin-bottom: 16px;
   position: relative;
   z-index: 1;
 }
-.ads-daylabel {
+.ads-burden-label {
   display: inline-flex;
   align-items: center;
   gap: 7px;
   color: var(--brand-deep);
   font-size: 12px;
   font-weight: 850;
-  margin-bottom: 6px;
+  margin-bottom: 7px;
 }
-.ads-daylabel svg { width: 14px; height: 14px; }
-.ads-daytop h3 {
+.ads-burden-label svg { width: 14px; height: 14px; }
+.ads-burden h3 {
   margin: 0;
   color: var(--ink);
   font-size: 18px;
@@ -362,99 +361,103 @@ const styles = `
   letter-spacing: -0.03em;
   line-height: 1.36;
 }
-.ads-daymetric {
-  min-width: 82px;
-  border-radius: 17px;
-  padding: 10px 12px;
-  text-align: right;
-  background: #fff;
-  border: 1px solid rgba(228, 224, 248, .9);
-  box-shadow: 0 10px 22px rgba(17, 24, 39, .06);
+.ads-burden-score {
+  flex: 0 0 auto;
+  width: 86px;
+  height: 86px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background:
+    radial-gradient(circle at 50% 50%, #fff 0 49%, transparent 50%),
+    conic-gradient(var(--brand) 0 72%, rgba(109, 93, 246, .14) 72% 100%);
+  box-shadow: 0 12px 26px rgba(79, 67, 216, .13), inset 0 1px 0 rgba(255,255,255,.9);
 }
-.ads-daymetric b {
+.ads-burden-score b {
   display: block;
   color: var(--brand-deep);
-  font-size: 24px;
+  font-size: 23px;
   font-weight: 900;
   letter-spacing: -0.045em;
   line-height: 1;
 }
-.ads-daymetric span {
+.ads-burden-score span {
   display: block;
-  margin-top: 4px;
+  margin-top: 3px;
   color: var(--muted);
-  font-size: 10.5px;
+  font-size: 10px;
   font-weight: 800;
-  white-space: nowrap;
+  text-align: center;
 }
-.ads-dayrows {
+.ads-burden-bars {
   display: grid;
-  gap: 10px;
-  position: relative;
-  z-index: 1;
-}
-.ads-dayrow {
-  display: grid;
-  grid-template-columns: 44px 1fr;
   gap: 12px;
-  align-items: center;
-}
-.ads-daytime {
+  margin-top: 18px;
   position: relative;
   z-index: 1;
+}
+.ads-burden-bar {
+  display: grid;
+  grid-template-columns: 34px 1fr auto;
+  align-items: center;
+  gap: 10px;
+}
+.ads-burden-bar .ic {
+  width: 34px;
+  height: 34px;
+  border-radius: 12px;
   display: grid;
   place-items: center;
-  min-height: 38px;
-  border-radius: 13px;
-  background: #fff;
-  border: 1px solid rgba(109, 93, 246, .16);
-  color: var(--brand-deep);
-  font-size: 11px;
-  font-weight: 850;
-  box-shadow: 0 6px 16px rgba(79, 67, 216, .10);
+  background: rgba(243, 241, 255, .94);
+  color: var(--brand);
+  border: 1px solid rgba(109, 93, 246, .10);
 }
-.ads-daytask {
+.ads-burden-bar .ic svg { width: 17px; height: 17px; }
+.ads-burden-track {
+  min-width: 0;
+}
+.ads-burden-track p {
   display: flex;
   align-items: center;
-  gap: 10px;
-  min-height: 54px;
-  padding: 11px 13px;
-  border-radius: 16px;
-  background: rgba(255,255,255,.84);
-  border: 1px solid rgba(238, 235, 251, .94);
-}
-.ads-daytask .ic {
-  width: 30px;
-  height: 30px;
-  border-radius: 10px;
-  display: grid;
-  place-items: center;
-  flex: 0 0 auto;
-  color: var(--brand);
-  background: rgba(243, 241, 255, .94);
-}
-.ads-daytask .ic svg { width: 16px; height: 16px; }
-.ads-daytask p {
-  margin: 0;
+  justify-content: space-between;
+  gap: 8px;
+  margin: 0 0 6px;
   color: #374151;
-  font-size: 13.5px;
-  font-weight: 750;
-  line-height: 1.38;
+  font-size: 13px;
+  font-weight: 800;
 }
-.ads-daytask p span {
-  display: block;
+.ads-burden-track p small {
   color: var(--muted);
-  font-size: 11.5px;
-  font-weight: 650;
-  margin-top: 2px;
+  font-size: 10.5px;
+  font-weight: 750;
+  white-space: nowrap;
 }
-.ads-dayfoot {
+.ads-burden-meter {
+  height: 8px;
+  border-radius: 999px;
+  background: rgba(109, 93, 246, .10);
+  overflow: hidden;
+}
+.ads-burden-meter span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, rgba(109, 93, 246, .55), var(--brand));
+}
+.ads-burden-count {
+  min-width: 42px;
+  text-align: right;
+  color: var(--brand-deep);
+  font-size: 13px;
+  font-weight: 900;
+}
+.ads-burden-foot {
   position: relative;
   z-index: 1;
   display: flex;
   align-items: center;
   gap: 8px;
-  margin: 14px 0 0;
+  margin: 16px 0 0;
   padding: 12px 13px;
   border-radius: 15px;
   background: rgba(109, 93, 246, .08);
@@ -464,7 +467,7 @@ const styles = `
   font-weight: 800;
   line-height: 1.42;
 }
-.ads-dayfoot svg { width: 15px; height: 15px; flex: 0 0 auto; }
+.ads-burden-foot svg { width: 15px; height: 15px; flex: 0 0 auto; }
 .ads-problem-line {
   margin: 22px 2px 0; text-align: center;
   font-size: 20px; line-height: 1.5; font-weight: 800; letter-spacing: -0.03em;
@@ -521,57 +524,119 @@ const styles = `
   box-shadow: 0 12px 26px rgba(79, 67, 216, 0.18);
 }
 
-/* ============ 4. Service scope (timeline) ============ */
-.ads-flow { position: relative; display: grid; gap: 12px; margin-top: 4px; }
-.ads-flow::before {
-  content: ""; position: absolute; left: 30px; top: 34px; bottom: 34px;
-  width: 2px; background: linear-gradient(180deg, var(--brand), rgba(109, 93, 246, 0.15));
-  border-radius: 2px;
+/* ============ 4. Service scope (operating system map) ============ */
+.ads-ops {
+  position: relative;
+  border-radius: 24px;
+  padding: 20px 18px 18px;
+  background:
+    radial-gradient(circle at 50% 0%, rgba(124,107,255,.14), transparent 38%),
+    linear-gradient(180deg, rgba(255,255,255,.94), rgba(247,245,255,.96));
+  border: 1px solid rgba(109,93,246,.16);
+  box-shadow: 0 16px 36px rgba(79,67,216,.12), inset 0 1px 0 rgba(255,255,255,.9);
+  overflow: hidden;
 }
-.ads-step { position: relative; display: flex; gap: 15px; }
-.ads-step .node {
-  position: relative; z-index: 1; flex: 0 0 auto;
-  width: 44px; height: 44px; border-radius: 14px;
-  display: grid; place-items: center;
-  background: #fff; color: var(--brand);
-  border: 1.5px solid var(--border);
-  box-shadow: 0 6px 16px rgba(109, 93, 246, 0.12);
+.ads-ops-hub {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 132px;
+  height: 132px;
+  margin: 0 auto 18px;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 50% 50%, #fff 0 54%, transparent 55%),
+    conic-gradient(from 24deg, rgba(109,93,246,.22), rgba(109,93,246,.06), rgba(109,93,246,.32), rgba(109,93,246,.08), rgba(109,93,246,.22));
+  box-shadow: 0 16px 34px rgba(79,67,216,.14);
 }
-.ads-step .node svg { width: 22px; height: 22px; }
-.ads-step .card {
-  flex: 1; min-width: 0;
-  background: rgba(255,255,255,.92); border: 1px solid #EEEBFB; border-radius: 16px;
-  padding: 14px 16px; box-shadow: 0 8px 20px rgba(17, 24, 39, 0.045), inset 0 1px 0 rgba(255,255,255,.86);
+.ads-ops-hub::before,
+.ads-ops-hub::after {
+  content: "";
+  position: absolute;
+  border: 1px solid rgba(109,93,246,.12);
+  border-radius: 50%;
 }
-.ads-step .card .row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-.ads-step .card h4 { margin: 0; font-size: 15.5px; font-weight: 800; }
-.ads-step .card p { margin: 4px 0 0; font-size: 13.5px; line-height: 1.45; color: var(--muted); font-weight: 500; }
-.ads-step .stepno { font-size: 11px; font-weight: 800; color: var(--brand); background: var(--brand-soft); border-radius: 999px; padding: 2px 8px; }
-
-/* featured first step */
-.ads-step.is-primary .node {
-  width: 52px; height: 52px; border-radius: 16px;
+.ads-ops-hub::before { inset: 13px; }
+.ads-ops-hub::after { inset: 26px; }
+.ads-ops-logo {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: 3px;
+  text-align: center;
+}
+.ads-ops-logo b {
+  color: var(--brand-deep);
+  font-size: 18px;
+  font-weight: 900;
+  letter-spacing: -0.035em;
+}
+.ads-ops-logo span {
+  color: var(--muted);
+  font-size: 10.5px;
+  font-weight: 800;
+}
+.ads-ops-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.ads-ops-card {
+  min-height: 112px;
+  border-radius: 17px;
+  padding: 13px;
+  background: rgba(255,255,255,.88);
+  border: 1px solid rgba(238,235,251,.96);
+  box-shadow: 0 8px 20px rgba(17,24,39,.045), inset 0 1px 0 rgba(255,255,255,.86);
+}
+.ads-ops-card.primary {
+  grid-column: 1 / -1;
+  min-height: auto;
+  display: grid;
+  grid-template-columns: 40px 1fr;
+  gap: 12px;
+  align-items: center;
+  border-color: rgba(109,93,246,.34);
+  background: linear-gradient(135deg, #fff, #F5F2FF);
+}
+.ads-ops-card .node {
+  width: 36px;
+  height: 36px;
+  border-radius: 13px;
+  display: grid;
+  place-items: center;
+  margin-bottom: 10px;
+  background: var(--brand-soft);
+  color: var(--brand);
+}
+.ads-ops-card.primary .node {
+  width: 40px;
+  height: 40px;
+  margin: 0;
+  color: #fff;
   background: linear-gradient(160deg, var(--brand-2), var(--brand-deep));
-  color: #fff; border: none;
-  box-shadow: 0 12px 26px rgba(79, 67, 216, 0.26);
+  box-shadow: 0 10px 22px rgba(79,67,216,.22);
 }
-.ads-step.is-primary .node svg { width: 26px; height: 26px; }
-.ads-step.is-primary .card {
-  border: 1.5px solid var(--brand);
-  background: linear-gradient(160deg, #ffffff, #F4F1FF);
-  box-shadow: 0 14px 30px rgba(79, 67, 216, 0.14);
+.ads-ops-card .node svg { width: 19px; height: 19px; }
+.ads-ops-card h4 {
+  margin: 0;
+  color: var(--ink);
+  font-size: 14.5px;
+  font-weight: 850;
+  line-height: 1.3;
 }
-.ads-step.is-primary .card h4 { font-size: 18px; }
-.ads-step.is-primary .card p { font-size: 14px; color: #4B5563; font-weight: 600; }
-.ads-step.is-primary .badge {
-  font-size: 11px; font-weight: 800; color: var(--brand-deep); background: rgba(255,255,255,.86);
-  border: 1px solid rgba(109,93,246,.16); border-radius: 999px; padding: 2px 9px;
+.ads-ops-card p {
+  margin: 5px 0 0;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.42;
 }
 
 /* ============ 5. Price includes ============ */
 .ads-inccard {
   position: relative;
-  border-radius: 24px; padding: 26px 22px;
+  border-radius: 24px; padding: 24px 20px;
   background:
     radial-gradient(circle at 80% 0%, rgba(124,107,255,.13), transparent 38%),
     linear-gradient(165deg, #ffffff 0%, #F6F3FF 100%);
@@ -590,31 +655,56 @@ const styles = `
   white-space: nowrap;
   font-size: 12.5px; font-weight: 800; color: var(--brand-deep);
   background: var(--brand-soft); border: 1px solid var(--border);
-  padding: 7px 12px; border-radius: 999px; margin-bottom: 18px;
+  padding: 7px 12px; border-radius: 999px; margin-bottom: 14px;
 }
-.ads-inc { list-style: none; margin: 0; padding: 0; display: grid; gap: 11px; }
-.ads-inc li {
-  display: flex; align-items: center; gap: 12px;
-  font-size: 15.5px; font-weight: 700; color: #1F2937;
-  padding: 12px 14px; border-radius: 13px;
-  background: #fff; border: 1px solid #EEEBFB;
-}
-.ads-inc li .ck {
-  width: 26px; height: 26px; border-radius: 8px; flex: 0 0 auto;
-  display: grid; place-items: center;
-  background: var(--brand-soft); color: var(--brand);
-}
-.ads-inc li .ck svg { width: 16px; height: 16px; }
-.ads-inc li.lead { border-color: rgba(109,93,246,.42); background: linear-gradient(120deg, #fff, #F6F3FF); }
-.ads-inc li.lead .ck { background: var(--brand); color: #fff; }
 .ads-inccard .cap svg { width: 13px; height: 13px; flex: 0 0 auto; }
 .ads-inccard .cap span { overflow: hidden; text-overflow: ellipsis; }
 .ads-inccard .vol {
   display: inline-flex; align-items: center; gap: 6px;
   font-size: 12.5px; font-weight: 700; color: var(--muted);
-  margin: 0 0 14px;
+  margin: 0 0 16px;
 }
 .ads-inccard .vol svg { width: 14px; height: 14px; color: var(--brand); }
+.ads-inc {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.ads-inc li {
+  position: relative;
+  min-height: 92px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 13px;
+  border-radius: 16px;
+  background: rgba(255,255,255,.88);
+  border: 1px solid #EEEBFB;
+  color: #1F2937;
+  font-size: 13.5px;
+  font-weight: 800;
+  line-height: 1.34;
+}
+.ads-inc li.lead {
+  grid-column: 1 / -1;
+  min-height: 76px;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  border-color: rgba(109,93,246,.42);
+  background: linear-gradient(120deg, #fff, #F6F3FF);
+}
+.ads-inc li .ck {
+  width: 28px; height: 28px; border-radius: 10px; flex: 0 0 auto;
+  display: grid; place-items: center;
+  background: var(--brand-soft); color: var(--brand);
+}
+.ads-inc li .ck svg { width: 16px; height: 16px; }
+.ads-inc li.lead .ck { background: var(--brand); color: #fff; }
 .ads-inccard .ads-cta { margin-top: 20px; }
 .ads-inccard .note { text-align: center; font-size: 12.5px; color: var(--muted); margin: 12px 0 0; }
 
@@ -662,18 +752,49 @@ const styles = `
 .ads-tier .ads-cta { margin-top: 16px; padding: 13px; font-size: 15px; border-radius: 13px; }
 
 /* ============ 6. Recommended ============ */
-.ads-reco { display: grid; grid-template-columns: 1fr 1fr; gap: 11px; }
-.ads-reco .item {
-  background: rgba(255,255,255,.9); border: 1px solid #EEEBFB; border-radius: 16px;
-  padding: 16px 15px; box-shadow: 0 8px 20px rgba(17, 24, 39, 0.045), inset 0 1px 0 rgba(255,255,255,.85);
+.ads-fit {
+  position: relative;
+  display: grid;
+  gap: 10px;
+  padding: 16px;
+  border-radius: 24px;
+  background:
+    radial-gradient(circle at 50% 42%, rgba(109,93,246,.12), transparent 38%),
+    rgba(255,255,255,.42);
+  border: 1px solid rgba(238,235,251,.8);
 }
-.ads-reco .item .chk {
+.ads-fit-core {
+  display: grid;
+  place-items: center;
+  height: 76px;
+  border-radius: 18px;
+  color: var(--brand-deep);
+  font-size: 14px;
+  font-weight: 900;
+  background: rgba(255,255,255,.88);
+  border: 1px solid rgba(109,93,246,.16);
+  box-shadow: 0 10px 24px rgba(79,67,216,.10), inset 0 1px 0 rgba(255,255,255,.86);
+}
+.ads-fit-list {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.ads-fit .item {
+  min-height: 112px;
+  background: rgba(255,255,255,.9);
+  border: 1px solid #EEEBFB;
+  border-radius: 16px;
+  padding: 14px;
+  box-shadow: 0 8px 20px rgba(17, 24, 39, 0.045), inset 0 1px 0 rgba(255,255,255,.85);
+}
+.ads-fit .item .chk {
   width: 28px; height: 28px; border-radius: 9px; margin-bottom: 10px;
   display: grid; place-items: center;
   background: var(--brand-soft); color: var(--brand);
 }
-.ads-reco .item .chk svg { width: 16px; height: 16px; }
-.ads-reco .item p { margin: 0; font-size: 14px; font-weight: 700; line-height: 1.4; }
+.ads-fit .item .chk svg { width: 16px; height: 16px; }
+.ads-fit .item p { margin: 0; font-size: 14px; font-weight: 750; line-height: 1.42; }
 
 /* ============ 7. Final CTA card ============ */
 .ads-final { position: relative; padding: 50px 20px 44px; overflow: hidden; }
@@ -886,32 +1007,20 @@ export default function AdsLandingPage({ searchParams }: { searchParams: SearchP
           <span className="hl">성장할 시간</span>이 사라집니다.
         </h2>
 
-        <div className="ads-daymap" aria-label="대표가 직접 처리하는 하루 CS 업무 흐름">
-          <div className="ads-daytop">
+        <div className="ads-burden" aria-label="대표가 직접 처리하는 CS 업무 부담 대시보드">
+          <div className="ads-burden-top">
             <div>
-              <span className="ads-daylabel">{IconRepeat}반복되는 CS 루틴</span>
-              <h3>문의는 흩어지고,<br />대표님의 하루는 쪼개집니다.</h3>
+              <span className="ads-burden-label">{IconRepeat}반복 문의 비중</span>
+              <h3>CS가 하루 업무를<br />계속 끊어냅니다.</h3>
             </div>
-            <div className="ads-daymetric">
-              <b>286</b>
-              <span>누적 문의</span>
-            </div>
+            <div className="ads-burden-score"><div><b>3.4h</b><span>일 평균</span></div></div>
           </div>
-          <div className="ads-dayrows">
-            <div className="ads-dayrow">
-              <span className="ads-daytime">09:40</span>
-              <div className="ads-daytask"><span className="ic">{IconTruck}</span><p>배송 일정 확인<span>송장 · 출고 상태 반복 확인</span></p></div>
-            </div>
-            <div className="ads-dayrow">
-              <span className="ads-daytime">13:20</span>
-              <div className="ads-daytask"><span className="ic">{IconRefund}</span><p>교환·환불 기준 답변<span>상황별 기준이 매번 달라짐</span></p></div>
-            </div>
-            <div className="ads-dayrow">
-              <span className="ads-daytime">17:50</span>
-              <div className="ads-daytask"><span className="ic">{IconChat}</span><p>게시판·DM 문의 마감<span>판매 업무보다 답변이 먼저</span></p></div>
-            </div>
+          <div className="ads-burden-bars">
+            <div className="ads-burden-bar"><span className="ic">{IconTruck}</span><div className="ads-burden-track"><p>배송 확인<small>반복 문의</small></p><div className="ads-burden-meter"><span style={{ width: "82%" }} /></div></div><span className="ads-burden-count">112</span></div>
+            <div className="ads-burden-bar"><span className="ic">{IconRefund}</span><div className="ads-burden-track"><p>교환·환불<small>기준 확인</small></p><div className="ads-burden-meter"><span style={{ width: "64%" }} /></div></div><span className="ads-burden-count">76</span></div>
+            <div className="ads-burden-bar"><span className="ic">{IconChat}</span><div className="ads-burden-track"><p>게시판·DM<small>실시간 응대</small></p><div className="ads-burden-meter"><span style={{ width: "72%" }} /></div></div><span className="ads-burden-count">98</span></div>
           </div>
-          <p className="ads-dayfoot">{IconBot}<span>반복 문의를 운영 기준으로 정리하지 않으면, 같은 답변이 매일 다시 쌓입니다.</span></p>
+          <p className="ads-burden-foot">{IconBot}<span>반복 문의를 운영 기준으로 정리하지 않으면, 같은 답변이 매일 다시 쌓입니다.</span></p>
         </div>
 
         <p className="ads-problem-line">
@@ -958,20 +1067,19 @@ export default function AdsLandingPage({ searchParams }: { searchParams: SearchP
           툴만 제공하지 않습니다.<br />
           <span className="hl">CS 운영을 대신</span>합니다.
         </h2>
-        <div className="ads-flow">
-          {flowSteps.map((s, i) => (
-            <div className={`ads-step${s.primary ? " is-primary" : ""}`} key={s.title}>
-              <span className="node">{s.icon}</span>
-              <div className="card">
-                <div className="row">
-                  <span className="stepno">STEP {i + 1}</span>
+        <div className="ads-ops" aria-label="Replo CS 운영대행 구성">
+          <div className="ads-ops-hub"><div className="ads-ops-logo"><b>Replo</b><span>CS 운영 시스템</span></div></div>
+          <div className="ads-ops-grid">
+            {flowSteps.map((s) => (
+              <div className={`ads-ops-card${s.primary ? " primary" : ""}`} key={s.title}>
+                <span className="node">{s.icon}</span>
+                <div>
                   <h4>{s.title}</h4>
-                  {s.primary && <span className="badge">직접 응대</span>}
+                  <p>{s.desc}</p>
                 </div>
-                <p>{s.desc}</p>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </section>
 
@@ -1004,13 +1112,16 @@ export default function AdsLandingPage({ searchParams }: { searchParams: SearchP
         <h2 className="ads-h2" id="ads-reco-title">
           이런 브랜드라면<br /><span className="hl">Replo</span>가 맞습니다.
         </h2>
-        <div className="ads-reco">
-          {recommended.map((r) => (
-            <div className="item" key={r}>
-              <span className="chk">{IconCheck}</span>
-              <p>{r}</p>
-            </div>
-          ))}
+        <div className="ads-fit">
+          <div className="ads-fit-core">Replo 추천 대상</div>
+          <div className="ads-fit-list">
+            {recommended.map((r) => (
+              <div className="item" key={r}>
+                <span className="chk">{IconCheck}</span>
+                <p>{r}</p>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
