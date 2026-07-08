@@ -93,7 +93,7 @@ export const homeCopy = {
     ],
     leftFeatures: [
       { icon: "cpu", title: "AI 자동화", description: "반복 문의는 AI가 1차 응대·분류" },
-      { icon: "headset", title: "상담 운영", description: "콜·채팅·게시판·이메일 통합 응대" },
+      { icon: "headset", title: "상담 운영", description: "전화·채팅·게시판·이메일 통합 응대" },
       { icon: "doc", title: "SOP 설계", description: "응대 기준·스크립트를 표준화" },
     ],
     rightFeatures: [
@@ -303,7 +303,7 @@ export const homeCopy = {
         badge: "",
         deadline: "",
         description: "다채널 상담 운영과 함께 CS 정책 설계, 응대 가이드, 주간 리포트까지 필요한 성장 브랜드를 위한 플랜",
-        features: ["콜·채팅·게시판·이메일 운영", "CS 정책 설계 지원", "응대 가이드 제공", "실시간 운영 대시보드", "주간 운영 리포트"],
+        features: ["전화·채팅·게시판·이메일 운영", "CS 정책 설계 지원", "응대 가이드 제공", "실시간 운영 대시보드", "주간 운영 리포트"],
       },
       {
         en: "Enterprise",
@@ -325,7 +325,7 @@ export const homeCopy = {
       rows: [
         { label: "월 구독료", kind: "strong", cells: ["₩590,000", "₩990,000", "₩1,790,000", "별도 협의"] },
         { label: "월 상담 제공량", kind: "strong", cells: ["200건", "500건", "1,000건", "2,000건+"] },
-        { label: "상담 채널", kind: "text", cells: ["채팅·게시판·이메일", "채팅·게시판·이메일", "콜·채팅·게시판·이메일", "모든 채널 + 맞춤"] },
+        { label: "상담 채널", kind: "text", cells: ["채팅·게시판·이메일", "채팅·게시판·이메일", "전화·채팅·게시판·이메일", "모든 채널 + 맞춤"] },
         { label: "AI 응대 지원", kind: "check", cells: [true, true, true, true] },
         { label: "반복 문의 자동화", kind: "check", cells: [true, true, true, true] },
         { label: "데일리 현황 알림", kind: "check", cells: [true, true, true, true] },
