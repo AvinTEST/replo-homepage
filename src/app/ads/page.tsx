@@ -51,12 +51,14 @@ const styles = `
   --lavender: #F7F5FF;
   --surface: rgba(255, 255, 255, 0.86);
   --dark: #19172A;
-  --accent-teal: #0F9F8F;
-  --accent-teal-soft: #E8FAF6;
-  --accent-amber: #D9911B;
-  --accent-amber-soft: #FFF6E6;
-  --accent-blue: #3478F6;
-  --accent-blue-soft: #EEF5FF;
+  /* Unified to one cohesive brand system — no unrelated accent hues.
+     Two subtle purple tones give tonal variety without going rainbow. */
+  --accent-teal: #6657F0;
+  --accent-teal-soft: #EFECFE;
+  --accent-amber: #8B7BF7;
+  --accent-amber-soft: #F1EEFF;
+  --accent-blue: #5648D6;
+  --accent-blue-soft: #ECE9FD;
   position: relative;
   min-height: 100vh;
   margin: 0 auto;
@@ -126,19 +128,33 @@ const styles = `
 .ads-badge svg { width: 15px; height: 15px; color: var(--brand); }
 
 .ads-eyebrow {
-  font-size: 12.5px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12px;
   font-weight: 800;
-  letter-spacing: 0.02em;
-  color: var(--brand);
-  margin: 0 0 11px;
-  text-transform: uppercase;
+  letter-spacing: 0;
+  color: var(--brand-deep);
+  background: var(--brand-soft);
+  border: 1px solid var(--border);
+  padding: 6px 12px 6px 11px;
+  border-radius: 999px;
+  margin: 0 0 15px;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.7);
+}
+.ads-eyebrow::before {
+  content: "";
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--brand);
+  box-shadow: 0 0 0 3px rgba(109,93,246,.14);
 }
 .ads-h2 {
-  font-size: 24px;
-  line-height: 1.4;
-  font-weight: 800;
-  margin: 0 0 22px;
-  letter-spacing: -0.035em;
+  font-size: 25px;
+  line-height: 1.42;
+  font-weight: 850;
+  margin: 0 0 24px;
+  letter-spacing: -0.042em;
+  word-break: keep-all;
 }
 .ads-h2 .hl { color: var(--brand); }
 .ads-sub { font-size: 15px; line-height: 1.62; color: var(--muted); margin: 0; }
@@ -316,7 +332,7 @@ const styles = `
 .ads-trust svg { width: 14px; height: 14px; color: var(--brand); }
 
 /* ============ Section frame / rhythm ============ */
-.ads-band { position: relative; padding: 48px 20px; }
+.ads-band { position: relative; padding: 54px 20px; }
 .ads-band--lav {
   background:
     radial-gradient(circle at 50% 0%, rgba(124, 107, 255, 0.08), transparent 42%),
@@ -335,11 +351,9 @@ const styles = `
   position: relative;
   border-radius: 24px;
   padding: 22px 18px 18px;
-  background:
-    radial-gradient(circle at 84% 0%, rgba(109, 93, 246, .04), transparent 34%),
-    linear-gradient(180deg, rgba(255, 255, 255, .98), rgba(248, 247, 252, .96));
-  border: 1px solid rgba(228, 224, 248, .9);
-  box-shadow: 0 12px 28px rgba(17, 24, 39, .06), inset 0 1px 0 rgba(255,255,255,.9);
+  background: linear-gradient(180deg, #FFFFFF 0%, #FBFAFE 100%);
+  border: 1px solid var(--border);
+  box-shadow: 0 1px 2px rgba(17,24,39,.04), 0 16px 34px rgba(17, 24, 39, .05);
   overflow: hidden;
 }
 .ads-burden-label {
@@ -474,12 +488,10 @@ const styles = `
 .ads-ops {
   position: relative;
   border-radius: 24px;
-  padding: 20px 18px 18px;
-  background:
-    radial-gradient(circle at 50% 0%, rgba(124,107,255,.14), transparent 38%),
-    linear-gradient(180deg, rgba(255,255,255,.94), rgba(247,245,255,.96));
-  border: 1px solid rgba(109,93,246,.16);
-  box-shadow: 0 16px 36px rgba(79,67,216,.12), inset 0 1px 0 rgba(255,255,255,.9);
+  padding: 22px 18px 18px;
+  background: linear-gradient(180deg, #FFFFFF 0%, #FAF9FF 100%);
+  border: 1px solid var(--border);
+  box-shadow: 0 1px 2px rgba(17,24,39,.04), 0 18px 40px rgba(79,67,216,.09);
   overflow: hidden;
 }
 .ads-ops-hub {
@@ -491,9 +503,9 @@ const styles = `
   margin: 0 auto 18px;
   border-radius: 50%;
   background:
-    radial-gradient(circle at 50% 50%, #fff 0 54%, transparent 55%),
-    conic-gradient(from 24deg, rgba(109,93,246,.22), rgba(109,93,246,.06), rgba(109,93,246,.32), rgba(109,93,246,.08), rgba(109,93,246,.22));
-  box-shadow: 0 16px 34px rgba(79,67,216,.14);
+    radial-gradient(circle at 50% 42%, #fff 0 50%, transparent 51%),
+    linear-gradient(160deg, #F1EDFF, #E7E2FC);
+  box-shadow: 0 14px 30px rgba(79,67,216,.12), inset 0 1px 0 rgba(255,255,255,.8);
 }
 .ads-ops-hub::before,
 .ads-ops-hub::after {
@@ -587,13 +599,10 @@ const styles = `
 .ads-inccard {
   position: relative;
   border-radius: 26px;
-  padding: 20px 16px 18px;
-  background:
-    radial-gradient(circle at 86% 6%, rgba(124,107,255,.12), transparent 34%),
-    radial-gradient(circle at 12% 28%, rgba(52,120,246,.06), transparent 30%),
-    linear-gradient(180deg, rgba(255,255,255,.98), rgba(249,247,255,.96));
-  border: 1px solid rgba(109, 93, 246, 0.18);
-  box-shadow: 0 18px 42px rgba(79, 67, 216, 0.12), inset 0 1px 0 rgba(255,255,255,.88);
+  padding: 22px 16px 18px;
+  background: linear-gradient(180deg, #FFFFFF 0%, #FAF9FF 100%);
+  border: 1px solid var(--border);
+  box-shadow: 0 1px 2px rgba(17,24,39,.04), 0 20px 44px rgba(79, 67, 216, 0.10);
   overflow: hidden;
 }
 .ads-inccard::before {
@@ -680,9 +689,9 @@ const styles = `
   white-space: nowrap;
 }
 .ads-price-offer .meta span:first-child {
-  color: #2563B8;
-  background: rgba(238,245,255,.92);
-  border: 1px solid rgba(52,120,246,.16);
+  color: var(--brand-deep);
+  background: rgba(239,236,254,.92);
+  border: 1px solid rgba(109,93,246,.16);
 }
 .ads-price-offer .meta span:last-child {
   color: #4B5563;
@@ -721,7 +730,7 @@ const styles = `
   place-items: center;
   background:
     radial-gradient(circle at 30% 25%, rgba(255,255,255,.95), transparent 32%),
-    linear-gradient(145deg, #F6F3FF, #EEF5FF);
+    linear-gradient(145deg, #F4F1FF, #EAE6FD);
   color: rgba(109,93,246,.82);
   border: 1px solid rgba(109,93,246,.12);
   box-shadow: inset 0 1px 0 rgba(255,255,255,.8);
