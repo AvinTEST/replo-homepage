@@ -290,8 +290,8 @@ export const homeCopy = {
         best: false,
         badge: "",
         deadline: "",
-        description: "문의량이 늘어나는 브랜드가 콜·채팅·게시판·이메일 응대를 한 기준으로 정리하고, 기본 응대 품질을 안정화하는 플랜",
-        features: ["콜·채팅·게시판·이메일 운영", "응대 가이드 제공", "교환·환불·클레임 운영", "운영 인사이트 분석", "격주 운영 리포트"],
+        description: "문의량이 늘어나는 브랜드가 채팅·게시판·이메일 응대를 한 기준으로 정리하고, 기본 응대 품질을 안정화하는 플랜",
+        features: ["채팅·게시판·이메일 운영", "응대 가이드 제공", "교환·환불·클레임 운영", "운영 인사이트 분석", "격주 운영 리포트"],
       },
       {
         en: "Pro",
@@ -325,7 +325,7 @@ export const homeCopy = {
       rows: [
         { label: "월 구독료", kind: "strong", cells: ["₩590,000", "₩990,000", "₩1,790,000", "별도 협의"] },
         { label: "월 상담 제공량", kind: "strong", cells: ["200건", "500건", "1,000건", "2,000건+"] },
-        { label: "상담 채널", kind: "text", cells: ["채팅·게시판·이메일", "콜·채팅·게시판·이메일", "콜·채팅·게시판·이메일", "모든 채널 + 맞춤"] },
+        { label: "상담 채널", kind: "text", cells: ["채팅·게시판·이메일", "채팅·게시판·이메일", "콜·채팅·게시판·이메일", "모든 채널 + 맞춤"] },
         { label: "AI 응대 지원", kind: "check", cells: [true, true, true, true] },
         { label: "반복 문의 자동화", kind: "check", cells: [true, true, true, true] },
         { label: "데일리 현황 알림", kind: "check", cells: [true, true, true, true] },
