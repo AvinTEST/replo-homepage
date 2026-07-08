@@ -367,27 +367,27 @@ const styles = `
   letter-spacing: -0.03em;
   line-height: 1.36;
 }
-.ads-burden-score {
+.ads-timecore {
   flex: 0 0 auto;
-  width: 86px;
-  height: 86px;
+  width: 92px;
+  height: 92px;
   border-radius: 50%;
   display: grid;
   place-items: center;
   background:
     radial-gradient(circle at 50% 50%, #fff 0 49%, transparent 50%),
-    conic-gradient(var(--accent-teal) 0 72%, rgba(15, 159, 143, .14) 72% 100%);
+    conic-gradient(var(--accent-teal) 0 78%, rgba(15, 159, 143, .14) 78% 100%);
   box-shadow: 0 12px 26px rgba(79, 67, 216, .13), inset 0 1px 0 rgba(255,255,255,.9);
 }
-.ads-burden-score b {
+.ads-timecore b {
   display: block;
   color: var(--accent-teal);
-  font-size: 23px;
+  font-size: 25px;
   font-weight: 900;
   letter-spacing: -0.045em;
   line-height: 1;
 }
-.ads-burden-score span {
+.ads-timecore span {
   display: block;
   margin-top: 3px;
   color: var(--muted);
@@ -395,20 +395,20 @@ const styles = `
   font-weight: 800;
   text-align: center;
 }
-.ads-burden-bars {
+.ads-timebreakdown {
   display: grid;
-  gap: 12px;
+  gap: 11px;
   margin-top: 18px;
   position: relative;
   z-index: 1;
 }
-.ads-burden-bar {
+.ads-timeitem {
   display: grid;
-  grid-template-columns: 34px 1fr auto;
+  grid-template-columns: 34px 1fr 48px;
   align-items: center;
   gap: 10px;
 }
-.ads-burden-bar .ic {
+.ads-timeitem .ic {
   width: 34px;
   height: 34px;
   border-radius: 12px;
@@ -418,14 +418,14 @@ const styles = `
   color: var(--brand);
   border: 1px solid rgba(109, 93, 246, .10);
 }
-.ads-burden-bar:nth-child(1) .ic { background: var(--accent-blue-soft); color: var(--accent-blue); border-color: rgba(52, 120, 246, .14); }
-.ads-burden-bar:nth-child(2) .ic { background: var(--accent-amber-soft); color: var(--accent-amber); border-color: rgba(217, 145, 27, .16); }
-.ads-burden-bar:nth-child(3) .ic { background: var(--accent-teal-soft); color: var(--accent-teal); border-color: rgba(15, 159, 143, .14); }
-.ads-burden-bar .ic svg { width: 17px; height: 17px; }
-.ads-burden-track {
+.ads-timeitem:nth-child(1) .ic { background: var(--accent-blue-soft); color: var(--accent-blue); border-color: rgba(52, 120, 246, .14); }
+.ads-timeitem:nth-child(2) .ic { background: var(--accent-amber-soft); color: var(--accent-amber); border-color: rgba(217, 145, 27, .16); }
+.ads-timeitem:nth-child(3) .ic { background: var(--accent-teal-soft); color: var(--accent-teal); border-color: rgba(15, 159, 143, .14); }
+.ads-timeitem .ic svg { width: 17px; height: 17px; }
+.ads-timetrack {
   min-width: 0;
 }
-.ads-burden-track p {
+.ads-timetrack p {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -435,32 +435,55 @@ const styles = `
   font-size: 13px;
   font-weight: 800;
 }
-.ads-burden-track p small {
+.ads-timetrack p small {
   color: var(--muted);
   font-size: 10.5px;
   font-weight: 750;
   white-space: nowrap;
 }
-.ads-burden-meter {
+.ads-timemeter {
   height: 8px;
   border-radius: 999px;
   background: rgba(109, 93, 246, .10);
   overflow: hidden;
 }
-.ads-burden-meter span {
+.ads-timemeter span {
   display: block;
   height: 100%;
   border-radius: inherit;
   background: linear-gradient(90deg, rgba(109, 93, 246, .55), var(--brand));
 }
-.ads-burden-bar:nth-child(1) .ads-burden-meter span { background: linear-gradient(90deg, rgba(52,120,246,.46), var(--accent-blue)); }
-.ads-burden-bar:nth-child(2) .ads-burden-meter span { background: linear-gradient(90deg, rgba(217,145,27,.42), var(--accent-amber)); }
-.ads-burden-bar:nth-child(3) .ads-burden-meter span { background: linear-gradient(90deg, rgba(15,159,143,.42), var(--accent-teal)); }
-.ads-burden-count {
+.ads-timeitem:nth-child(1) .ads-timemeter span { background: linear-gradient(90deg, rgba(52,120,246,.46), var(--accent-blue)); }
+.ads-timeitem:nth-child(2) .ads-timemeter span { background: linear-gradient(90deg, rgba(217,145,27,.42), var(--accent-amber)); }
+.ads-timeitem:nth-child(3) .ads-timemeter span { background: linear-gradient(90deg, rgba(15,159,143,.42), var(--accent-teal)); }
+.ads-timevalue {
   min-width: 42px;
   text-align: right;
   color: var(--brand-deep);
-  font-size: 13px;
+  font-size: 13.5px;
+  font-weight: 900;
+}
+.ads-timesummary {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 14px;
+  position: relative;
+  z-index: 1;
+}
+.ads-timesummary span {
+  border-radius: 13px;
+  padding: 10px 11px;
+  background: rgba(255,255,255,.82);
+  border: 1px solid rgba(238,235,251,.92);
+  color: #374151;
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1.35;
+}
+.ads-timesummary b {
+  color: var(--accent-teal);
+  font-size: 15px;
   font-weight: 900;
 }
 .ads-burden-foot {
@@ -1011,20 +1034,24 @@ export default function AdsLandingPage({ searchParams }: { searchParams: SearchP
           <span className="hl">성장할 시간</span>이 사라집니다.
         </h2>
 
-        <div className="ads-burden" aria-label="대표가 직접 처리하는 CS 업무 부담 대시보드">
+        <div className="ads-burden" aria-label="CS로 매일 평균 3시간이 소요되는 업무 구성">
           <div className="ads-burden-top">
             <div>
-              <span className="ads-burden-label">{IconRepeat}반복 문의 비중</span>
-              <h3>CS가 하루 업무를<br />계속 끊어냅니다.</h3>
+              <span className="ads-burden-label">{IconRepeat}하루 CS 소요 시간</span>
+              <h3>CS로 매일 평균<br />3시간이 소요되고 있습니다.</h3>
             </div>
-            <div className="ads-burden-score"><div><b>3.4h</b><span>일 평균</span></div></div>
+            <div className="ads-timecore"><div><b>3h</b><span>일 평균</span></div></div>
           </div>
-          <div className="ads-burden-bars">
-            <div className="ads-burden-bar"><span className="ic">{IconTruck}</span><div className="ads-burden-track"><p>배송 확인<small>반복 문의</small></p><div className="ads-burden-meter"><span style={{ width: "82%" }} /></div></div><span className="ads-burden-count">112</span></div>
-            <div className="ads-burden-bar"><span className="ic">{IconRefund}</span><div className="ads-burden-track"><p>교환·환불<small>기준 확인</small></p><div className="ads-burden-meter"><span style={{ width: "64%" }} /></div></div><span className="ads-burden-count">76</span></div>
-            <div className="ads-burden-bar"><span className="ic">{IconChat}</span><div className="ads-burden-track"><p>게시판·DM<small>실시간 응대</small></p><div className="ads-burden-meter"><span style={{ width: "72%" }} /></div></div><span className="ads-burden-count">98</span></div>
+          <div className="ads-timesummary">
+            <span><b>15h</b><br />주간 누적</span>
+            <span><b>60h</b><br />월간 누적</span>
           </div>
-          <p className="ads-burden-foot">{IconBot}<span>반복 문의를 운영 기준으로 정리하지 않으면, 같은 답변이 매일 다시 쌓입니다.</span></p>
+          <div className="ads-timebreakdown">
+            <div className="ads-timeitem"><span className="ic">{IconChat}</span><div className="ads-timetrack"><p>문의 답변 작성<small>채팅 · 게시판 · DM</small></p><div className="ads-timemeter"><span style={{ width: "72%" }} /></div></div><span className="ads-timevalue">1.4h</span></div>
+            <div className="ads-timeitem"><span className="ic">{IconTruck}</span><div className="ads-timetrack"><p>주문·배송 확인<small>송장 · 출고 상태</small></p><div className="ads-timemeter"><span style={{ width: "52%" }} /></div></div><span className="ads-timevalue">1.0h</span></div>
+            <div className="ads-timeitem"><span className="ic">{IconRefund}</span><div className="ads-timetrack"><p>교환·환불 판단<small>상황별 기준 확인</small></p><div className="ads-timemeter"><span style={{ width: "32%" }} /></div></div><span className="ads-timevalue">0.6h</span></div>
+          </div>
+          <p className="ads-burden-foot">{IconBot}<span>반복 문의를 운영 기준으로 정리하면, 대표님의 시간을 다시 확보할 수 있습니다.</span></p>
         </div>
 
         <p className="ads-problem-line">
