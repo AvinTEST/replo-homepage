@@ -577,10 +577,10 @@ const styles = `
 .ads-inccard {
   position: relative;
   border-radius: 26px;
-  padding: 24px 16px 18px;
+  padding: 20px 16px 18px;
   background:
-    radial-gradient(circle at 86% 6%, rgba(124,107,255,.13), transparent 34%),
-    radial-gradient(circle at 12% 28%, rgba(52,120,246,.07), transparent 30%),
+    radial-gradient(circle at 86% 6%, rgba(124,107,255,.12), transparent 34%),
+    radial-gradient(circle at 12% 28%, rgba(52,120,246,.06), transparent 30%),
     linear-gradient(180deg, rgba(255,255,255,.98), rgba(249,247,255,.96));
   border: 1px solid rgba(109, 93, 246, 0.18);
   box-shadow: 0 18px 42px rgba(79, 67, 216, 0.12), inset 0 1px 0 rgba(255,255,255,.88);
@@ -604,46 +604,82 @@ const styles = `
   height: 170px;
   left: -64px;
   bottom: -70px;
-  background: radial-gradient(circle, rgba(122, 107, 255, 0.13), transparent 70%);
+  background: radial-gradient(circle, rgba(122, 107, 255, 0.12), transparent 70%);
 }
 .ads-inccard > * { position: relative; z-index: 1; }
-.ads-inc-pills {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  margin-bottom: 18px;
-  flex-wrap: wrap;
+.ads-price-offer {
+  margin-bottom: 14px;
+  padding: 18px 16px;
+  border-radius: 22px;
+  background:
+    radial-gradient(circle at 16% 18%, rgba(255,255,255,.9), transparent 26%),
+    linear-gradient(135deg, rgba(255,255,255,.96), rgba(243,241,255,.90));
+  border: 1px solid rgba(109,93,246,.20);
+  box-shadow: 0 12px 26px rgba(79,67,216,.10), inset 0 1px 0 rgba(255,255,255,.92);
 }
-.ads-inccard .cap,
-.ads-inccard .vol {
+.ads-price-offer .label {
   display: inline-flex;
   align-items: center;
-  justify-content: center;
   gap: 6px;
-  max-width: 100%;
-  white-space: nowrap;
-  border-radius: 999px;
-  padding: 9px 13px;
-  margin: 0;
+  color: var(--brand-deep);
   font-size: 12.5px;
   font-weight: 850;
   line-height: 1;
+  margin-bottom: 10px;
 }
-.ads-inccard .cap {
+.ads-price-offer .label svg { width: 14px; height: 14px; }
+.ads-price-offer .price {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 4px;
+  color: var(--ink);
+  letter-spacing: -0.055em;
+  line-height: 1;
+  margin: 2px 0 12px;
+}
+.ads-price-offer .price .month {
+  font-size: 25px;
+  font-weight: 950;
+}
+.ads-price-offer .price .num {
+  font-size: 55px;
+  font-weight: 950;
   color: var(--brand-deep);
-  background: rgba(243, 241, 255, .88);
-  border: 1px solid rgba(109,93,246,.18);
+  text-shadow: 0 10px 26px rgba(91,75,232,.16);
 }
-.ads-inccard .vol {
+.ads-price-offer .price .unit {
+  font-size: 31px;
+  font-weight: 950;
+}
+.ads-price-offer .meta {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.ads-price-offer .meta span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border-radius: 999px;
+  padding: 8px 11px;
+  font-size: 12px;
+  font-weight: 820;
+  line-height: 1;
+  white-space: nowrap;
+}
+.ads-price-offer .meta span:first-child {
   color: #2563B8;
-  background: rgba(238,245,255,.9);
+  background: rgba(238,245,255,.92);
   border: 1px solid rgba(52,120,246,.16);
 }
-.ads-inccard .cap svg,
-.ads-inccard .vol svg { width: 13px; height: 13px; flex: 0 0 auto; }
-.ads-inccard .cap span,
-.ads-inccard .vol span { overflow: hidden; text-overflow: ellipsis; }
+.ads-price-offer .meta span:last-child {
+  color: #4B5563;
+  background: rgba(255,255,255,.72);
+  border: 1px solid rgba(222,229,242,.82);
+}
+.ads-price-offer .meta svg { width: 13px; height: 13px; }
 .ads-inc {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -654,33 +690,22 @@ const styles = `
 }
 .ads-inc li {
   position: relative;
-  min-height: 132px;
+  min-height: 150px;
   display: grid;
-  grid-template-columns: 54px 1fr auto;
-  align-items: center;
+  grid-template-columns: 1fr auto;
+  align-content: start;
   gap: 10px;
-  padding: 14px 12px;
+  padding: 15px 13px;
   border-radius: 18px;
-  background: rgba(255,255,255,.74);
+  background: rgba(255,255,255,.76);
   border: 1px solid rgba(222,229,242,.92);
   color: #1F2937;
   box-shadow: 0 8px 18px rgba(17,24,39,.035), inset 0 1px 0 rgba(255,255,255,.82);
 }
-.ads-inc li.lead {
-  grid-column: 1 / -1;
-  min-height: 178px;
-  grid-template-columns: 138px 1fr;
-  gap: 16px;
-  padding: 22px 18px;
-  border-color: rgba(109,93,246,.24);
-  background:
-    radial-gradient(circle at 22% 48%, rgba(109,93,246,.14), transparent 32%),
-    linear-gradient(135deg, rgba(255,255,255,.94), rgba(246,243,255,.88));
-  box-shadow: 0 12px 26px rgba(79,67,216,.10), inset 0 1px 0 rgba(255,255,255,.9);
-}
 .ads-inc .ck {
-  width: 52px;
-  height: 52px;
+  grid-column: 1 / -1;
+  width: 50px;
+  height: 50px;
   border-radius: 50%;
   display: grid;
   place-items: center;
@@ -691,19 +716,7 @@ const styles = `
   border: 1px solid rgba(109,93,246,.12);
   box-shadow: inset 0 1px 0 rgba(255,255,255,.8);
 }
-.ads-inc .ck svg { width: 24px; height: 24px; }
-.ads-inc li.lead .ck {
-  width: 122px;
-  height: 122px;
-  border-radius: 34px;
-  color: #fff;
-  background:
-    radial-gradient(circle at 28% 24%, rgba(255,255,255,.55), transparent 22%),
-    linear-gradient(135deg, #B980FF 0%, #6D5DF6 58%, #4E8BFF 100%);
-  border: 1px solid rgba(255,255,255,.56);
-  box-shadow: 0 18px 34px rgba(91,75,232,.22), inset 0 1px 0 rgba(255,255,255,.45);
-}
-.ads-inc li.lead .ck svg { width: 50px; height: 50px; stroke-width: 1.55; }
+.ads-inc .ck svg { width: 23px; height: 23px; }
 .ads-inc-copy { min-width: 0; }
 .ads-inc-copy b {
   display: block;
@@ -711,7 +724,7 @@ const styles = `
   font-size: 15px;
   font-weight: 900;
   letter-spacing: -0.035em;
-  line-height: 1.3;
+  line-height: 1.26;
   word-break: keep-all;
 }
 .ads-inc-copy p {
@@ -719,34 +732,23 @@ const styles = `
   color: #5F6676;
   font-size: 12.5px;
   font-weight: 650;
-  line-height: 1.52;
+  line-height: 1.5;
   letter-spacing: -0.025em;
   word-break: keep-all;
 }
-.ads-inc li.lead .ads-inc-copy b {
-  font-size: 25px;
-  letter-spacing: -0.055em;
-}
-.ads-inc li.lead .ads-inc-copy p {
-  margin-top: 10px;
-  font-size: 14px;
-  line-height: 1.65;
-  color: #4B5563;
-}
 .ads-inc-more {
-  color: rgba(109,93,246,.72);
+  align-self: end;
+  color: rgba(109,93,246,.62);
   width: 16px;
   height: 16px;
 }
 .ads-inc-more svg { width: 16px; height: 16px; stroke-width: 2.4; }
-.ads-inc li.lead .ads-inc-more { display: none; }
 @media (max-width: 380px) {
   .ads-inccard { padding-left: 14px; padding-right: 14px; }
-  .ads-inc li.lead { grid-template-columns: 112px 1fr; padding: 18px 14px; }
-  .ads-inc li.lead .ck { width: 100px; height: 100px; border-radius: 28px; }
-  .ads-inc li.lead .ads-inc-copy b { font-size: 22px; }
-  .ads-inc li { grid-template-columns: 1fr auto; align-content: start; min-height: 138px; }
-  .ads-inc li:not(.lead) .ck { width: 46px; height: 46px; grid-column: 1 / -1; }
+  .ads-price-offer .price .month { font-size: 22px; }
+  .ads-price-offer .price .num { font-size: 48px; }
+  .ads-price-offer .price .unit { font-size: 28px; }
+  .ads-inc li { min-height: 146px; padding: 14px 12px; }
 }
 
 /* plan tiers (client toggle) */
@@ -957,7 +959,7 @@ const flowSteps = [
 ];
 
 const included = [
-  { icon: IconHeadset, title: "상담 응대", desc: "채팅 · 게시판 · 이메일 등 다양한 채널의 문의를 전문 상담사가 응대합니다.", lead: true },
+  { icon: IconHeadset, title: "상담 응대", desc: "채팅 · 게시판 · 이메일 문의를 응대합니다." },
   { icon: IconFlow, title: "자동화 구조 설계", desc: "반복 문의의 흐름과 운영 구조를 정리합니다." },
   { icon: IconBot, title: "챗봇 플로우 설계", desc: "문의 유형에 맞는 응대 시나리오를 설계합니다." },
   { icon: IconDoc, title: "FAQ / SOP 정리", desc: "자주 묻는 질문과 운영 기준을 문서화합니다." },
@@ -1100,13 +1102,17 @@ export default function AdsLandingPage({ searchParams }: { searchParams: SearchP
           <span className="hl">월 59만원</span>에<br />포함되는 것
         </h2>
         <div className="ads-inccard">
-          <div className="ads-inc-pills">
-            <span className="cap">{IconSpark}<span>7월 한정 월 59만원</span></span>
-            <span className="vol">{IconHeadset}<span>월 상담 200건 기준 · 상담 응대 포함</span></span>
+          <div className="ads-price-offer" aria-label="7월 한정 월 59만원 도입 혜택">
+            <span className="label">{IconSpark}7월 한정 런칭 혜택</span>
+            <div className="price"><span className="month">월</span><strong className="num">59</strong><span className="unit">만원</span></div>
+            <div className="meta">
+              <span>{IconHeadset}월 상담 200건 기준</span>
+              <span>상담 응대 포함</span>
+            </div>
           </div>
           <ul className="ads-inc">
             {included.map((it) => (
-              <li className={it.lead ? "lead" : undefined} key={it.title}>
+              <li key={it.title}>
                 <span className="ck">{it.icon}</span>
                 <div className="ads-inc-copy">
                   <b>{it.title}</b>
