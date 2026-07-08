@@ -323,29 +323,15 @@ const styles = `
 .ads-burden {
   position: relative;
   border-radius: 24px;
-  padding: 18px;
+  padding: 22px 18px 18px;
   background:
-    radial-gradient(circle at 76% 12%, rgba(124, 107, 255, .16), transparent 34%),
-    linear-gradient(180deg, rgba(255, 255, 255, .96), rgba(247, 245, 255, .96));
-  border: 1px solid rgba(109, 93, 246, .16);
-  box-shadow: 0 16px 36px rgba(79, 67, 216, .12), inset 0 1px 0 rgba(255,255,255,.9);
+    radial-gradient(circle at 80% 0%, rgba(109, 93, 246, .08), transparent 34%),
+    linear-gradient(180deg, rgba(255, 255, 255, .98), rgba(248, 247, 252, .96));
+  border: 1px solid rgba(228, 224, 248, .9);
+  box-shadow: 0 14px 34px rgba(17, 24, 39, .08), inset 0 1px 0 rgba(255,255,255,.9);
   overflow: hidden;
 }
-.ads-burden::after {
-  content: "";
-  position: absolute;
-  width: 170px;
-  height: 170px;
-  right: -72px;
-  bottom: -86px;
-  background: radial-gradient(circle, rgba(109, 93, 246, .12), transparent 66%);
-  pointer-events: none;
-}
 .ads-burden-top {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 12px;
   position: relative;
   z-index: 1;
 }
@@ -356,142 +342,160 @@ const styles = `
   color: var(--brand-deep);
   font-size: 12px;
   font-weight: 850;
-  margin-bottom: 7px;
+  margin-bottom: 10px;
 }
 .ads-burden-label svg { width: 14px; height: 14px; }
 .ads-burden h3 {
   margin: 0;
   color: var(--ink);
-  font-size: 18px;
-  font-weight: 850;
-  letter-spacing: -0.03em;
-  line-height: 1.36;
+  font-size: 21px;
+  font-weight: 900;
+  letter-spacing: -0.04em;
+  line-height: 1.38;
+  word-break: keep-all;
 }
-.ads-workcore {
-  flex: 0 0 auto;
-  width: 92px;
-  min-height: 92px;
-  border-radius: 22px;
-  display: grid;
-  place-items: center;
-  text-align: center;
-  background: linear-gradient(160deg, #fff, var(--accent-teal-soft));
-  border: 1px solid rgba(15, 159, 143, .18);
-  box-shadow: 0 12px 26px rgba(15, 159, 143, .12), inset 0 1px 0 rgba(255,255,255,.9);
-}
-.ads-workcore b {
-  display: block;
-  color: var(--accent-teal);
-  font-size: 27px;
-  font-weight: 950;
-  letter-spacing: -0.055em;
-  line-height: 1;
-}
-.ads-workcore span {
-  display: block;
-  margin-top: 5px;
+.ads-burden-desc {
   color: var(--muted);
-  font-size: 10px;
-  font-weight: 850;
-  line-height: 1.25;
+  font-size: 13.5px;
+  font-weight: 600;
+  line-height: 1.62;
+  margin: 12px 0 0;
+  word-break: keep-all;
 }
-.ads-workdays {
+.ads-calc {
   display: grid;
-  gap: 12px;
-  margin-top: 18px;
+  gap: 10px;
+  margin-top: 20px;
   position: relative;
   z-index: 1;
 }
-.ads-workdays-head {
+.ads-calc-flow {
+  align-items: center;
   display: grid;
-  grid-template-columns: 1fr 1fr;
   gap: 8px;
+  grid-template-columns: 1fr auto 1fr auto 1fr;
 }
-.ads-workdays-head span {
-  border-radius: 15px;
-  padding: 11px 12px;
-  background: rgba(255,255,255,.84);
-  border: 1px solid rgba(238,235,251,.92);
-  color: #374151;
-  font-size: 12px;
-  font-weight: 800;
-  line-height: 1.35;
-}
-.ads-workdays-head b {
-  color: var(--accent-teal);
-  font-size: 18px;
-  font-weight: 950;
-}
-.ads-workcalendar {
-  border-radius: 18px;
-  padding: 14px;
-  background: rgba(255,255,255,.86);
+.ads-calc-step {
+  min-height: 70px;
+  border-radius: 17px;
+  padding: 12px 10px;
+  text-align: center;
+  background: #fff;
   border: 1px solid rgba(238,235,251,.94);
   box-shadow: 0 8px 20px rgba(17,24,39,.045), inset 0 1px 0 rgba(255,255,255,.86);
 }
-.ads-workcalendar-top {
-  display: flex;
+.ads-calc-step b {
+  color: var(--ink);
+  display: block;
+  font-size: 20px;
+  font-weight: 950;
+  letter-spacing: -0.04em;
+  line-height: 1;
+}
+.ads-calc-step:last-child b { color: var(--brand-deep); }
+.ads-calc-step span {
+  color: var(--muted);
+  display: block;
+  font-size: 10.5px;
+  font-weight: 800;
+  line-height: 1.25;
+  margin-top: 7px;
+}
+.ads-calc-arrow {
+  color: rgba(109,93,246,.45);
+  font-size: 14px;
+  font-weight: 900;
+}
+.ads-calc-note {
+  border-radius: 15px;
+  color: #374151;
+  background: rgba(109,93,246,.06);
+  border: 1px solid rgba(109,93,246,.12);
+  font-size: 12.5px;
+  font-weight: 800;
+  line-height: 1.45;
+  padding: 11px 12px;
+  text-align: center;
+}
+.ads-calendar {
+  margin-top: 18px;
+  padding: 15px;
+  border-radius: 19px;
+  background: rgba(255,255,255,.86);
+  border: 1px solid rgba(238,235,251,.94);
+  box-shadow: 0 8px 20px rgba(17,24,39,.045), inset 0 1px 0 rgba(255,255,255,.86);
+  position: relative;
+  z-index: 1;
+}
+.ads-calendar-head {
   align-items: center;
+  display: flex;
   justify-content: space-between;
   gap: 10px;
   margin-bottom: 12px;
 }
-.ads-workcalendar-top strong {
+.ads-calendar-head strong {
   color: var(--ink);
-  font-size: 13px;
-  font-weight: 900;
-  line-height: 1.35;
-  word-break: keep-all;
-}
-.ads-workcalendar-top small {
-  color: var(--muted);
-  font-size: 11px;
-  font-weight: 750;
-}
-.ads-workblocks {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 8px;
-}
-.ads-workblock {
-  min-height: 46px;
-  border-radius: 13px;
-  display: grid;
-  place-items: center;
-  background: linear-gradient(160deg, var(--accent-teal-soft), #fff);
-  border: 1px solid rgba(15, 159, 143, .18);
-  color: var(--accent-teal);
-  font-size: 11px;
+  font-size: 13.5px;
   font-weight: 900;
 }
-.ads-workblock.partial {
-  background:
-    linear-gradient(90deg, var(--accent-teal-soft) 0 50%, rgba(255,255,255,.9) 50% 100%);
+.ads-calendar-head span {
+  color: var(--brand-deep);
+  background: var(--brand-soft);
+  border: 1px solid rgba(109,93,246,.13);
+  border-radius: 999px;
+  font-size: 10.5px;
+  font-weight: 850;
+  padding: 4px 8px;
+  white-space: nowrap;
 }
-.ads-worksplit {
+.ads-calendar-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  gap: 8px;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 7px;
 }
-.ads-worksplit span {
-  min-height: 58px;
-  border-radius: 15px;
-  padding: 10px;
-  background: rgba(255,255,255,.78);
-  border: 1px solid rgba(238,235,251,.92);
-  color: #374151;
+.ads-day {
+  aspect-ratio: 1;
+  align-items: center;
+  border-radius: 11px;
+  display: grid;
+  justify-items: center;
+  background: #F8F8FB;
+  border: 1px solid rgba(231,233,241,.9);
+  color: #98A2B3;
+  font-size: 10px;
+  font-weight: 800;
+  position: relative;
+}
+.ads-day.lost {
+  background: linear-gradient(160deg, rgba(109,93,246,.14), rgba(255,255,255,.8));
+  border-color: rgba(109,93,246,.20);
+  color: var(--brand-deep);
+}
+.ads-day.partial {
+  background: linear-gradient(90deg, rgba(109,93,246,.14) 0 50%, #F8F8FB 50% 100%);
+  border-color: rgba(109,93,246,.20);
+  color: var(--brand-deep);
+}
+.ads-day small {
+  color: inherit;
+  font-size: 9px;
+  font-weight: 900;
+}
+.ads-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-top: 14px;
+}
+.ads-tags span {
+  border-radius: 999px;
+  color: #475467;
+  background: rgba(255,255,255,.82);
+  border: 1px solid rgba(238,235,251,.94);
   font-size: 11.5px;
   font-weight: 800;
-  line-height: 1.35;
-}
-.ads-worksplit span:nth-child(1) b { color: var(--accent-blue); }
-.ads-worksplit span:nth-child(2) b { color: var(--accent-amber); }
-.ads-worksplit span:nth-child(3) b { color: var(--accent-teal); }
-.ads-worksplit b {
-  display: block;
-  font-size: 15px;
-  font-weight: 950;
-  margin-bottom: 3px;
+  padding: 6px 9px;
 }
 .ads-burden-foot {
   position: relative;
@@ -499,7 +503,7 @@ const styles = `
   display: flex;
   align-items: center;
   gap: 8px;
-  margin: 14px 0 0;
+  margin: 16px 0 0;
   padding: 12px 13px;
   border-radius: 15px;
   background: rgba(109, 93, 246, .08);
@@ -510,11 +514,13 @@ const styles = `
   line-height: 1.42;
 }
 .ads-burden-foot svg { width: 15px; height: 15px; flex: 0 0 auto; }
-.ads-problem-line {
-  margin: 22px 2px 0; text-align: center;
-  font-size: 20px; line-height: 1.5; font-weight: 800; letter-spacing: -0.03em;
+
+@media (max-width: 380px) {
+  .ads-calc-flow { gap: 5px; }
+  .ads-calc-step { padding-left: 7px; padding-right: 7px; }
+  .ads-calc-step b { font-size: 18px; }
+  .ads-calc-step span { font-size: 10px; }
 }
-.ads-problem-line .hl { color: var(--brand); }
 
 /* ============ 3. Comparison ============ */
 .ads-compare { position: relative; display: grid; gap: 16px; }
@@ -890,7 +896,6 @@ const styles = `
   .ads-hero h1 { font-size: 27px; }
   .ads-h2 { font-size: 22px; }
   .ads-price .num { font-size: 60px; }
-  .ads-problem-line { font-size: 18px; }
 }
 @media (max-width: 360px) {
   .ads-wrap, .ads-band, .ads-hero, .ads-final { padding-left: 16px; padding-right: 16px; }
@@ -1035,45 +1040,36 @@ export default function AdsLandingPage({ searchParams }: { searchParams: SearchP
 
       {/* 2. Problem */}
       <section className="ads-band ads-band--lav" aria-labelledby="ads-problem-title">
-        <p className="ads-eyebrow">이런 하루, 익숙하신가요?</p>
-        <h2 className="ads-h2" id="ads-problem-title" style={{ marginBottom: 20 }}>
-          대표님이 직접 CS를 보고 있다면<br />
-          <span className="hl">성장할 시간</span>이 사라집니다.
-        </h2>
-
-        <div className="ads-burden" aria-label="CS로 매일 평균 3시간이 소요되는 업무 구성">
+        <div className="ads-burden" aria-label="CS 업무 시간이 월간 근무일로 환산되는 흐름">
           <div className="ads-burden-top">
-            <div>
-              <span className="ads-burden-label">{IconRepeat}하루 CS 소요 시간</span>
-              <h3>CS로 매일 평균<br />3시간이 소요되고 있습니다.</h3>
-            </div>
-            <div className="ads-workcore"><div><b>3h</b><span>매일<br />소요</span></div></div>
+            <span className="ads-burden-label">{IconRepeat}이런 하루, 익숙하신가요?</span>
+            <h3 id="ads-problem-title">대표님이 직접 CS를 보고 있다면,<br />한 달 7.5일이 사라지고 있을 수 있습니다.</h3>
+            <p className="ads-burden-desc">문의 답변, 배송 확인, 교환·환불 판단까지<br />매일 반복되는 CS는 생각보다 많은 운영 시간을 가져갑니다.</p>
           </div>
-          <div className="ads-workdays">
-            <div className="ads-workdays-head">
-              <span><b>약 2일</b><br />주마다 CS에 사용</span>
-              <span><b>7.5일</b><br />월마다 CS만 하는 시간</span>
-            </div>
-            <div className="ads-workcalendar">
-              <div className="ads-workcalendar-top"><strong>월 60시간은 8시간 근무일 기준 7.5일</strong><small>월간 누적</small></div>
-              <div className="ads-workblocks" aria-hidden="true">
-                <span className="ads-workblock">1일</span><span className="ads-workblock">2일</span><span className="ads-workblock">3일</span><span className="ads-workblock">4일</span>
-                <span className="ads-workblock">5일</span><span className="ads-workblock">6일</span><span className="ads-workblock">7일</span><span className="ads-workblock partial">0.5일</span>
-              </div>
-            </div>
-            <div className="ads-worksplit">
-              <span><b>1.4h</b>문의 답변</span>
-              <span><b>1.0h</b>주문·배송 확인</span>
-              <span><b>0.6h</b>교환·환불 판단</span>
-            </div>
-          </div>
-          <p className="ads-burden-foot">{IconBot}<span>반복 문의를 운영 기준으로 정리하면, 대표님의 시간을 다시 확보할 수 있습니다.</span></p>
-        </div>
 
-        <p className="ads-problem-line">
-          문의에 묶이는 시간만큼,<br />
-          <span className="hl">매출을 키울 시간</span>이 줄어듭니다.
-        </p>
+          <div className="ads-calc" aria-label="하루 3시간 곱하기 20영업일은 월 60시간이며 8시간 근무일 기준 약 7.5일입니다">
+            <div className="ads-calc-flow">
+              <div className="ads-calc-step"><b>하루 3시간</b><span>매일 CS 응대</span></div>
+              <span className="ads-calc-arrow">×</span>
+              <div className="ads-calc-step"><b>월 60시간</b><span>20영업일 기준</span></div>
+              <span className="ads-calc-arrow">=</span>
+              <div className="ads-calc-step"><b>약 7.5일</b><span>8시간 근무일</span></div>
+            </div>
+            <div className="ads-calc-note">하루 3시간 × 20영업일 = 월 60시간 · 월 60시간은 8시간 근무일 기준 약 7.5일입니다.</div>
+          </div>
+
+          <div className="ads-calendar" aria-label="20영업일 중 약 7.5일이 CS 업무로 사라지는 월간 캘린더">
+            <div className="ads-calendar-head"><strong>월간 운영 시간 손실</strong><span>20영업일 중 7.5일</span></div>
+            <div className="ads-calendar-grid" aria-hidden="true">
+              {Array.from({ length: 20 }).map((_, index) => (
+                <span className={`ads-day${index < 7 ? " lost" : index === 7 ? " partial" : ""}`} key={index}><small>{index + 1}</small></span>
+              ))}
+            </div>
+            <div className="ads-tags"><span>문의 답변</span><span>주문·배송 확인</span><span>교환·환불 판단</span></div>
+          </div>
+
+          <p className="ads-burden-foot">{IconBot}<span>Replo는 반복 문의를 운영 기준으로 정리해, 대표님의 시간을 다시 확보합니다.</span></p>
+        </div>
       </section>
 
       {/* 3. Hiring comparison */}
