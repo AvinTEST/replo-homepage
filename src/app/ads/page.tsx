@@ -51,6 +51,12 @@ const styles = `
   --lavender: #F7F5FF;
   --surface: rgba(255, 255, 255, 0.86);
   --dark: #19172A;
+  --accent-teal: #0F9F8F;
+  --accent-teal-soft: #E8FAF6;
+  --accent-amber: #D9911B;
+  --accent-amber-soft: #FFF6E6;
+  --accent-blue: #3478F6;
+  --accent-blue-soft: #EEF5FF;
   position: relative;
   min-height: 100vh;
   margin: 0 auto;
@@ -370,12 +376,12 @@ const styles = `
   place-items: center;
   background:
     radial-gradient(circle at 50% 50%, #fff 0 49%, transparent 50%),
-    conic-gradient(var(--brand) 0 72%, rgba(109, 93, 246, .14) 72% 100%);
+    conic-gradient(var(--accent-teal) 0 72%, rgba(15, 159, 143, .14) 72% 100%);
   box-shadow: 0 12px 26px rgba(79, 67, 216, .13), inset 0 1px 0 rgba(255,255,255,.9);
 }
 .ads-burden-score b {
   display: block;
-  color: var(--brand-deep);
+  color: var(--accent-teal);
   font-size: 23px;
   font-weight: 900;
   letter-spacing: -0.045em;
@@ -412,6 +418,9 @@ const styles = `
   color: var(--brand);
   border: 1px solid rgba(109, 93, 246, .10);
 }
+.ads-burden-bar:nth-child(1) .ic { background: var(--accent-blue-soft); color: var(--accent-blue); border-color: rgba(52, 120, 246, .14); }
+.ads-burden-bar:nth-child(2) .ic { background: var(--accent-amber-soft); color: var(--accent-amber); border-color: rgba(217, 145, 27, .16); }
+.ads-burden-bar:nth-child(3) .ic { background: var(--accent-teal-soft); color: var(--accent-teal); border-color: rgba(15, 159, 143, .14); }
 .ads-burden-bar .ic svg { width: 17px; height: 17px; }
 .ads-burden-track {
   min-width: 0;
@@ -444,6 +453,9 @@ const styles = `
   border-radius: inherit;
   background: linear-gradient(90deg, rgba(109, 93, 246, .55), var(--brand));
 }
+.ads-burden-bar:nth-child(1) .ads-burden-meter span { background: linear-gradient(90deg, rgba(52,120,246,.46), var(--accent-blue)); }
+.ads-burden-bar:nth-child(2) .ads-burden-meter span { background: linear-gradient(90deg, rgba(217,145,27,.42), var(--accent-amber)); }
+.ads-burden-bar:nth-child(3) .ads-burden-meter span { background: linear-gradient(90deg, rgba(15,159,143,.42), var(--accent-teal)); }
 .ads-burden-count {
   min-width: 42px;
   text-align: right;
@@ -609,6 +621,10 @@ const styles = `
   background: var(--brand-soft);
   color: var(--brand);
 }
+.ads-ops-card:nth-child(2) .node { background: var(--accent-teal-soft); color: var(--accent-teal); }
+.ads-ops-card:nth-child(3) .node { background: var(--accent-blue-soft); color: var(--accent-blue); }
+.ads-ops-card:nth-child(4) .node { background: var(--accent-amber-soft); color: var(--accent-amber); }
+.ads-ops-card:nth-child(5) .node { background: var(--brand-soft); color: var(--brand); }
 .ads-ops-card.primary .node {
   width: 40px;
   height: 40px;
@@ -703,6 +719,10 @@ const styles = `
   display: grid; place-items: center;
   background: var(--brand-soft); color: var(--brand);
 }
+.ads-inc li:nth-child(2) .ck { background: var(--accent-teal-soft); color: var(--accent-teal); }
+.ads-inc li:nth-child(3) .ck { background: var(--accent-blue-soft); color: var(--accent-blue); }
+.ads-inc li:nth-child(4) .ck { background: var(--accent-amber-soft); color: var(--accent-amber); }
+.ads-inc li:nth-child(5) .ck { background: var(--brand-soft); color: var(--brand); }
 .ads-inc li .ck svg { width: 16px; height: 16px; }
 .ads-inc li.lead .ck { background: var(--brand); color: #fff; }
 .ads-inccard .ads-cta { margin-top: 20px; }
@@ -752,49 +772,33 @@ const styles = `
 .ads-tier .ads-cta { margin-top: 16px; padding: 13px; font-size: 15px; border-radius: 13px; }
 
 /* ============ 6. Recommended ============ */
-.ads-fit {
-  position: relative;
+.ads-checkfit {
   display: grid;
   gap: 10px;
-  padding: 16px;
-  border-radius: 24px;
-  background:
-    radial-gradient(circle at 50% 42%, rgba(109,93,246,.12), transparent 38%),
-    rgba(255,255,255,.42);
-  border: 1px solid rgba(238,235,251,.8);
 }
-.ads-fit-core {
+.ads-checkfit .item {
   display: grid;
-  place-items: center;
-  height: 76px;
-  border-radius: 18px;
-  color: var(--brand-deep);
-  font-size: 14px;
-  font-weight: 900;
-  background: rgba(255,255,255,.88);
-  border: 1px solid rgba(109,93,246,.16);
-  box-shadow: 0 10px 24px rgba(79,67,216,.10), inset 0 1px 0 rgba(255,255,255,.86);
-}
-.ads-fit-list {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-}
-.ads-fit .item {
-  min-height: 112px;
+  grid-template-columns: 30px 1fr;
+  align-items: center;
+  gap: 11px;
+  min-height: 58px;
+  padding: 12px 14px;
+  border-radius: 16px;
   background: rgba(255,255,255,.9);
   border: 1px solid #EEEBFB;
-  border-radius: 16px;
-  padding: 14px;
   box-shadow: 0 8px 20px rgba(17, 24, 39, 0.045), inset 0 1px 0 rgba(255,255,255,.85);
 }
-.ads-fit .item .chk {
-  width: 28px; height: 28px; border-radius: 9px; margin-bottom: 10px;
+.ads-checkfit .item .chk {
+  width: 30px; height: 30px; border-radius: 9px;
   display: grid; place-items: center;
   background: var(--brand-soft); color: var(--brand);
 }
-.ads-fit .item .chk svg { width: 16px; height: 16px; }
-.ads-fit .item p { margin: 0; font-size: 14px; font-weight: 750; line-height: 1.42; }
+.ads-checkfit .item:nth-child(1) .chk { background: var(--accent-teal-soft); color: var(--accent-teal); }
+.ads-checkfit .item:nth-child(2) .chk { background: var(--accent-blue-soft); color: var(--accent-blue); }
+.ads-checkfit .item:nth-child(3) .chk { background: var(--accent-amber-soft); color: var(--accent-amber); }
+.ads-checkfit .item:nth-child(4) .chk { background: var(--brand-soft); color: var(--brand); }
+.ads-checkfit .item .chk svg { width: 16px; height: 16px; }
+.ads-checkfit .item p { margin: 0; font-size: 14.5px; font-weight: 780; line-height: 1.38; color: #1F2937; }
 
 /* ============ 7. Final CTA card ============ */
 .ads-final { position: relative; padding: 50px 20px 44px; overflow: hidden; }
@@ -1112,16 +1116,13 @@ export default function AdsLandingPage({ searchParams }: { searchParams: SearchP
         <h2 className="ads-h2" id="ads-reco-title">
           이런 브랜드라면<br /><span className="hl">Replo</span>가 맞습니다.
         </h2>
-        <div className="ads-fit">
-          <div className="ads-fit-core">Replo 추천 대상</div>
-          <div className="ads-fit-list">
-            {recommended.map((r) => (
-              <div className="item" key={r}>
-                <span className="chk">{IconCheck}</span>
-                <p>{r}</p>
-              </div>
-            ))}
-          </div>
+        <div className="ads-checkfit">
+          {recommended.map((r) => (
+            <div className="item" key={r}>
+              <span className="chk">{IconCheck}</span>
+              <p>{r}</p>
+            </div>
+          ))}
         </div>
       </section>
 
