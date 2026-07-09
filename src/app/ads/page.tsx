@@ -900,27 +900,12 @@ const styles = `
   opacity: 0;
   pointer-events: none;
   transform: translateY(118%);
-  transition: opacity .26s ease, transform .32s cubic-bezier(.22, 1, .36, 1);
-}
-html.ads-sticky-on .ads-sticky {
-  opacity: 1;
-  pointer-events: auto;
-  transform: translateY(0);
+  will-change: opacity, transform;
 }
 .ads-sticky .ads-cta {
   padding: 16px 20px;
   border-radius: 15px;
   box-shadow: 0 -2px 10px rgba(91, 71, 224, 0.08), 0 14px 30px rgba(79, 67, 216, 0.28);
-}
-html.ads-sticky-on #ch-plugin,
-html.ads-sticky-on [id*="ch-plugin"],
-html.ads-sticky-on iframe[src*="channel"],
-html.ads-sticky-on iframe[title*="Channel"],
-html.ads-sticky-on iframe[title*="channel"] {
-  right: max(16px, calc((100vw - 480px) / 2 + 16px)) !important;
-  bottom: calc(92px + env(safe-area-inset-bottom)) !important;
-  transform: translateY(0) !important;
-  transition: right .32s cubic-bezier(.22, 1, .36, 1), bottom .32s cubic-bezier(.22, 1, .36, 1), transform .32s cubic-bezier(.22, 1, .36, 1) !important;
 }
 
 @media (max-width: 400px) {
@@ -1198,8 +1183,17 @@ export default function AdsLandingPage({ searchParams }: { searchParams: SearchP
         dangerouslySetInnerHTML={{
           __html: `
 (function () {
-  var root = document.documentElement;
+  var sticky = document.querySelector('.ads-sticky');
   var originals = new WeakMap();
+  var ticking = false;
+  function clamp(value) {
+    return Math.max(0, Math.min(1, value));
+  }
+  function progress() {
+    var start = Math.min(260, window.innerHeight * 0.28);
+    var distance = Math.max(180, window.innerHeight * 0.32);
+    return clamp((window.scrollY - start) / distance);
+  }
   function columnRight() {
     var columnWidth = Math.min(window.innerWidth, 480);
     return Math.max(16, (window.innerWidth - columnWidth) / 2 + 16);
@@ -1215,44 +1209,43 @@ export default function AdsLandingPage({ searchParams }: { searchParams: SearchP
       zIndex: el.style.zIndex
     });
   }
-  function restore(el) {
-    var original = originals.get(el);
-    if (!original) return;
-    el.style.position = original.position;
-    el.style.right = original.right;
-    el.style.bottom = original.bottom;
-    el.style.transform = original.transform;
-    el.style.transition = original.transition;
-    el.style.zIndex = original.zIndex;
-  }
-  function setChannelOffset(active) {
+  function channelNodes() {
     var selectors = '#ch-plugin, [id*="ch-plugin"], iframe[src*="channel"], iframe[title*="Channel"], iframe[title*="channel"]';
-    document.querySelectorAll(selectors).forEach(function (el) {
+    return Array.prototype.slice.call(document.querySelectorAll(selectors));
+  }
+  function apply(progressValue) {
+    if (sticky) {
+      sticky.style.opacity = String(progressValue);
+      sticky.style.transform = 'translateY(' + ((1 - progressValue) * 118) + '%)';
+      sticky.style.pointerEvents = progressValue > 0.92 ? 'auto' : 'none';
+    }
+    var right = columnRight();
+    var bottom = 16 + 76 * progressValue;
+    channelNodes().forEach(function (el) {
       remember(el);
-      if (!active) {
-        restore(el);
-        return;
-      }
       el.style.position = 'fixed';
-      el.style.right = columnRight() + 'px';
-      el.style.bottom = '92px';
+      el.style.right = right + 'px';
+      el.style.bottom = bottom + 'px';
       el.style.transform = 'translateY(0)';
-      el.style.transition = 'right .32s cubic-bezier(.22, 1, .36, 1), bottom .32s cubic-bezier(.22, 1, .36, 1), transform .32s cubic-bezier(.22, 1, .36, 1)';
+      el.style.transition = 'none';
       el.style.zIndex = '45';
     });
   }
   function update() {
-    var threshold = Math.min(520, Math.max(280, window.innerHeight * 0.62));
-    var active = window.scrollY > threshold;
-    root.classList.toggle('ads-sticky-on', active);
-    setChannelOffset(active);
+    ticking = false;
+    apply(progress());
   }
-  update();
-  window.addEventListener('scroll', update, { passive: true });
-  window.addEventListener('resize', update);
-  setTimeout(update, 500);
-  setTimeout(update, 1200);
-  setTimeout(update, 2400);
+  function requestUpdate() {
+    if (ticking) return;
+    ticking = true;
+    window.requestAnimationFrame(update);
+  }
+  requestUpdate();
+  window.addEventListener('scroll', requestUpdate, { passive: true });
+  window.addEventListener('resize', requestUpdate);
+  setTimeout(requestUpdate, 500);
+  setTimeout(requestUpdate, 1200);
+  setTimeout(requestUpdate, 2400);
 })();
           `,
         }}
