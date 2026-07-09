@@ -917,8 +917,10 @@ html.ads-sticky-on [id*="ch-plugin"],
 html.ads-sticky-on iframe[src*="channel"],
 html.ads-sticky-on iframe[title*="Channel"],
 html.ads-sticky-on iframe[title*="channel"] {
-  transform: translateY(-86px) !important;
-  transition: transform .32s cubic-bezier(.22, 1, .36, 1) !important;
+  right: max(16px, calc((100vw - 480px) / 2 + 16px)) !important;
+  bottom: calc(92px + env(safe-area-inset-bottom)) !important;
+  transform: translateY(0) !important;
+  transition: right .32s cubic-bezier(.22, 1, .36, 1), bottom .32s cubic-bezier(.22, 1, .36, 1), transform .32s cubic-bezier(.22, 1, .36, 1) !important;
 }
 
 @media (max-width: 400px) {
@@ -1197,15 +1199,46 @@ export default function AdsLandingPage({ searchParams }: { searchParams: SearchP
           __html: `
 (function () {
   var root = document.documentElement;
-  var pushed = new WeakSet();
+  var originals = new WeakMap();
+  function columnRight() {
+    var columnWidth = Math.min(window.innerWidth, 480);
+    return Math.max(16, (window.innerWidth - columnWidth) / 2 + 16);
+  }
+  function remember(el) {
+    if (originals.has(el)) return;
+    originals.set(el, {
+      position: el.style.position,
+      right: el.style.right,
+      bottom: el.style.bottom,
+      transform: el.style.transform,
+      transition: el.style.transition,
+      zIndex: el.style.zIndex
+    });
+  }
+  function restore(el) {
+    var original = originals.get(el);
+    if (!original) return;
+    el.style.position = original.position;
+    el.style.right = original.right;
+    el.style.bottom = original.bottom;
+    el.style.transform = original.transform;
+    el.style.transition = original.transition;
+    el.style.zIndex = original.zIndex;
+  }
   function setChannelOffset(active) {
     var selectors = '#ch-plugin, [id*="ch-plugin"], iframe[src*="channel"], iframe[title*="Channel"], iframe[title*="channel"]';
     document.querySelectorAll(selectors).forEach(function (el) {
-      if (!pushed.has(el)) {
-        el.style.transition = 'transform .32s cubic-bezier(.22, 1, .36, 1)';
-        pushed.add(el);
+      remember(el);
+      if (!active) {
+        restore(el);
+        return;
       }
-      el.style.transform = active ? 'translateY(-86px)' : '';
+      el.style.position = 'fixed';
+      el.style.right = columnRight() + 'px';
+      el.style.bottom = '92px';
+      el.style.transform = 'translateY(0)';
+      el.style.transition = 'right .32s cubic-bezier(.22, 1, .36, 1), bottom .32s cubic-bezier(.22, 1, .36, 1), transform .32s cubic-bezier(.22, 1, .36, 1)';
+      el.style.zIndex = '45';
     });
   }
   function update() {
@@ -1217,8 +1250,9 @@ export default function AdsLandingPage({ searchParams }: { searchParams: SearchP
   update();
   window.addEventListener('scroll', update, { passive: true });
   window.addEventListener('resize', update);
-  setTimeout(update, 800);
-  setTimeout(update, 2000);
+  setTimeout(update, 500);
+  setTimeout(update, 1200);
+  setTimeout(update, 2400);
 })();
           `,
         }}
