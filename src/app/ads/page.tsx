@@ -886,21 +886,69 @@ const styles = `
 .ads-footer img { height: 21px; width: auto; margin: 0 auto 10px; opacity: 0.85; }
 .ads-footer p { margin: 0; font-size: 12px; color: #9CA3AF; line-height: 1.7; }
 
-/* ============ Sticky CTA ============ */
-.ads-sticky {
+/* ============ Sticky CTA + chat launcher ============ */
+.ads-action-stack {
   position: fixed;
   left: 0;
   right: 0;
   bottom: 0;
-  z-index: 40;
+  z-index: 50;
   margin: 0 auto;
   max-width: 480px;
-  padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
+  padding: 0 16px calc(12px + env(safe-area-inset-bottom));
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 10px;
+  pointer-events: none;
+  transform: translateY(66px);
+  will-change: transform;
+}
+.ads-chat-row {
+  display: flex;
+  justify-content: flex-end;
+}
+.ads-chat-button {
+  width: 58px;
+  height: 58px;
+  border: 1px solid rgba(228, 224, 248, 0.86);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.96);
+  color: var(--ink);
+  box-shadow: 0 10px 24px rgba(17, 24, 39, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  font-size: 13px;
+  font-weight: 850;
+  letter-spacing: -0.04em;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  pointer-events: auto;
+  position: relative;
+}
+.ads-chat-button span {
+  position: absolute;
+  top: 14px;
+  right: 10px;
+  color: var(--brand);
+  font-size: 12px;
+  font-weight: 900;
+}
+.ads-chat-button::after {
+  content: "";
+  position: absolute;
+  top: 4px;
+  right: 5px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #EF4444;
+  border: 2px solid #fff;
+}
+.ads-sticky {
   background: linear-gradient(180deg, rgba(251, 250, 255, 0), rgba(251, 250, 255, 0.92) 34%, #FBFAFF 100%);
   opacity: 0;
   pointer-events: none;
-  transform: translateY(118%);
-  will-change: opacity, transform;
+  will-change: opacity;
 }
 .ads-sticky .ads-cta {
   padding: 16px 20px;
@@ -1175,74 +1223,83 @@ export default function AdsLandingPage({ searchParams }: { searchParams: SearchP
         <p>커머스 브랜드를 위한 CS 운영대행 서비스<br />© Replo. All rights reserved.</p>
       </footer>
 
-      {/* Sticky mobile CTA */}
-      <div className="ads-sticky">
-        <a className="ads-cta" href={contactHref}>무료 운영 진단 받기{IconArrow}</a>
+      {/* Sticky mobile CTA + chat launcher */}
+      <div className="ads-action-stack">
+        <div className="ads-chat-row">
+          <button className="ads-chat-button" type="button" data-ads-chat-button aria-label="채널톡 상담 열기">
+            Replo<span>+</span>
+          </button>
+        </div>
+        <div className="ads-sticky">
+          <a className="ads-cta" href={contactHref}>무료 운영 진단 받기{IconArrow}</a>
+        </div>
       </div>
       <script
         dangerouslySetInnerHTML={{
           __html: `
 (function () {
+  var stack = document.querySelector('.ads-action-stack');
   var sticky = document.querySelector('.ads-sticky');
-  var originals = new WeakMap();
+  var chatButton = document.querySelector('[data-ads-chat-button]');
   var ticking = false;
+
   function clamp(value) {
     return Math.max(0, Math.min(1, value));
   }
+
   function progress() {
-    var start = Math.min(260, window.innerHeight * 0.28);
-    var distance = Math.max(180, window.innerHeight * 0.32);
+    var start = Math.min(220, window.innerHeight * 0.22);
+    var distance = Math.max(260, window.innerHeight * 0.42);
     return clamp((window.scrollY - start) / distance);
   }
-  function columnRight() {
-    var columnWidth = Math.min(window.innerWidth, 480);
-    return Math.max(16, (window.innerWidth - columnWidth) / 2 + 16);
+
+  function hiddenOffset() {
+    if (!sticky) return 66;
+    return sticky.offsetHeight + 10;
   }
-  function remember(el) {
-    if (originals.has(el)) return;
-    originals.set(el, {
-      position: el.style.position,
-      right: el.style.right,
-      bottom: el.style.bottom,
-      transform: el.style.transform,
-      transition: el.style.transition,
-      zIndex: el.style.zIndex
-    });
+
+  function hideNativeChannelButton() {
+    if (window.ChannelIO) {
+      window.ChannelIO('hideChannelButton');
+    }
   }
-  function channelNodes() {
-    var selectors = '#ch-plugin, [id*="ch-plugin"], iframe[src*="channel"], iframe[title*="Channel"], iframe[title*="channel"]';
-    return Array.prototype.slice.call(document.querySelectorAll(selectors));
+
+  function openMessenger() {
+    if (window.ChannelIO) {
+      window.ChannelIO('showMessenger');
+    }
   }
+
   function apply(progressValue) {
+    var offset = hiddenOffset() * (1 - progressValue);
+    if (stack) {
+      stack.style.transform = 'translateY(' + offset.toFixed(2) + 'px)';
+    }
     if (sticky) {
       sticky.style.opacity = String(progressValue);
-      sticky.style.transform = 'translateY(' + ((1 - progressValue) * 118) + '%)';
       sticky.style.pointerEvents = progressValue > 0.92 ? 'auto' : 'none';
     }
-    var right = columnRight();
-    var bottom = 16 + 76 * progressValue;
-    channelNodes().forEach(function (el) {
-      remember(el);
-      el.style.position = 'fixed';
-      el.style.right = right + 'px';
-      el.style.bottom = bottom + 'px';
-      el.style.transform = 'translateY(0)';
-      el.style.transition = 'none';
-      el.style.zIndex = '45';
-    });
+    hideNativeChannelButton();
   }
+
   function update() {
     ticking = false;
     apply(progress());
   }
+
   function requestUpdate() {
     if (ticking) return;
     ticking = true;
     window.requestAnimationFrame(update);
   }
+
+  if (chatButton) {
+    chatButton.addEventListener('click', openMessenger);
+  }
   requestUpdate();
   window.addEventListener('scroll', requestUpdate, { passive: true });
   window.addEventListener('resize', requestUpdate);
+  setInterval(hideNativeChannelButton, 1000);
   setTimeout(requestUpdate, 500);
   setTimeout(requestUpdate, 1200);
   setTimeout(requestUpdate, 2400);
