@@ -888,14 +888,37 @@ const styles = `
 
 /* ============ Sticky CTA ============ */
 .ads-sticky {
-  position: fixed; left: 0; right: 0; bottom: 0; z-index: 40;
-  margin: 0 auto; max-width: 480px;
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 40;
+  margin: 0 auto;
+  max-width: 480px;
   padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
-  background: linear-gradient(180deg, rgba(251, 250, 255, 0), rgba(251, 250, 255, 0.9) 34%, #FBFAFF 100%);
+  background: linear-gradient(180deg, rgba(251, 250, 255, 0), rgba(251, 250, 255, 0.92) 34%, #FBFAFF 100%);
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(118%);
+  transition: opacity .26s ease, transform .32s cubic-bezier(.22, 1, .36, 1);
+}
+html.ads-sticky-on .ads-sticky {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
 }
 .ads-sticky .ads-cta {
-  padding: 16px 20px; border-radius: 15px;
+  padding: 16px 20px;
+  border-radius: 15px;
   box-shadow: 0 -2px 10px rgba(91, 71, 224, 0.08), 0 14px 30px rgba(79, 67, 216, 0.28);
+}
+html.ads-sticky-on #ch-plugin,
+html.ads-sticky-on [id*="ch-plugin"],
+html.ads-sticky-on iframe[src*="channel"],
+html.ads-sticky-on iframe[title*="Channel"],
+html.ads-sticky-on iframe[title*="channel"] {
+  transform: translateY(-86px) !important;
+  transition: transform .32s cubic-bezier(.22, 1, .36, 1) !important;
 }
 
 @media (max-width: 400px) {
@@ -1169,6 +1192,37 @@ export default function AdsLandingPage({ searchParams }: { searchParams: SearchP
       <div className="ads-sticky">
         <a className="ads-cta" href={contactHref}>무료 운영 진단 받기{IconArrow}</a>
       </div>
+      <script
+        dangerouslySetInnerHTML={{
+          __html: `
+(function () {
+  var root = document.documentElement;
+  var pushed = new WeakSet();
+  function setChannelOffset(active) {
+    var selectors = '#ch-plugin, [id*="ch-plugin"], iframe[src*="channel"], iframe[title*="Channel"], iframe[title*="channel"]';
+    document.querySelectorAll(selectors).forEach(function (el) {
+      if (!pushed.has(el)) {
+        el.style.transition = 'transform .32s cubic-bezier(.22, 1, .36, 1)';
+        pushed.add(el);
+      }
+      el.style.transform = active ? 'translateY(-86px)' : '';
+    });
+  }
+  function update() {
+    var threshold = Math.min(520, Math.max(280, window.innerHeight * 0.62));
+    var active = window.scrollY > threshold;
+    root.classList.toggle('ads-sticky-on', active);
+    setChannelOffset(active);
+  }
+  update();
+  window.addEventListener('scroll', update, { passive: true });
+  window.addEventListener('resize', update);
+  setTimeout(update, 800);
+  setTimeout(update, 2000);
+})();
+          `,
+        }}
+      />
     </main>
   );
 }
