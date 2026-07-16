@@ -486,7 +486,7 @@ function CostSection() {
           <p className="t-lead" style={{ marginTop: 16 }}>{cost.description}</p>
         </div>
 
-        <div className="cost-compare" aria-label="직접 채용과 Replo 스타트 비용 비교">
+        <div className="cost-compare" aria-label="직접 채용과 Replo 라이트 비용 비교">
           <article className="cost-card cost-card-hire">
             <div className="cost-card-head">
               <span className="cost-card-kicker">In-house</span>
